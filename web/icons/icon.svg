@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Read Aloud">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a86b34"/>
+      <stop offset="1" stop-color="#7a4720"/>
+    </linearGradient>
+    <g id="mark">
+      <!-- open book, both pages closed shapes -->
+      <g fill="none" stroke="#faf3e3" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M232 156c-28-20-64-27-104-24-11 1-20 10-20 21v140c0 12 10 21 22 20 37-3 72 4 102 23"/>
+        <path d="M232 156c28-20 64-27 104-24 11 1 20 10 20 21v140c0 12-10 21-22 20-37-3-72 4-102 23"/>
+        <path d="M232 156v180"/>
+      </g>
+      <!-- the word being spoken, highlighted -->
+      <rect x="130" y="198" width="70" height="24" rx="9" fill="#ffc861"/>
+      <g fill="none" stroke="#faf3e3" stroke-width="15" stroke-linecap="round" opacity="0.5">
+        <path d="M138 244h72"/>
+        <path d="M138 280h50"/>
+        <path d="M256 210h72"/>
+        <path d="M256 246h56"/>
+      </g>
+      <!-- speech, emanating from the page -->
+      <g fill="none" stroke="#ffc861" stroke-width="20" stroke-linecap="round">
+        <path d="M386 222a44 44 0 0 1 0 52"/>
+        <path d="M412 198a80 80 0 0 1 0 100"/>
+      </g>
+    </g>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <use href="#mark"/>
+</svg>

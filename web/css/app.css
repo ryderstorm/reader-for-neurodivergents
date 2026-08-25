@@ -1,6 +1,9 @@
 /* =========================================================================
    Read Aloud — a Markdown reader for dyslexic and ADHD readers.
 
+   Mobile first. Everything below the theme block is written for a phone in
+   portrait; @media (min-width: 760px) adds the desktop layout on top.
+
    Design rules this sheet follows:
    - No pure black on pure white. Every theme is a low-contrast tint, which
      is the single most reliable accommodation for visual stress.
@@ -10,6 +13,8 @@
      space that dyslexic readers lose their place in.
    - Two-level highlight: a soft band for the sentence being read, a strong
      marker for the exact word. The eye can follow either.
+   - Touch targets are never below 44 px, and nothing important is reachable
+     only by hover.
    - Nothing moves that does not have to, and all of it respects
      prefers-reduced-motion.
    ========================================================================= */
@@ -55,9 +60,18 @@
   --measure: 62ch;
 
   --ui-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --radius: 10px;
+  --radius: 12px;
   --shadow: 0 8px 30px rgb(0 0 0 / 0.10);
   --dim-opacity: 0.34;
+
+  /* Minimum comfortable touch target. */
+  --tap: 44px;
+
+  /* Notch, home indicator, rounded corners. Zero on anything else. */
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
 }
 
 /* Warm cream — the default. Closest to the tinted-overlay recommendation. */
@@ -103,15 +117,35 @@
 
 * { box-sizing: border-box; }
 
+html {
+  /* Stop iOS enlarging text when the phone is rotated. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 html, body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
   font-family: var(--ui-font);
-  /* Leave room for the fixed transport bar. */
-  scroll-padding-block: 40vh 30vh;
+  scroll-padding-block: 35vh 40vh;
+  /* No horizontal rubber-banding; the reader is a vertical surface. */
+  overscroll-behavior-x: none;
 }
-body { min-height: 100vh; padding-bottom: 120px; }
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;                 /* survives mobile browser chrome */
+  /* Room for the transport bar plus the home indicator. */
+  padding-bottom: calc(190px + var(--safe-b));
+}
+body.no-doc { padding-bottom: calc(24px + var(--safe-b)); }
+
+/* While a bottom sheet is open the page behind it must not scroll. */
+body.sheet-open { overflow: hidden; }
+
+/* Kill the 300 ms tap delay and double-tap-to-zoom on controls and words. */
+button, label, input, select, summary, .doc .w { touch-action: manipulation; }
 
 .skip-link {
   position: absolute; left: -999px; top: 0; z-index: 100;
@@ -125,59 +159,84 @@ body { min-height: 100vh; padding-bottom: 120px; }
   outline-offset: 2px;
 }
 
+.only-mobile { display: list-item; }
+.only-desktop { display: none; }
+
 /* ------------------------------------------------------------------ topbar */
 
 .topbar {
   position: sticky; top: 0; z-index: 30;
-  display: flex; align-items: center; gap: 16px;
-  padding: 10px 18px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px;
+  padding-top: calc(8px + var(--safe-t));
+  padding-left: calc(12px + var(--safe-l));
+  padding-right: calc(12px + var(--safe-r));
   background: var(--surface);
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--line);
 }
-.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
-.brand-mark { font-size: 1.2rem; }
-.brand-name { letter-spacing: 0.01em; }
-.file-controls { display: flex; gap: 8px; }
-.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
-.status { font-size: 0.82rem; color: var(--muted); white-space: nowrap; }
-.status[data-kind='error'] { color: #c0392b; font-weight: 600; }
-.status[data-kind='ok'] { color: var(--muted); }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; min-width: 0; }
+.brand-mark { width: 24px; height: 24px; border-radius: 6px; flex: none; }
+.brand-name {
+  letter-spacing: 0.01em; font-size: 0.95rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+
+.status-line {
+  margin: 0; padding: 6px 14px;
+  font-size: 0.78rem; color: var(--muted); text-align: center;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.status-line[data-kind='error'] { color: #fff; background: #b3372a; font-weight: 600; }
 
 .btn {
   font: inherit; font-size: 0.9rem;
+  min-height: var(--tap);
   padding: 8px 14px; border-radius: var(--radius);
   border: 1px solid var(--line); background: var(--surface); color: var(--fg);
   cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
 }
-.btn:hover { border-color: var(--accent); }
 .btn-primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
 .btn-quiet { background: transparent; }
-.btn-file { display: inline-block; }
+.btn-lg { min-height: 52px; padding: 12px 22px; font-size: 1rem; }
+/* On a phone the top-bar buttons are icon-only squares. */
+.btn-icon { min-width: var(--tap); padding: 8px 10px; border-color: transparent; font-size: 1.15rem; }
+.btn-icon .btn-text { display: none; }
+@media (hover: hover) {
+  .btn:hover { border-color: var(--accent); }
+}
 
 /* ------------------------------------------------------------------- stage */
 
 .stage { position: relative; }
 
-.dropzone { display: grid; place-items: center; padding: 8vh 24px; }
-.dropzone-inner { max-width: 60ch; text-align: left; }
-.dropzone h1 { font-size: clamp(1.7rem, 4vw, 2.6rem); margin: 0 0 14px; }
-.lede { font-size: 1.05rem; line-height: 1.7; color: var(--fg); }
-.hints { list-style: none; padding: 0; margin: 22px 0; display: grid; gap: 8px; color: var(--muted); }
+.dropzone { display: grid; place-items: center; padding: 5vh 20px; }
+.dropzone-inner { max-width: 60ch; }
+.dropzone h1 { font-size: clamp(1.5rem, 6vw, 2.6rem); margin: 0 0 12px; line-height: 1.2; }
+.lede { font-size: 1rem; line-height: 1.65; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0; }
+.cta-row .btn { flex: 1 1 auto; }
+.hints { list-style: none; padding: 0; margin: 22px 0; display: grid; gap: 10px;
+  color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
+.hint-k { color: var(--fg); font-weight: 600; }
 kbd {
   font: inherit; font-size: 0.8em; padding: 2px 7px;
   border: 1px solid var(--line); border-bottom-width: 2px;
   border-radius: 5px; background: var(--surface);
 }
-body.dragging .dropzone-inner { outline: 3px dashed var(--accent); outline-offset: 24px; }
+body.dragging .dropzone-inner { outline: 3px dashed var(--accent); outline-offset: 20px; }
 
 /* ------------------------------------------------------------------ reader */
 
-.reader { padding: 4vh 24px 10vh; }
+.reader { padding: 3vh 16px 6vh;
+  padding-left: calc(16px + var(--safe-l)); padding-right: calc(16px + var(--safe-r)); }
 .doc-host { margin-inline: auto; max-width: var(--measure); }
-.doc-end { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 4rem; }
+.doc-end { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 3rem; }
 
 /* Reading typography. Everything here is user-controlled. */
 .doc {
@@ -199,21 +258,23 @@ body.dragging .dropzone-inner { outline: 3px dashed var(--accent); outline-offse
 /* OpenDyslexic runs large and heavy; pull it back so the measure still fits. */
 :root[data-font='opendyslexic'] .doc { font-size: calc(var(--font-size) * 0.88); }
 
-.doc h1, .doc h2, .doc h3, .doc h4 { line-height: 1.3; margin: 2em 0 0.6em; }
-.doc h1 { font-size: 1.7em; }
-.doc h2 { font-size: 1.4em; }
-.doc h3 { font-size: 1.18em; }
+.doc h1, .doc h2, .doc h3, .doc h4 { line-height: 1.3; margin: 1.6em 0 0.6em; }
+.doc h1 { font-size: 1.55em; }
+.doc h2 { font-size: 1.3em; }
+.doc h3 { font-size: 1.12em; }
 .doc > *:first-child { margin-top: 0; }
 .doc p, .doc li { margin: 0 0 1em; }
-.doc ul, .doc ol { padding-left: 1.6em; }
+.doc ul, .doc ol { padding-left: 1.4em; }
 .doc blockquote {
-  margin: 1.4em 0; padding: 0.2em 0 0.2em 1.2em;
+  margin: 1.4em 0; padding: 0.2em 0 0.2em 1em;
   border-left: 4px solid var(--accent); color: var(--muted);
 }
 .doc a { color: var(--accent); text-underline-offset: 3px; }
 .doc img { max-width: 100%; height: auto; border-radius: var(--radius); }
-.doc hr { border: 0; border-top: 1px solid var(--line); margin: 2.5em 0; }
-.doc table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+.doc hr { border: 0; border-top: 1px solid var(--line); margin: 2.2em 0; }
+/* Tables scroll inside themselves rather than widening the page. */
+.doc .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 1.2em 0; }
+.doc table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
 .doc th, .doc td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; }
 .doc code {
   font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
@@ -224,7 +285,8 @@ body.dragging .dropzone-inner { outline: 3px dashed var(--accent); outline-offse
 }
 .doc pre {
   background: var(--surface); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 14px 16px; overflow-x: auto;
+  border-radius: var(--radius); padding: 12px 14px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
   letter-spacing: 0; word-spacing: 0; line-height: 1.5;
 }
 .doc pre code { background: none; padding: 0; }
@@ -237,9 +299,7 @@ body.dragging .dropzone-inner { outline: 3px dashed var(--accent); outline-offse
   /* Padding would reflow the line when the highlight appears; a box-shadow
      spread gives the same visual padding with zero layout impact. */
   transition: background-color 90ms linear, box-shadow 90ms linear;
-}
-@media (prefers-reduced-motion: reduce) {
-  .doc .w { transition: none; }
+  cursor: pointer;
 }
 
 :root[data-word-hl='on'] .doc .w.is-speaking,
@@ -260,12 +320,14 @@ body.dragging .dropzone-inner { outline: 3px dashed var(--accent); outline-offse
   border-radius: 4px;
 }
 
-.doc .w:hover {
-  background: var(--hl-sentence);
-  background: color-mix(in srgb, var(--accent) 20%, transparent);
-  box-shadow: 0 0 0 3px var(--hl-sentence);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
-  cursor: pointer;
+/* Hover is a pointer affordance only; on touch it would stick after a tap. */
+@media (hover: hover) {
+  .doc .w:hover {
+    background: var(--hl-sentence);
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+    box-shadow: 0 0 0 3px var(--hl-sentence);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+  }
 }
 
 /* Focus mask: everything that is not the active unit fades back. */
@@ -283,9 +345,6 @@ body.dragging .dropzone-inner { outline: 3px dashed var(--accent); outline-offse
 :root[data-focus='sentence'] .doc.is-reading .sentence-active { opacity: 1; }
 .doc :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre) {
   transition: opacity 200ms ease;
-}
-@media (prefers-reduced-motion: reduce) {
-  .doc :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre) { transition: none; }
 }
 
 /* Reading ruler: a soft band pinned under the line being spoken. */
@@ -310,80 +369,116 @@ body.dragging .dropzone-inner { outline: 3px dashed var(--accent); outline-offse
 .transport {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
   background: var(--surface);
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-top: 1px solid var(--line);
   box-shadow: var(--shadow);
+  padding-bottom: var(--safe-b);
+  padding-left: var(--safe-l);
+  padding-right: var(--safe-r);
 }
-.transport-progress { height: 4px; background: var(--line); }
+
+/* Tall enough to be a comfortable scrub target on a phone. */
+.transport-progress {
+  height: 14px; background: var(--line);
+  cursor: pointer; position: relative; touch-action: none;
+}
 .transport-progress .bar {
   height: 100%; width: 0%; background: var(--accent);
   transition: width 200ms linear;
 }
-@media (prefers-reduced-motion: reduce) { .transport-progress .bar { transition: none; } }
 
-.transport-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 18px; max-width: 1100px; margin-inline: auto;
+.transport-main {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 10px 4px;
 }
+.transport-speed {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 12px 10px;
+}
+.transport-speed input[type='range'] { flex: 1; accent-color: var(--accent); height: var(--tap); }
+.transport-speed output {
+  font-variant-numeric: tabular-nums; font-size: 0.85rem;
+  min-width: 4.6ch; text-align: right; color: var(--muted);
+}
+
 .tbtn {
   font: inherit; font-size: 1.05rem; line-height: 1;
-  width: 42px; height: 42px; border-radius: 50%;
+  width: var(--tap); height: var(--tap); border-radius: 50%;
   border: 1px solid var(--line); background: var(--surface); color: var(--fg);
-  cursor: pointer; display: grid; place-items: center;
+  cursor: pointer; display: grid; place-items: center; flex: none;
 }
-.tbtn:hover { border-color: var(--accent); }
 .tbtn[aria-pressed='true'] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
-.tbtn-play { width: 52px; height: 52px; font-size: 1.25rem;
+.tbtn-play { width: 56px; height: 56px; font-size: 1.3rem;
   background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.tbtn-sm { width: 38px; height: 38px; font-size: 1.2rem; }
+@media (hover: hover) { .tbtn:hover { border-color: var(--accent); } }
 
-.speed { display: flex; align-items: center; gap: 10px; margin-left: 14px; }
-.speed-label { font-size: 0.85rem; color: var(--muted); }
-.speed input[type='range'] { width: clamp(90px, 20vw, 220px); accent-color: var(--accent); }
-.speed output { font-variant-numeric: tabular-nums; font-size: 0.88rem; min-width: 4.2ch; }
-
-.counter { margin-left: auto; font-size: 0.85rem; color: var(--muted);
-  font-variant-numeric: tabular-nums; white-space: nowrap; }
+.counter { margin-left: auto; font-size: 0.78rem; color: var(--muted);
+  font-variant-numeric: tabular-nums; text-align: right; line-height: 1.25; }
 
 /* ------------------------------------------------------------------- panel */
 
+/* On a phone the settings are a bottom sheet: reachable with a thumb. */
+.scrim {
+  position: fixed; inset: 0; z-index: 45;
+  background: rgb(0 0 0 / 0.45);
+}
+
 .panel {
-  position: fixed; top: 0; right: 0; bottom: 0; z-index: 50;
-  width: min(400px, 92vw); overflow-y: auto;
-  background: var(--surface); border-left: 1px solid var(--line);
-  box-shadow: var(--shadow); padding: 0 20px 120px;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  max-height: 88vh; max-height: 88dvh;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-radius: 20px 20px 0 0;
+  box-shadow: var(--shadow);
+  padding: 0 18px calc(28px + var(--safe-b));
+  animation: sheet-up 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: none; } }
+
+.panel-grip {
+  width: 42px; height: 4px; border-radius: 2px; background: var(--line);
+  margin: 10px auto 0;
 }
 .panel-head {
   position: sticky; top: 0; background: var(--surface);
   display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 0 12px; border-bottom: 1px solid var(--line); margin-bottom: 8px;
+  padding: 10px 0; border-bottom: 1px solid var(--line); margin-bottom: 8px;
+  z-index: 1;
 }
 .panel h2 { font-size: 1.05rem; margin: 0; }
 .panel section { padding: 14px 0; border-bottom: 1px solid var(--line); }
 .panel section:last-child { border-bottom: 0; }
 .panel h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
   color: var(--muted); margin: 0 0 12px; }
-.hint { font-size: 0.82rem; color: var(--muted); margin: -4px 0 12px; line-height: 1.5; }
+.hint { font-size: 0.85rem; color: var(--muted); margin: -4px 0 12px; line-height: 1.5; }
 
-.field { display: grid; gap: 6px; margin-bottom: 14px; font-size: 0.9rem; }
+.field { display: grid; gap: 6px; margin-bottom: 16px; font-size: 0.92rem; }
 .field > span { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); }
 .field select, .paste-dialog textarea {
-  font: inherit; font-size: 0.92rem; padding: 8px 10px;
+  font: inherit;
+  /* 16px minimum, or iOS Safari zooms the page when the field is focused. */
+  font-size: 16px;
+  min-height: var(--tap);
+  padding: 8px 10px;
   border: 1px solid var(--line); border-radius: var(--radius);
   background: var(--bg); color: var(--fg);
 }
-.field.range input { accent-color: var(--accent); width: 100%; }
+.field.range input { accent-color: var(--accent); width: 100%; height: var(--tap); }
 .field output { font-variant-numeric: tabular-nums; color: var(--fg); }
 
-.check { display: flex; align-items: start; gap: 10px; margin-bottom: 12px;
-  font-size: 0.9rem; line-height: 1.45; cursor: pointer; }
-.check input { margin-top: 3px; accent-color: var(--accent); width: 17px; height: 17px; }
+.check { display: flex; align-items: start; gap: 12px; padding: 8px 0;
+  min-height: var(--tap); font-size: 0.92rem; line-height: 1.45; cursor: pointer; }
+.check input { margin-top: 2px; accent-color: var(--accent); width: 22px; height: 22px; flex: none; }
 .check small { color: var(--muted); }
 
-.swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+.swatches { display: flex; flex-wrap: wrap; gap: 12px; }
 .swatch {
-  width: 46px; height: 46px; border-radius: var(--radius);
+  width: var(--tap); height: var(--tap); border-radius: var(--radius);
   border: 2px solid var(--line); cursor: pointer; position: relative;
 }
 .swatch[aria-checked='true'] { border-color: var(--accent); }
@@ -397,9 +492,9 @@ body.dragging .dropzone-inner { outline: 3px dashed var(--accent); outline-offse
 .paste-dialog {
   border: 1px solid var(--line); border-radius: var(--radius);
   background: var(--surface); color: var(--fg);
-  padding: 20px; width: min(720px, 92vw); box-shadow: var(--shadow);
+  padding: 18px; width: min(720px, 94vw); box-shadow: var(--shadow);
 }
-.paste-dialog::backdrop { background: rgb(0 0 0 / 0.4); }
+.paste-dialog::backdrop { background: rgb(0 0 0 / 0.45); }
 .paste-dialog h2 { margin: 0 0 12px; font-size: 1.05rem; }
 .paste-dialog textarea { width: 100%; resize: vertical; line-height: 1.6; }
 .paste-dialog menu { display: flex; justify-content: flex-end; gap: 10px;
@@ -408,16 +503,101 @@ body.dragging .dropzone-inner { outline: 3px dashed var(--accent); outline-offse
 /* ------------------------------------------------------------------- toast */
 
 .toast {
-  position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%);
-  z-index: 60; max-width: 90vw;
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(200px + var(--safe-b));
+  z-index: 60; max-width: min(92vw, 46ch);
   background: var(--fg); color: var(--bg);
-  padding: 11px 18px; border-radius: var(--radius); box-shadow: var(--shadow);
-  font-size: 0.9rem;
+  padding: 12px 18px; border-radius: var(--radius); box-shadow: var(--shadow);
+  font-size: 0.9rem; line-height: 1.4; text-align: center;
+}
+body.no-doc .toast { bottom: calc(24px + var(--safe-b)); }
+.toast button {
+  font: inherit; font-size: 0.88rem; font-weight: 600;
+  margin-left: 10px; padding: 6px 12px; min-height: 36px;
+  border-radius: 8px; border: 0; cursor: pointer;
+  background: var(--accent); color: var(--accent-fg);
 }
 
-@media (max-width: 720px) {
-  .topbar { flex-wrap: wrap; gap: 10px; }
-  .topbar-right { width: 100%; }
-  .speed-label { display: none; }
-  .counter { display: none; }
+/* ============================ desktop ==================================== */
+
+@media (min-width: 760px) {
+  /* The desktop drawer sits beside the page rather than over it. */
+  body.sheet-open { overflow: auto; }
+
+  .only-mobile { display: none; }
+  .only-desktop { display: list-item; }
+
+  body { padding-bottom: 130px; }
+
+  .topbar { gap: 16px; padding: 10px 18px; }
+  .brand-name { font-size: 1rem; }
+  .btn-icon { min-width: 0; padding: 8px 14px; font-size: 0.9rem;
+    border-color: var(--line); }
+  .btn-icon .btn-text { display: inline; }
+
+  /* On desktop the status goes back into the top bar. */
+  .status-line {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    border: 0; background: none; padding: 0; z-index: 31;
+  }
+  .status-line[data-kind='error'] {
+    background: #b3372a; padding: 4px 12px; border-radius: 999px;
+  }
+
+  .dropzone { padding: 8vh 24px; }
+  .cta-row .btn { flex: 0 0 auto; }
+  .reader { padding: 4vh 24px 10vh; }
+  .doc h1 { font-size: 1.7em; }
+  .doc h2 { font-size: 1.4em; }
+
+  /* Transport collapses back to a single row. */
+  .transport-progress { height: 6px; }
+  .transport-main { padding: 10px 18px; max-width: 1100px; margin-inline: auto; }
+  .transport-speed {
+    padding: 0; margin: 0; border: 0;
+    position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
+    width: min(360px, 34vw);
+  }
+  .transport-speed input[type='range'] { height: auto; }
+  .tbtn-sm { display: none; }
+  .counter { font-size: 0.85rem; }
+
+  /* Settings become a right-hand drawer again. */
+  .scrim { display: none; }
+  .panel {
+    top: 0; left: auto; right: 0; bottom: 0;
+    width: min(400px, 92vw); max-height: none;
+    border-radius: 0; border-top: 0; border-left: 1px solid var(--line);
+    padding: 0 20px 120px;
+    animation: drawer-in 200ms ease;
+  }
+  @keyframes drawer-in { from { transform: translateX(100%); } to { transform: none; } }
+  .panel-grip { display: none; }
+  .panel-head { padding: 16px 0 12px; }
+  .field select { font-size: 0.92rem; }
+
+  .toast { bottom: 150px; }
+}
+
+@media (min-width: 1100px) {
+  .transport-speed { width: 400px; }
+}
+
+/* Landscape phone: very little vertical room, so shed the second row. */
+@media (max-height: 460px) and (orientation: landscape) {
+  body { padding-bottom: calc(84px + var(--safe-b)); }
+  .transport-speed { padding: 0 12px 6px; }
+  .transport-main { padding: 6px 10px 2px; }
+  .tbtn-play { width: 44px; height: 44px; font-size: 1.05rem; }
+  .status-line { display: none; }
+  .panel { max-height: 96dvh; }
+}
+
+/* ------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .doc .w,
+  .doc :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre),
+  .transport-progress .bar { transition: none; }
+  .panel { animation: none; }
 }

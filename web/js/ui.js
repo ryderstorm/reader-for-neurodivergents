@@ -17,7 +17,7 @@ const THEMES = [
 ];
 
 const RANGES = ['fontSize', 'lineHeight', 'letterSpacing', 'wordSpacing', 'measure'];
-const CHECKS = ['bionic', 'ruler', 'highlightWord', 'autoScroll', 'skipCode'];
+const CHECKS = ['bionic', 'ruler', 'highlightWord', 'autoScroll', 'skipCode', 'keepAwake'];
 const SELECTS = ['font', 'focus'];
 
 const FORMAT = {
@@ -91,16 +91,22 @@ export class Ui extends EventTarget {
 
   _bindPanel() {
     const panel = this.$('panel');
+    const scrim = this.$('scrim');
     const open = (yes) => {
       panel.hidden = !yes;
+      if (scrim) scrim.hidden = !yes;
       this.$('settings-btn').setAttribute('aria-expanded', String(yes));
+      // Behind a bottom sheet the page must not scroll under the thumb.
+      document.body.classList.toggle('sheet-open', yes);
       if (yes) panel.querySelector('select, input, button').focus();
     };
+    this.openPanel = open;
     this.$('settings-btn').addEventListener('click', () => open(panel.hidden));
     this.$('panel-close').addEventListener('click', () => {
       open(false);
       this.$('settings-btn').focus();
     });
+    if (scrim) scrim.addEventListener('click', () => open(false));
 
     for (const id of RANGES) {
       this.$(id).addEventListener('input', (e) => {

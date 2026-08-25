@@ -1,9 +1,11 @@
 # Reader for Neurodivergents
 
-A browser-based Markdown reader that speaks a document out loud and highlights
-each word **as it is spoken**. Built for readers with **dyslexia** or **ADHD**:
-bimodal (see + hear) reading, an adjustable pace, a focus mask, and full
-control over typography and colour.
+A Markdown reader that speaks a document out loud and highlights each word
+**as it is spoken**. Built for readers with **dyslexia** or **ADHD**: bimodal
+(see + hear) reading, an adjustable pace, a focus mask, and full control over
+typography and colour.
+
+Mobile-first, and **installable as an app** on a phone, tablet or desktop.
 
 Everything runs locally. The text you open never leaves your machine — the
 container image doesn't even have network access enabled.
@@ -16,6 +18,7 @@ container image doesn't even have network access enabled.
 - [Quick start](#quick-start)
 - [Option A — run on your host](#option-a--run-on-your-host)
 - [Option B — run as a Docker container](#option-b--run-as-a-docker-container)
+- [Using it on a phone](#using-it-on-a-phone)
 - [Using it](#using-it)
 - [Configuration](#configuration)
 - [The voice model](#the-voice-model)
@@ -42,7 +45,18 @@ container image doesn't even have network access enabled.
   rarely useful — but they are still displayed.
 - Every setting persists between sessions.
 
-Runs in **Firefox, Chrome, Safari 16.4+, Opera and Edge**.
+On a phone it additionally:
+
+- **Installs to the home screen** as a standalone app (PWA).
+- Puts **play / pause / next sentence on the lock screen** and on headset
+  buttons.
+- **Keeps the screen awake** while reading, so the highlight stays visible.
+- Accepts **text shared from other apps**.
+- Uses a thumb-reachable bottom sheet for settings and 44 px touch targets
+  throughout.
+
+Runs in **Firefox, Chrome, Safari 16.4+, Opera and Edge**, on desktop and
+mobile.
 
 ---
 
@@ -157,6 +171,37 @@ sleep 60 && docker exec t curl -fsS http://127.0.0.1:8765/api/health
 
 ---
 
+## Using it on a phone
+
+The phone is a client; speech is generated on your computer. So the phone has
+to reach your machine — and to *install* the app, it has to reach it over
+**https**, because browsers only allow service workers and "Add to Home
+Screen" in a secure context.
+
+Quickest path on a home network:
+
+```bash
+./scripts-tools/make-cert.sh          # detects your LAN addresses
+HOST=0.0.0.0 ./scripts-tools/run.sh   # picks up certs/ automatically
+```
+
+Then trust the generated CA on the phone once, and open the `https://` address
+that `run.sh` prints. An **Install** button appears on Android; on iOS use
+Share → *Add to Home Screen*.
+
+Plain `http://` on a LAN address still **reads** perfectly well — it just
+cannot be installed and has no offline shell. The app says so on screen rather
+than failing silently.
+
+Prefer not to install a certificate? Tailscale and cloudflared both give you a
+real https URL with no certificate work.
+
+**Full details, the iOS trust steps, and the platform limits (including the
+iOS ringer switch muting web audio) are in
+[`docs/mobile.md`](docs/mobile.md).**
+
+---
+
 ## Using it
 
 Open a `.md` file by dropping it anywhere on the page, via **Open Markdown…**,
@@ -186,6 +231,8 @@ Both run paths take the same environment variables.
 | `HOST` | `127.0.0.1` | Bind address. `0.0.0.0` exposes it to your LAN |
 | `T2S_DEVICE` | `auto` | `auto`, `cuda` or `cpu` |
 | `OPEN` | `1` | `0` stops `run.sh` from launching a browser |
+| `T2S_SSL_CERT` | — | TLS certificate. `run.sh` uses `certs/server.crt` automatically if present |
+| `T2S_SSL_KEY` | — | TLS private key |
 
 ```bash
 PORT=9000 T2S_DEVICE=cpu ./scripts-tools/run.sh
@@ -258,17 +305,22 @@ long sentence. The settings panel says so when you pick one.
 │   │   ├── player.js             fetch, prefetch, playback, highlight loop
 │   │   ├── ui.js                 settings panel, keyboard, ruler
 │   │   ├── settings.js           preferences + persistence
+│   │   ├── platform.js           PWA: install, lock screen, wake lock, share
 │   │   └── api.js                server client
+│   ├── sw.js                     service worker (offline shell)
+│   ├── manifest.webmanifest      PWA manifest
+│   ├── icons/                    app icons
 │   ├── fonts/                    OpenDyslexic, Atkinson Hyperlegible (OFL)
 │   └── vendor/                   marked, DOMPurify (MIT / Apache-2.0)
 ├── scripts-tools/
-│   ├── setup.sh, run.sh
+│   ├── setup.sh, run.sh, make-cert.sh
 │   ├── check_timestamps.py       verifies alignment on your hardware
 │   └── test_frontend.mjs         headless end-to-end test
 ├── samples/welcome.md
 └── docs/
     ├── model-research.md
-    └── architecture.md
+    ├── architecture.md
+    └── mobile.md
 ```
 
 No build step. The front-end is plain ES modules; edit and reload.
@@ -318,6 +370,14 @@ Most of it is the PyTorch download. It is cached after the first build; only
 **GPU not used**
 `curl localhost:8765/api/health` reports the device. In Docker you need
 `--gpus all` *and* an image built with `TORCH_VARIANT=cu128`.
+
+**No Install button on the phone**
+You are on `http://`. Installing needs https — see
+[Using it on a phone](#using-it-on-a-phone). On iOS there is never a button:
+use Share → *Add to Home Screen*.
+
+**The phone plays nothing, but the highlight moves**
+iOS mutes web audio when the ringer switch is off. Check the side switch.
 
 ---
 

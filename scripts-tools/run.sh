@@ -11,8 +11,24 @@ if [ ! -x .venv/bin/python ]; then
   echo "!! No virtualenv found. Run ./scripts-tools/setup.sh first."; exit 1
 fi
 
-if [ "${OPEN:-1}" = "1" ]; then
-  ( sleep 2; xdg-open "http://${HOST}:${PORT}" >/dev/null 2>&1 || true ) &
+# Serve over https when certificates exist, so phones can install the reader
+# as an app. Create them with ./scripts-tools/make-cert.sh
+TLS_ARGS=()
+SCHEME=http
+if [ -f certs/server.crt ] && [ -f certs/server.key ]; then
+  TLS_ARGS=(--ssl-certfile certs/server.crt --ssl-keyfile certs/server.key)
+  SCHEME=https
 fi
 
-exec ./.venv/bin/python server/app.py --host "$HOST" --port "$PORT" --device "$DEVICE"
+if [ "${OPEN:-1}" = "1" ]; then
+  ( sleep 2; xdg-open "${SCHEME}://${HOST}:${PORT}" >/dev/null 2>&1 || true ) &
+fi
+
+if [ "$HOST" = "0.0.0.0" ]; then
+  echo "Reachable from this network at:"
+  ip -4 -o addr show scope global 2>/dev/null \
+    | awk -v s="$SCHEME" -v p="$PORT" '{split($4,a,"/"); print "  " s "://" a[1] ":" p}'
+fi
+
+exec ./.venv/bin/python server/app.py \
+  --host "$HOST" --port "$PORT" --device "$DEVICE" "${TLS_ARGS[@]}"

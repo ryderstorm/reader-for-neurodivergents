@@ -13,3 +13,6 @@ scripts-tools/run.sh
 Dockerfile
 .dockerignore
 compose.yaml
+certs/
+*.key
+*.pem

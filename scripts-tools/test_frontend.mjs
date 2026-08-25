@@ -11,7 +11,7 @@
  * Requires jsdom (`npm i jsdom@24`); NODE_PATH may point at any install.
  */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { createRequire } from 'node:module';
@@ -156,7 +156,85 @@ console.log('\nhighlight sweep');
     `${visited.length} of ${order.length}`);
 }
 
-// --- 5. round-trip against the live server ---------------------------------
+// --- 5. installability (PWA) ------------------------------------------------
+// A manifest that parses but points at a missing icon, or a service worker
+// that precaches a renamed file, both fail silently in the browser.
+console.log('\ninstallable as an app');
+{
+  const manifest = JSON.parse(readFileSync(join(ROOT, 'web/manifest.webmanifest'), 'utf8'));
+  for (const field of ['name', 'short_name', 'start_url', 'display', 'icons',
+                       'background_color', 'theme_color']) {
+    check(manifest[field] !== undefined, `manifest has ${field}`);
+  }
+  check(manifest.display === 'standalone', 'manifest display is standalone');
+
+  const sizes = manifest.icons.map((i) => i.sizes);
+  check(sizes.includes('192x192'), 'manifest declares a 192px icon');
+  check(sizes.includes('512x512'), 'manifest declares a 512px icon');
+  check(manifest.icons.some((i) => (i.purpose || '').includes('maskable')),
+    'manifest declares a maskable icon');
+
+  for (const icon of manifest.icons) {
+    const file = join(ROOT, 'web', icon.src);
+    check(existsSync(file), `icon file exists: ${icon.src}`);
+  }
+
+  const sw = readFileSync(join(ROOT, 'web/sw.js'), 'utf8');
+  const list = sw.slice(sw.indexOf('const PRECACHE'), sw.indexOf('];', sw.indexOf('const PRECACHE')));
+  const urls = [...list.matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  check(urls.length > 10, 'service worker precaches the shell', `${urls.length} entries`);
+  const missing = urls.filter((u) => {
+    if (u === '/') return false;                       // served by the app, not a file
+    return !existsSync(join(ROOT, 'web', u)) && !existsSync(join(ROOT, u.replace(/^\//, '')));
+  });
+  check(missing.length === 0, 'every precached URL resolves to a real file',
+    missing.join(', '));
+  check(!sw.includes("cache.put(request, res.clone())\n        return res\n      }\n    }).catch"),
+    'api responses are never cached');
+  check(/pathname\.startsWith\('\/api\/'\)/.test(sw), 'service worker bypasses /api/');
+
+  const html = readFileSync(join(ROOT, 'web/index.html'), 'utf8');
+  check(html.includes('rel="manifest"'), 'index.html links the manifest');
+  check(html.includes('apple-touch-icon'), 'index.html has an apple-touch-icon');
+  check(html.includes('viewport-fit=cover'), 'index.html opts into the safe-area insets');
+  check(/theme-color/.test(html), 'index.html sets a theme colour');
+}
+
+// --- 6. the JS and the HTML agree on element ids ----------------------------
+// Rewriting index.html is the easiest way to silently break a control: the
+// listener is attached to null and the button simply stops working.
+console.log('\nDOM contract');
+{
+  const html = readFileSync(join(ROOT, 'web/index.html'), 'utf8');
+  const present = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map((m) => m[1]));
+
+  const wanted = new Map();          // id -> file that asks for it
+  for (const f of ['app.js', 'ui.js', 'settings.js', 'player.js', 'platform.js']) {
+    const src = readFileSync(join(ROOT, 'web/js', f), 'utf8');
+    for (const m of src.matchAll(/\$\('([a-zA-Z][\w-]*)'\)/g)) wanted.set(m[1], f);
+    // ui.js drives controls from these arrays rather than by literal $() calls.
+    for (const listName of ['RANGES', 'CHECKS', 'SELECTS']) {
+      const arr = src.match(new RegExp(`const ${listName} = \\[([^\\]]*)\\]`));
+      if (!arr) continue;
+      for (const m of arr[1].matchAll(/'([^']+)'/g)) wanted.set(m[1], f);
+    }
+  }
+
+  const missing = [...wanted].filter(([id]) => !present.has(id) && !present.has(`${id}-out`));
+  check(missing.length === 0,
+    `every id the JS reaches for exists in the HTML (${wanted.size} checked)`,
+    missing.map(([id, f]) => `${id} (${f})`).join(', '));
+
+  // The range controls each need a matching <output> to show their value.
+  const ui = readFileSync(join(ROOT, 'web/js/ui.js'), 'utf8');
+  const ranges = [...(ui.match(/const RANGES = \[([^\]]*)\]/) || ['', ''])[1]
+    .matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  const noOutput = ranges.filter((r) => !present.has(`${r}-out`));
+  check(noOutput.length === 0, 'every range control has its output element',
+    noOutput.join(', '));
+}
+
+// --- 7. round-trip against the live server ---------------------------------
 console.log(`\nsynthesis round-trip against ${BASE}`);
 let health;
 try {

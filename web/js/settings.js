@@ -28,6 +28,9 @@ export const DEFAULTS = {
   ruler: false,
   autoScroll: true,
   highlightWord: true,
+  // Phones dim the screen after ~30s, which hides the highlight. On by
+  // default; ignored where the Wake Lock API is unavailable.
+  keepAwake: true,
 
   // Voice
   voice: 'af_heart',

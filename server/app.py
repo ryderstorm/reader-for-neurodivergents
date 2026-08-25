@@ -11,6 +11,7 @@ import argparse
 import base64
 import io
 import logging
+import mimetypes
 import os
 import sys
 import wave
@@ -33,6 +34,15 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 log = logging.getLogger("t2s.app")
+
+__version__ = "1.1.0"
+
+# Some minimal base images do not know these, and a manifest served as
+# application/octet-stream is silently ignored by the browser.
+mimetypes.add_type("application/manifest+json", ".webmanifest")
+mimetypes.add_type("text/javascript", ".js")
+mimetypes.add_type("image/svg+xml", ".svg")
+mimetypes.add_type("font/woff2", ".woff2")
 
 ROOT = Path(__file__).resolve().parent.parent
 WEB_DIR = ROOT / "web"
@@ -73,6 +83,7 @@ def wav_bytes(audio: np.ndarray) -> bytes:
 def health():
     return {
         "ok": True,
+        "version": __version__,
         "model": "hexgrad/Kokoro-82M",
         "device": engine.resolved_device,
         "sample_rate": SAMPLE_RATE,
@@ -111,9 +122,31 @@ def speak(req: SpeakRequest):
     }
 
 
-@app.get("/")
+@app.api_route("/sw.js", methods=["GET", "HEAD"])
+def service_worker():
+    """Served from the root so the worker's scope can cover the whole origin.
+
+    no-cache matters: browsers check for a new worker on every navigation, and
+    a stale cached copy would pin users to an old build.
+    """
+    return FileResponse(
+        WEB_DIR / "sw.js",
+        media_type="text/javascript",
+        headers={"Cache-Control": "no-cache", "Service-Worker-Allowed": "/"},
+    )
+
+
+@app.api_route("/manifest.webmanifest", methods=["GET", "HEAD"])
+def manifest():
+    return FileResponse(
+        WEB_DIR / "manifest.webmanifest",
+        media_type="application/manifest+json",
+    )
+
+
+@app.api_route("/", methods=["GET", "HEAD"])
 def index():
-    return FileResponse(WEB_DIR / "index.html")
+    return FileResponse(WEB_DIR / "index.html", headers={"Cache-Control": "no-cache"})
 
 
 if SAMPLES_DIR.is_dir():
@@ -129,6 +162,11 @@ def main() -> None:
                     choices=["auto", "cuda", "cpu"])
     ap.add_argument("--no-warm", action="store_true",
                     help="skip loading the model at startup")
+    ap.add_argument("--ssl-certfile", default=os.environ.get("T2S_SSL_CERT"),
+                    help="TLS certificate. Serving over https is required to "
+                         "install the reader as an app on a phone.")
+    ap.add_argument("--ssl-keyfile", default=os.environ.get("T2S_SSL_KEY"),
+                    help="TLS private key")
     args = ap.parse_args()
 
     engine.set_device(args.device)
@@ -138,8 +176,36 @@ def main() -> None:
 
     import uvicorn
 
-    log.info("http://%s:%d", args.host, args.port)
-    uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
+    tls = bool(args.ssl_certfile and args.ssl_keyfile)
+    if tls:
+        # uvicorn's failure here is a bare PermissionError with no path in it.
+        # In a container this is almost always the key being mode 600 and owned
+        # by a different uid than the one the container runs as.
+        for label, path in (("certificate", args.ssl_certfile), ("key", args.ssl_keyfile)):
+            try:
+                with open(path, "rb"):
+                    pass
+            except OSError as exc:
+                log.error("cannot read the TLS %s at %s: %s", label, path, exc)
+                if os.path.exists(path):
+                    log.error(
+                        "the file exists but is not readable by uid %d. In Docker, "
+                        'run with --user "$(id -u):$(id -g)" so the container can '
+                        "read a key that stays mode 600 on the host.", os.getuid(),
+                    )
+                raise SystemExit(1)
+    scheme = "https" if tls else "http"
+    log.info("%s://%s:%d", scheme, args.host, args.port)
+    if not tls and args.host not in ("127.0.0.1", "localhost"):
+        log.warning(
+            "serving over http on a non-local address: phones will refuse to "
+            "install this as an app or use it offline. See ./scripts-tools/make-cert.sh"
+        )
+    uvicorn.run(
+        app, host=args.host, port=args.port, log_level="warning",
+        ssl_certfile=args.ssl_certfile if tls else None,
+        ssl_keyfile=args.ssl_keyfile if tls else None,
+    )
 
 
 def _warm() -> None:

@@ -58,6 +58,7 @@ FROM python:${PYTHON_VERSION}-slim AS runtime
 
 LABEL org.opencontainers.image.title="Read Aloud" \
       org.opencontainers.image.description="Markdown reader with real-time word highlighting, powered by Kokoro-82M" \
+      org.opencontainers.image.version="1.1.0" \
       org.opencontainers.image.licenses="MIT AND GPL-3.0-or-later" \
       org.opencontainers.image.source="https://github.com/n2048-creative-technology/reader-for-neurodivergents"
 
@@ -67,6 +68,12 @@ ENV PATH=/opt/venv/bin:$PATH \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     T2S_DEVICE=auto
+
+# Optional TLS. Mount a certificate and point these at it to serve https,
+# which phones require before they will install the reader as an app:
+#   -v ./certs:/certs:ro -e T2S_SSL_CERT=/certs/server.crt -e T2S_SSL_KEY=/certs/server.key
+ENV T2S_SSL_CERT="" \
+    T2S_SSL_KEY=""
 
 # curl is only here for the HEALTHCHECK below.
 RUN apt-get update \
@@ -81,7 +88,7 @@ COPY server/ /app/server/
 COPY web/ /app/web/
 COPY samples/ /app/samples/
 COPY scripts-tools/check_timestamps.py /app/scripts-tools/
-COPY LICENSE THIRD-PARTY-LICENSES.md README.md /app/
+COPY LICENSE THIRD-PARTY-LICENSES.md README.md CHANGELOG.md /app/
 
 # Run unprivileged. The model cache is read-only to the app.
 RUN useradd --system --create-home --uid 10001 reader \
@@ -91,6 +98,7 @@ USER reader
 EXPOSE 8765
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=180s --retries=3 \
-  CMD curl -fsS http://127.0.0.1:8765/api/health || exit 1
+  CMD curl -fsSk http://127.0.0.1:8765/api/health \
+   || curl -fsSk https://127.0.0.1:8765/api/health || exit 1
 
 CMD ["python", "server/app.py", "--host", "0.0.0.0", "--port", "8765"]

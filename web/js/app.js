@@ -10,6 +10,10 @@ import { buildDocument, estimateDuration } from './document.js';
 import { Player } from './player.js';
 import { load as loadSettings, save as saveSettings, apply as applySettings } from './settings.js';
 import { Ui, applyBionic, keepInView, moveRuler } from './ui.js';
+import {
+  registerServiceWorker, setupInstall, setupMediaSession, createWakeLock,
+  receiveIncoming, isStandalone,
+} from './platform.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -19,9 +23,12 @@ applySettings(settings);
 
 const player = new Player(api);
 const ui = new Ui(settings);
+const wakeLock = createWakeLock();
+const media = setupMediaSession(player);
 
 let doc = null;          // { root, blocks }
 let source = '';         // raw markdown, kept so we can rebuild on setting change
+let docTitle = 'Read Aloud';
 let activeBlock = -1;
 let totalWords = 0;
 let wordsBefore = [];    // cumulative word count per block, for the progress bar
@@ -132,9 +139,15 @@ function render(markdown) {
   player.setVoice(settings.voice, settings.lang);
   player.setRate(settings.rate);
 
+  // First heading, or first few words, becomes the lock-screen album title.
+  const heading = doc.root.querySelector('h1, h2');
+  docTitle = (heading ? heading.textContent : markdown).trim().slice(0, 60) || 'Read Aloud';
+  media.setDocumentTitle(docTitle);
+
   $('dropzone').hidden = true;
   $('reader').hidden = false;
   $('transport').hidden = false;
+  document.body.classList.remove('no-doc');
   activeBlock = -1;
   markBlock(0);
   updateCounter(0);
@@ -164,6 +177,11 @@ player.addEventListener('state', (e) => {
   btn.textContent = playing ? '❚❚' : '▶';
   btn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
   if (doc) doc.root.classList.toggle('is-reading', playing);
+
+  media.setPlaybackState(playing ? 'playing' : 'paused');
+  // Only hold the screen awake while actually reading.
+  if (playing && settings.keepAwake) wakeLock.enable();
+  else wakeLock.disable();
 });
 player.addEventListener('buffering', (e) => {
   if (!e.detail.buffering) return;
@@ -182,6 +200,7 @@ player.addEventListener('progress', (e) => {
   const done = wordsBefore[index] + (duration ? (time / duration) * doc.blocks[index].words.length : 0);
   $('progress-bar').style.width = `${Math.min(100, (done / totalWords) * 100).toFixed(2)}%`;
   updateCounter(index);
+  media.setPosition(duration, time, settings.rate);
 });
 player.addEventListener('finished', () => {
   $('progress-bar').style.width = '100%';
@@ -206,6 +225,9 @@ function markBlock(index) {
   }
   activeBlock = index;
   updateCounter(index);
+  if (next) {
+    media.update({ index, total: doc.blocks.length, text: next.text });
+  }
 }
 
 function updateCounter(index) {
@@ -232,6 +254,28 @@ $('repeat-btn').addEventListener('click', () => player.jumpTo(player.index, true
 $('focus-btn').addEventListener('click', () => cycleFocus());
 
 $('rate').addEventListener('input', (e) => setRate(parseFloat(e.target.value)));
+$('slower-btn').addEventListener('click', () => setRate(settings.rate - 0.1));
+$('faster-btn').addEventListener('click', () => setRate(settings.rate + 0.1));
+
+/* Scrubbing the progress bar jumps to the sentence at that position. The bar
+   is 14 px tall on touch specifically so this is hittable with a thumb. */
+const track = $('progress-track');
+const seekTo = (clientX) => {
+  if (!doc || !totalWords) return;
+  const r = track.getBoundingClientRect();
+  const ratio = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+  const targetWord = ratio * totalWords;
+  let index = wordsBefore.findIndex((w, i) => targetWord < w + doc.blocks[i].words.length);
+  if (index < 0) index = doc.blocks.length - 1;
+  player.jumpTo(index, player.playing);
+};
+track.addEventListener('pointerdown', (e) => {
+  track.setPointerCapture(e.pointerId);
+  seekTo(e.clientX);
+});
+track.addEventListener('pointermove', (e) => {
+  if (track.hasPointerCapture(e.pointerId)) seekTo(e.clientX);
+});
 
 function setRate(rate) {
   rate = Math.max(0.5, Math.min(3, Math.round(rate * 100) / 100));
@@ -279,12 +323,17 @@ ui.addEventListener('change', (e) => {
     player.jumpTo(Math.min(at, doc.blocks.length - 1), false);
   }
   if (key === 'ruler' && !settings.ruler) $('ruler').style.height = '0px';
+  if (key === 'keepAwake' || key === '*') {
+    if (settings.keepAwake && player.playing) wakeLock.enable();
+    else wakeLock.disable();
+  }
   if (key === '*') { setRate(settings.rate); if (source) render(source); }
 });
 
 // -------------------------------------------------------------- file loading
 
 $('file').addEventListener('change', (e) => openFile(e.target.files[0]));
+$('open-btn').addEventListener('click', () => $('file').click());
 
 for (const type of ['dragenter', 'dragover']) {
   document.addEventListener(type, (e) => {
@@ -329,20 +378,67 @@ $('sample-btn').addEventListener('click', async () => {
 // -------------------------------------------------------------------- toasts
 
 let toastTimer = null;
-function toast(message) {
+/** `action` adds a button; the toast then stays until it is used or dismissed. */
+function toast(message, action) {
   const el = $('toast');
   el.textContent = message;
   el.hidden = false;
   clearTimeout(toastTimer);
+  if (action) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = action.label;
+    b.addEventListener('click', () => { el.hidden = true; action.run(); });
+    el.appendChild(b);
+    return;
+  }
   toastTimer = setTimeout(() => { el.hidden = true; }, 4200);
 }
 
 // ----------------------------------------------------------------- start-up
 
 $('focus-btn').setAttribute('aria-pressed', String(settings.focus !== 'off'));
+document.body.classList.add('no-doc');
 setRate(settings.rate);
 connect();
 loadVoices();
+
+/* ---------------------------------------------------------------- as an app */
+
+// Hide the wake-lock setting where the API does not exist (notably iOS < 16.4).
+if (!wakeLock.supported) $('wakeLock-row').hidden = true;
+
+registerServiceWorker({
+  onUpdate: (apply) => toast('A new version is ready.',
+    { label: 'Reload', run: apply }),
+  onUnavailable: (reason) => {
+    // Installing and offline use need a secure context. Over plain http on a
+    // LAN address the browser refuses, and saying so beats silent absence.
+    if (reason !== 'insecure') return;
+    const note = $('pwa-note');
+    note.hidden = false;
+    note.textContent =
+      'Opening this over http://, so it cannot be installed or work offline. '
+      + 'Serve it over https (see the README) to install it on a phone. '
+      + 'Reading works either way.';
+  },
+});
+
+setupInstall($('install-btn'), { onInstructions: (text) => toast(text) });
+
+receiveIncoming({
+  onText: (text) => render(text),
+  onFile: (file) => openFile(file),
+  onPaste: () => { $('paste-dialog').showModal(); $('paste-text').focus(); },
+});
+
+if (isStandalone()) document.documentElement.dataset.standalone = 'on';
+
+// The ruler is positioned from viewport coordinates, so it has to be redrawn
+// when the phone rotates or the browser chrome collapses.
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => { if (settings.ruler && lastWordEl) moveRuler($('ruler'), lastWordEl); }, 250);
+});
 
 // Reposition the ruler when the layout moves under it.
 const followRuler = () => {

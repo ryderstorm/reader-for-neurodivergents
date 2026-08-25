@@ -18,6 +18,18 @@ services:
     security_opt:
       - no-new-privileges:true
 
+    # --- https (needed to install the reader as an app on a phone) --------
+    # Run ./scripts-tools/make-cert.sh first, then uncomment these and change
+    # the port mapping above to "8765:8765" so the phone can reach it.
+    # The key stays mode 600 on the host, so the container has to run as the
+    # user that owns it rather than as its own unprivileged uid.
+    # user: "${UID:-1000}:${GID:-1000}"
+    # volumes:
+    #   - ./certs:/certs:ro
+    # environment:
+    #   T2S_SSL_CERT: /certs/server.crt
+    #   T2S_SSL_KEY: /certs/server.key
+
     # --- NVIDIA GPU -------------------------------------------------------
     # Build with TORCH_VARIANT=cu128, then uncomment:
     # deploy:

@@ -119,6 +119,15 @@ export function buildDocument(markdown, options = {}) {
     pre.dataset.readable = skipCode ? 'false' : 'true';
   });
 
+  // Wrap tables so a wide one scrolls in its own box instead of forcing the
+  // whole page sideways on a narrow screen.
+  root.querySelectorAll('table').forEach((table) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'table-scroll';
+    table.parentNode.insertBefore(wrap, table);
+    wrap.appendChild(table);
+  });
+
   const blocks = [];
   uid = 0;
   walk(root, blocks, skipCode);
