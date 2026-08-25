@@ -18,6 +18,7 @@ container image doesn't even have network access enabled.
 - [Quick start](#quick-start)
 - [Option A — run on your host](#option-a--run-on-your-host)
 - [Option B — run as a Docker container](#option-b--run-as-a-docker-container)
+- [Option C — deploy on a server](#option-c--deploy-on-a-server)
 - [Using it on a phone](#using-it-on-a-phone)
 - [Using it](#using-it)
 - [Configuration](#configuration)
@@ -171,6 +172,30 @@ sleep 60 && docker exec t curl -fsS http://127.0.0.1:8765/api/health
 
 ---
 
+## Option C — deploy on a server
+
+To reach the reader from anywhere — and to install it on a phone without
+fiddling with certificates — put it behind a real domain.
+[`docs/deploy-droplet.md`](docs/deploy-droplet.md) is a full walkthrough for
+Ubuntu + nginx + Let's Encrypt, with ready-made configs in `deploy/`.
+
+Two findings from measuring it on a 2 vCPU / 2 GB droplet are worth knowing
+before you pick a size:
+
+- **Pin the CPU count.** PyTorch sizes its thread pools from the *host's* core
+  count, not the container's share. On a 2-vCPU cgroup of a 32-core host that
+  measured **0.35× real time**; with the pools pinned to the cgroup quota,
+  **3.22×**. The server now detects the quota itself, which is why
+  `deploy/compose.prod.yaml` sets `cpus: 2.0` — do not remove it. Check
+  `"threads"` in `/api/health`: it should match your vCPU count.
+- **Memory is the binding constraint**, not CPU. Peak RSS is ~1.5 GB, so a
+  2 GB droplet needs a swap file and a container memory cap.
+
+Throughput on 2 vCPU is about **3.2× real time**, which stays ahead of
+playback at normal speed and at 2×.
+
+---
+
 ## Using it on a phone
 
 The phone is a client; speech is generated on your computer. So the phone has
@@ -233,6 +258,7 @@ Both run paths take the same environment variables.
 | `OPEN` | `1` | `0` stops `run.sh` from launching a browser |
 | `T2S_SSL_CERT` | — | TLS certificate. `run.sh` uses `certs/server.crt` automatically if present |
 | `T2S_SSL_KEY` | — | TLS private key |
+| `T2S_CORS_ORIGINS` | `*` | Comma-separated origins allowed to call the API. Restrict this on a public deployment |
 
 ```bash
 PORT=9000 T2S_DEVICE=cpu ./scripts-tools/run.sh
@@ -292,6 +318,7 @@ long sentence. The settings panel says so when you pick one.
 
 ```
 ├── Dockerfile / compose.yaml     self-contained image
+├── deploy/                       production compose + nginx site configs
 ├── server/
 │   ├── app.py                    FastAPI: static files + /api/speak
 │   ├── tts.py                    Kokoro wrapper, word alignment, LRU cache
@@ -320,7 +347,8 @@ long sentence. The settings panel says so when you pick one.
 └── docs/
     ├── model-research.md
     ├── architecture.md
-    └── mobile.md
+    ├── mobile.md
+    └── deploy-droplet.md
 ```
 
 No build step. The front-end is plain ES modules; edit and reload.

@@ -4,6 +4,36 @@ All notable changes to this project. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow
 [SemVer](https://semver.org/).
 
+## [v1.1.1] — 2026-08-25
+
+Server deployment, and a performance bug that only shows up in a container.
+
+### Fixed
+- **PyTorch was sizing its thread pools from the host's core count rather than
+  the container's CPU share.** On a 2-vCPU cgroup of a 32-core host that meant
+  dozens of threads fighting over two cores: **0.35× real time**, and a 19 s
+  warm-up. The server now reads the cgroup v1/v2 quota (falling back to the
+  affinity mask) and pins the pools accordingly — **3.22× real time**, 4 s
+  warm-up. A 9× difference on the same hardware.
+  `/api/health` now reports `threads` so this is verifiable.
+
+### Added
+- gzip on API responses: about **39 KB per second of speech** on the wire
+  instead of 63. Level 5 rather than 9, because on a small CPU the compression
+  competes with synthesis.
+- `T2S_CORS_ORIGINS` to restrict which origins may call the API. Still `*` by
+  default for local use; the production compose sets it to the real origin.
+- `deploy/` with a production compose file and nginx site configs, and
+  `docs/deploy-droplet.md` — a measured walkthrough for Ubuntu + nginx +
+  Let's Encrypt including droplet sizing.
+
+### Notes
+- The nginx rate limit applies only to `/api/speak`. Applied site-wide it
+  broke a cold page load, which fetches ~22 assets at once — caught by testing
+  the real proxy topology rather than the config in isolation.
+
+[v1.1.1]: https://github.com/n2048-creative-technology/reader-for-neurodivergents/releases/tag/v1.1.1
+
 ## [v1.1.0] — 2026-08-25
 
 Mobile-first, and installable as an app.

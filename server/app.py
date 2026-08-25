@@ -21,12 +21,19 @@ from pathlib import Path
 import numpy as np
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from tts import LANGUAGES, SAMPLE_RATE, KokoroEngine  # noqa: E402
+# limit_torch_threads must run before anything imports torch, so this import
+# and call come before the rest of the application.
+from tts import (  # noqa: E402
+    LANGUAGES, SAMPLE_RATE, KokoroEngine, available_cpus, limit_torch_threads,
+)
+
+_THREADS = limit_torch_threads()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -35,7 +42,7 @@ logging.basicConfig(
 )
 log = logging.getLogger("t2s.app")
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 # Some minimal base images do not know these, and a manifest served as
 # application/octet-stream is silently ignored by the browser.
@@ -50,9 +57,18 @@ SAMPLES_DIR = ROOT / "samples"
 
 engine = KokoroEngine(device=os.environ.get("T2S_DEVICE", "auto"))
 app = FastAPI(title="Read Aloud", docs_url="/api/docs", redoc_url=None)
+# On a private machine any origin is fine and makes development easier. On a
+# public deployment it means any website can spend your CPU generating speech
+# from a visitor's browser, so set T2S_CORS_ORIGINS to your own origin there.
+_origins = [o.strip() for o in os.environ.get("T2S_CORS_ORIGINS", "*").split(",") if o.strip()]
 app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
+    CORSMiddleware, allow_origins=_origins, allow_methods=["*"], allow_headers=["*"]
 )
+# Audio is returned as base64 WAV, which compresses to about 60%. Over a local
+# network that hardly matters; over the internet it is roughly 39 KB per second
+# of speech instead of 63. Level 5 rather than the default 9: on a small CPU
+# the compression time competes with synthesis for the same cores.
+app.add_middleware(GZipMiddleware, minimum_size=1024, compresslevel=5)
 
 
 class SpeakRequest(BaseModel):
@@ -86,6 +102,7 @@ def health():
         "version": __version__,
         "model": "hexgrad/Kokoro-82M",
         "device": engine.resolved_device,
+        "threads": _THREADS,
         "sample_rate": SAMPLE_RATE,
         "loaded": engine.is_loaded,
     }
@@ -169,6 +186,7 @@ def main() -> None:
                     help="TLS private key")
     args = ap.parse_args()
 
+    log.info("%d CPU(s) available to this process", available_cpus())
     engine.set_device(args.device)
     if not args.no_warm:
         # Warm in a thread so the browser can open while the model loads.

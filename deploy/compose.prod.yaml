@@ -1,0 +1,47 @@
+# Production compose for a DigitalOcean droplet behind nginx.
+#
+#   docker compose -f deploy/compose.prod.yaml up -d --build
+#
+# The container listens on 127.0.0.1 only: nginx terminates TLS and proxies to
+# it, so the port is never exposed to the internet directly.
+
+services:
+  read-aloud:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        TORCH_VARIANT: cpu
+    image: read-aloud:latest
+    container_name: read-aloud
+    restart: unless-stopped
+
+    # Loopback only. nginx is the sole way in.
+    ports:
+      - "127.0.0.1:8765:8765"
+
+    environment:
+      T2S_DEVICE: cpu
+      # Only this origin may call the API from a browser.
+      T2S_CORS_ORIGINS: "https://reader.n2048.com"
+
+    # Measured peak RSS is ~1.5 GB. On a 2 GB droplet that leaves little for
+    # the OS, so cap it: a predictable container OOM is far better than the
+    # kernel picking a victim and killing nginx or sshd.
+    mem_limit: 1600m
+    memswap_limit: 3g
+
+    # The thread count is derived from this at startup. Getting it wrong is not
+    # a small penalty: unpinned on a 2-vCPU cgroup measured 0.35x real time
+    # against 3.2x pinned.
+    cpus: 2.0
+
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }

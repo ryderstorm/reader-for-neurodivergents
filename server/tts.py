@@ -12,11 +12,13 @@ app can highlight words in sync with the audio.
 from __future__ import annotations
 
 import logging
+import os
 import re
 import threading
 import unicodedata
 from collections import OrderedDict
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Iterable
 
 import numpy as np
@@ -24,6 +26,50 @@ import numpy as np
 log = logging.getLogger("t2s.tts")
 
 SAMPLE_RATE = 24000
+
+
+def available_cpus() -> int:
+    """How many CPUs this process may actually use.
+
+    `os.cpu_count()` reports the host's cores, which is the wrong number inside
+    a container: PyTorch would start a thread per host core while the cgroup
+    only schedules a fraction of one, and the resulting contention is
+    catastrophic rather than merely wasteful. Measured on a 2-vCPU container of
+    a 32-core host: 0.35x real time unpinned, 2.99x pinned.
+    """
+    # cgroup v2
+    try:
+        quota, period = Path("/sys/fs/cgroup/cpu.max").read_text().split()
+        if quota != "max":
+            return max(1, round(int(quota) / int(period)))
+    except (OSError, ValueError):
+        pass
+    # cgroup v1
+    try:
+        quota = int(Path("/sys/fs/cgroup/cpu/cpu.cfs_quota_us").read_text())
+        period = int(Path("/sys/fs/cgroup/cpu/cpu.cfs_period_us").read_text())
+        if quota > 0:
+            return max(1, round(quota / period))
+    except (OSError, ValueError):
+        pass
+    # Affinity mask covers taskset and some orchestrators.
+    try:
+        return max(1, len(os.sched_getaffinity(0)))
+    except AttributeError:
+        return os.cpu_count() or 1
+
+
+def limit_torch_threads() -> int:
+    """Pin the BLAS/OpenMP thread pools to the CPUs we really have.
+
+    Must run before torch is imported for the environment variables to take
+    effect, so this is called from the top of app.py.
+    """
+    n = available_cpus()
+    for var in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
+                "NUMEXPR_NUM_THREADS"):
+        os.environ.setdefault(var, str(n))
+    return n
 
 # Kokoro language codes -> human labels. 'a'/'b' are the two best-supported.
 LANGUAGES = {
@@ -141,6 +187,11 @@ class KokoroEngine:
 
                 if not self._pipelines:
                     self.resolved_device = self._resolve_device()
+                    if self.resolved_device == "cpu":
+                        import torch
+                        n = available_cpus()
+                        torch.set_num_threads(n)
+                        log.info("CPU inference limited to %d thread(s)", n)
                     log.info("loading Kokoro-82M on %s", self.resolved_device)
                     self._model = KModel().to(self.resolved_device).eval()
                 # repo_id is passed explicitly to silence kokoro's default warning
