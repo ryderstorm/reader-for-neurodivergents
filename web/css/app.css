@@ -1,0 +1,423 @@
+/* =========================================================================
+   Read Aloud — a Markdown reader for dyslexic and ADHD readers.
+
+   Design rules this sheet follows:
+   - No pure black on pure white. Every theme is a low-contrast tint, which
+     is the single most reliable accommodation for visual stress.
+   - Generous, user-controlled spacing. Letter, word and line spacing are all
+     custom properties driven by the settings panel.
+   - Left-aligned, ragged right. Justified text creates "rivers" of white
+     space that dyslexic readers lose their place in.
+   - Two-level highlight: a soft band for the sentence being read, a strong
+     marker for the exact word. The eye can follow either.
+   - Nothing moves that does not have to, and all of it respects
+     prefers-reduced-motion.
+   ========================================================================= */
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('/fonts/ah-400.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('/fonts/ah-700.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('/fonts/ah-400i.woff2') format('woff2');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/od-400.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/od-700.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/od-400i.woff2') format('woff2');
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+
+/* ------------------------------------------------------------------ themes */
+
+:root {
+  --font-size: 21px;
+  --line-height: 1.75;
+  --letter-spacing: 0.02em;
+  --word-spacing: 0.16em;
+  --measure: 62ch;
+
+  --ui-font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --radius: 10px;
+  --shadow: 0 8px 30px rgb(0 0 0 / 0.10);
+  --dim-opacity: 0.34;
+}
+
+/* Warm cream — the default. Closest to the tinted-overlay recommendation. */
+:root[data-theme='cream'] {
+  --bg: #faf3e3;  --surface: #fffbf1; --fg: #33302b; --muted: #7b7466;
+  --line: #e3d9c2; --accent: #8a5a2b; --accent-fg: #fff8ec;
+  --hl-sentence: #f3e3bd; --hl-word: #ffc861; --hl-word-fg: #2b2519;
+}
+:root[data-theme='peach'] {
+  --bg: #fdeee6; --surface: #fff6f1; --fg: #36302c; --muted: #856f64;
+  --line: #eed6c8; --accent: #a8502f; --accent-fg: #fff4ef;
+  --hl-sentence: #fadfcd; --hl-word: #ffb08a; --hl-word-fg: #33231a;
+}
+:root[data-theme='blue'] {
+  --bg: #e8f1f8; --surface: #f3f9fd; --fg: #26313a; --muted: #63758a;
+  --line: #cbdcea; --accent: #1f5f8b; --accent-fg: #eef7fd;
+  --hl-sentence: #d3e6f5; --hl-word: #8fc9f2; --hl-word-fg: #14293a;
+}
+:root[data-theme='mint'] {
+  --bg: #e7f4ec; --surface: #f2faf5; --fg: #26332b; --muted: #5f7a69;
+  --line: #c8e2d3; --accent: #22684a; --accent-fg: #eefaf3;
+  --hl-sentence: #d0ecdb; --hl-word: #8ddcae; --hl-word-fg: #143024;
+}
+:root[data-theme='grey'] {
+  --bg: #eceae7; --surface: #f6f5f3; --fg: #2f2e2c; --muted: #74716c;
+  --line: #d6d3ce; --accent: #4c4a46; --accent-fg: #f7f6f4;
+  --hl-sentence: #ddd9d3; --hl-word: #c4bda9; --hl-word-fg: #26251f;
+}
+:root[data-theme='paper'] {
+  --bg: #f7f7f5; --surface: #ffffff; --fg: #232323; --muted: #6c6c6c;
+  --line: #e2e2e0; --accent: #2f5fd0; --accent-fg: #ffffff;
+  --hl-sentence: #e9eefb; --hl-word: #ffd54a; --hl-word-fg: #2a2410;
+}
+:root[data-theme='night'] {
+  --bg: #14171c; --surface: #1c2027; --fg: #d9dde3; --muted: #8b939f;
+  --line: #2b313a; --accent: #7fb2ff; --accent-fg: #10141a;
+  --hl-sentence: #26303e; --hl-word: #4d6fa8; --hl-word-fg: #f2f6ff;
+  --dim-opacity: 0.30;
+  --shadow: 0 8px 30px rgb(0 0 0 / 0.45);
+}
+
+/* ---------------------------------------------------------------- skeleton */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--ui-font);
+  /* Leave room for the fixed transport bar. */
+  scroll-padding-block: 40vh 30vh;
+}
+body { min-height: 100vh; padding-bottom: 120px; }
+
+.skip-link {
+  position: absolute; left: -999px; top: 0; z-index: 100;
+  background: var(--accent); color: var(--accent-fg);
+  padding: 10px 16px; border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; }
+
+:where(button, select, input, a):focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ topbar */
+
+.topbar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: 16px;
+  padding: 10px 18px;
+  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.brand-mark { font-size: 1.2rem; }
+.brand-name { letter-spacing: 0.01em; }
+.file-controls { display: flex; gap: 8px; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.status { font-size: 0.82rem; color: var(--muted); white-space: nowrap; }
+.status[data-kind='error'] { color: #c0392b; font-weight: 600; }
+.status[data-kind='ok'] { color: var(--muted); }
+
+.btn {
+  font: inherit; font-size: 0.9rem;
+  padding: 8px 14px; border-radius: var(--radius);
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--accent); }
+.btn-primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.btn-quiet { background: transparent; }
+.btn-file { display: inline-block; }
+
+/* ------------------------------------------------------------------- stage */
+
+.stage { position: relative; }
+
+.dropzone { display: grid; place-items: center; padding: 8vh 24px; }
+.dropzone-inner { max-width: 60ch; text-align: left; }
+.dropzone h1 { font-size: clamp(1.7rem, 4vw, 2.6rem); margin: 0 0 14px; }
+.lede { font-size: 1.05rem; line-height: 1.7; color: var(--fg); }
+.hints { list-style: none; padding: 0; margin: 22px 0; display: grid; gap: 8px; color: var(--muted); }
+kbd {
+  font: inherit; font-size: 0.8em; padding: 2px 7px;
+  border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: 5px; background: var(--surface);
+}
+body.dragging .dropzone-inner { outline: 3px dashed var(--accent); outline-offset: 24px; }
+
+/* ------------------------------------------------------------------ reader */
+
+.reader { padding: 4vh 24px 10vh; }
+.doc-host { margin-inline: auto; max-width: var(--measure); }
+.doc-end { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 4rem; }
+
+/* Reading typography. Everything here is user-controlled. */
+.doc {
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  letter-spacing: var(--letter-spacing);
+  word-spacing: var(--word-spacing);
+  text-align: left;
+  hyphens: none;               /* hyphenation fragments words mid-read */
+  overflow-wrap: break-word;
+}
+:root[data-align='justify'] .doc { text-align: justify; }
+
+:root[data-font='atkinson'] .doc { font-family: 'Atkinson Hyperlegible', var(--ui-font); }
+:root[data-font='opendyslexic'] .doc { font-family: 'OpenDyslexic', var(--ui-font); }
+:root[data-font='sans'] .doc { font-family: var(--ui-font); }
+:root[data-font='serif'] .doc { font-family: Georgia, 'Iowan Old Style', serif; }
+
+/* OpenDyslexic runs large and heavy; pull it back so the measure still fits. */
+:root[data-font='opendyslexic'] .doc { font-size: calc(var(--font-size) * 0.88); }
+
+.doc h1, .doc h2, .doc h3, .doc h4 { line-height: 1.3; margin: 2em 0 0.6em; }
+.doc h1 { font-size: 1.7em; }
+.doc h2 { font-size: 1.4em; }
+.doc h3 { font-size: 1.18em; }
+.doc > *:first-child { margin-top: 0; }
+.doc p, .doc li { margin: 0 0 1em; }
+.doc ul, .doc ol { padding-left: 1.6em; }
+.doc blockquote {
+  margin: 1.4em 0; padding: 0.2em 0 0.2em 1.2em;
+  border-left: 4px solid var(--accent); color: var(--muted);
+}
+.doc a { color: var(--accent); text-underline-offset: 3px; }
+.doc img { max-width: 100%; height: auto; border-radius: var(--radius); }
+.doc hr { border: 0; border-top: 1px solid var(--line); margin: 2.5em 0; }
+.doc table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
+.doc th, .doc td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; }
+.doc code {
+  font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+  font-size: 0.88em; letter-spacing: 0;
+  background: var(--line);
+  background: color-mix(in srgb, var(--line) 45%, transparent);
+  padding: 1px 5px; border-radius: 5px;
+}
+.doc pre {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 14px 16px; overflow-x: auto;
+  letter-spacing: 0; word-spacing: 0; line-height: 1.5;
+}
+.doc pre code { background: none; padding: 0; }
+.doc pre[data-readable='false'] { opacity: 0.75; }
+
+/* -------------------------------------------------------------- highlights */
+
+.doc .w {
+  border-radius: 4px;
+  /* Padding would reflow the line when the highlight appears; a box-shadow
+     spread gives the same visual padding with zero layout impact. */
+  transition: background-color 90ms linear, box-shadow 90ms linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .doc .w { transition: none; }
+}
+
+:root[data-word-hl='on'] .doc .w.is-speaking,
+:root:not([data-word-hl]) .doc .w.is-speaking {
+  background: var(--hl-word);
+  color: var(--hl-word-fg);
+  box-shadow: 0 0 0 3px var(--hl-word);
+}
+:root[data-word-hl='off'] .doc .w.is-speaking {
+  background: none; color: inherit; box-shadow: none;
+  text-decoration: underline 3px var(--hl-word); text-underline-offset: 4px;
+}
+
+/* The sentence currently being read. */
+.doc .sentence-active {
+  background: var(--hl-sentence);
+  box-shadow: 0 0 0 4px var(--hl-sentence);
+  border-radius: 4px;
+}
+
+.doc .w:hover {
+  background: var(--hl-sentence);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  box-shadow: 0 0 0 3px var(--hl-sentence);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+  cursor: pointer;
+}
+
+/* Focus mask: everything that is not the active unit fades back. */
+/* Word-level dimming is scoped to the active block: other blocks are already
+   dimmed by the rule below, and opacity compounds through nesting. */
+:root[data-focus='sentence'] .doc.is-reading .block-active .w:not(.sentence-active),
+:root[data-focus='sentence'] .doc.is-reading :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre):not(.block-active) {
+  opacity: var(--dim-opacity);
+}
+:root[data-focus='paragraph'] .doc.is-reading :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre):not(.block-active) {
+  opacity: var(--dim-opacity);
+}
+:root[data-focus='sentence'] .doc.is-reading .block-active,
+:root[data-focus='paragraph'] .doc.is-reading .block-active { opacity: 1; }
+:root[data-focus='sentence'] .doc.is-reading .sentence-active { opacity: 1; }
+.doc :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre) {
+  transition: opacity 200ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .doc :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, td, th, pre) { transition: none; }
+}
+
+/* Reading ruler: a soft band pinned under the line being spoken. */
+.reading-ruler {
+  position: fixed; left: 0; right: 0; z-index: 1;
+  height: 0; display: none; pointer-events: none;
+  background: var(--hl-sentence);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-top: 2px solid var(--accent);
+  border-top-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  border-bottom: 2px solid var(--accent);
+  border-bottom-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+:root[data-ruler='on'] .reading-ruler { display: block; }
+
+/* Bionic reading: the first part of each word carries the weight. */
+:root[data-bionic='on'] .doc .w > b.bio { font-weight: 700; }
+:root[data-bionic='off'] .doc .w > b.bio { font-weight: inherit; }
+
+/* --------------------------------------------------------------- transport */
+
+.transport {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.transport-progress { height: 4px; background: var(--line); }
+.transport-progress .bar {
+  height: 100%; width: 0%; background: var(--accent);
+  transition: width 200ms linear;
+}
+@media (prefers-reduced-motion: reduce) { .transport-progress .bar { transition: none; } }
+
+.transport-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 18px; max-width: 1100px; margin-inline: auto;
+}
+.tbtn {
+  font: inherit; font-size: 1.05rem; line-height: 1;
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+  cursor: pointer; display: grid; place-items: center;
+}
+.tbtn:hover { border-color: var(--accent); }
+.tbtn[aria-pressed='true'] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.tbtn-play { width: 52px; height: 52px; font-size: 1.25rem;
+  background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+
+.speed { display: flex; align-items: center; gap: 10px; margin-left: 14px; }
+.speed-label { font-size: 0.85rem; color: var(--muted); }
+.speed input[type='range'] { width: clamp(90px, 20vw, 220px); accent-color: var(--accent); }
+.speed output { font-variant-numeric: tabular-nums; font-size: 0.88rem; min-width: 4.2ch; }
+
+.counter { margin-left: auto; font-size: 0.85rem; color: var(--muted);
+  font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ------------------------------------------------------------------- panel */
+
+.panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 50;
+  width: min(400px, 92vw); overflow-y: auto;
+  background: var(--surface); border-left: 1px solid var(--line);
+  box-shadow: var(--shadow); padding: 0 20px 120px;
+}
+.panel-head {
+  position: sticky; top: 0; background: var(--surface);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 0 12px; border-bottom: 1px solid var(--line); margin-bottom: 8px;
+}
+.panel h2 { font-size: 1.05rem; margin: 0; }
+.panel section { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.panel section:last-child { border-bottom: 0; }
+.panel h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); margin: 0 0 12px; }
+.hint { font-size: 0.82rem; color: var(--muted); margin: -4px 0 12px; line-height: 1.5; }
+
+.field { display: grid; gap: 6px; margin-bottom: 14px; font-size: 0.9rem; }
+.field > span { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); }
+.field select, .paste-dialog textarea {
+  font: inherit; font-size: 0.92rem; padding: 8px 10px;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--bg); color: var(--fg);
+}
+.field.range input { accent-color: var(--accent); width: 100%; }
+.field output { font-variant-numeric: tabular-nums; color: var(--fg); }
+
+.check { display: flex; align-items: start; gap: 10px; margin-bottom: 12px;
+  font-size: 0.9rem; line-height: 1.45; cursor: pointer; }
+.check input { margin-top: 3px; accent-color: var(--accent); width: 17px; height: 17px; }
+.check small { color: var(--muted); }
+
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+.swatch {
+  width: 46px; height: 46px; border-radius: var(--radius);
+  border: 2px solid var(--line); cursor: pointer; position: relative;
+}
+.swatch[aria-checked='true'] { border-color: var(--accent); }
+.swatch[aria-checked='true']::after {
+  content: '✓'; position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: 1.1rem; color: #333; text-shadow: 0 0 4px #fff;
+}
+
+/* ------------------------------------------------------------------ dialog */
+
+.paste-dialog {
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface); color: var(--fg);
+  padding: 20px; width: min(720px, 92vw); box-shadow: var(--shadow);
+}
+.paste-dialog::backdrop { background: rgb(0 0 0 / 0.4); }
+.paste-dialog h2 { margin: 0 0 12px; font-size: 1.05rem; }
+.paste-dialog textarea { width: 100%; resize: vertical; line-height: 1.6; }
+.paste-dialog menu { display: flex; justify-content: flex-end; gap: 10px;
+  padding: 0; margin: 14px 0 0; }
+
+/* ------------------------------------------------------------------- toast */
+
+.toast {
+  position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%);
+  z-index: 60; max-width: 90vw;
+  background: var(--fg); color: var(--bg);
+  padding: 11px 18px; border-radius: var(--radius); box-shadow: var(--shadow);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 720px) {
+  .topbar { flex-wrap: wrap; gap: 10px; }
+  .topbar-right { width: 100%; }
+  .speed-label { display: none; }
+  .counter { display: none; }
+}

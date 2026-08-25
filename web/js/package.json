@@ -1,0 +1,6 @@
+{
+  "name": "read-aloud-web",
+  "private": true,
+  "type": "module",
+  "description": "Marks the files in this directory as ES modules so Node-based tests can import them directly. The browser does not read this file."
+}
