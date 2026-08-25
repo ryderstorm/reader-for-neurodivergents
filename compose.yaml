@@ -1,0 +1,29 @@
+# docker compose up   ->   http://127.0.0.1:8765
+services:
+  read-aloud:
+    build:
+      context: .
+      args:
+        # cpu (default) or cu128 for an NVIDIA host
+        TORCH_VARIANT: cpu
+    image: read-aloud:latest
+    container_name: read-aloud
+    # Bound to localhost. Change to "8765:8765" to expose it on your LAN.
+    ports:
+      - "127.0.0.1:8765:8765"
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+    # --- NVIDIA GPU -------------------------------------------------------
+    # Build with TORCH_VARIANT=cu128, then uncomment:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]

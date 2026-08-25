@@ -1,0 +1,15 @@
+.venv/
+node_modules/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+docs/
+package.json
+package-lock.json
+scripts-tools/test_frontend.mjs
+scripts-tools/setup.sh
+scripts-tools/run.sh
+Dockerfile
+.dockerignore
+compose.yaml

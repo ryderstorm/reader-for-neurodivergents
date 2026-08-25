@@ -13,6 +13,7 @@ import io
 import logging
 import os
 import sys
+import wave
 import threading
 from pathlib import Path
 
@@ -52,11 +53,19 @@ class SpeakRequest(BaseModel):
 
 
 def wav_bytes(audio: np.ndarray) -> bytes:
-    """Encode float32 mono audio as a 16-bit PCM WAV."""
-    import soundfile as sf
+    """Encode float32 mono audio as a 16-bit PCM WAV.
 
+    Uses the standard library rather than libsndfile: it is one fewer
+    dependency, one fewer native library in the container image, and it keeps
+    the LGPL out of the distribution. See THIRD-PARTY-LICENSES.md.
+    """
+    pcm = (np.clip(audio, -1.0, 1.0) * 32767.0).astype("<i2")
     buf = io.BytesIO()
-    sf.write(buf, np.clip(audio, -1.0, 1.0), SAMPLE_RATE, format="WAV", subtype="PCM_16")
+    with wave.open(buf, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(SAMPLE_RATE)
+        w.writeframes(pcm.tobytes())
     return buf.getvalue()
 
 
