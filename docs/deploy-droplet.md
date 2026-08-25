@@ -126,14 +126,14 @@ open — but keep the rate limit if you do.
 ### 6. Configure nginx
 
 ```bash
-sudo cp deploy/nginx/reader-ratelimit.conf /etc/nginx/conf.d/
 sudo cp deploy/nginx/reader.n2048.com.conf /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/reader.n2048.com.conf /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-The rate-limit file is separate because `limit_req_zone` must live in nginx's
-`http` context, not inside a `server` block.
+One file, nothing else to copy. `limit_req_zone` has to be in nginx's `http`
+context, and a file included from `sites-enabled` *is* in the http context, so
+it lives at the top of the site config above the `server` block.
 
 ### 7. TLS
 
@@ -186,6 +186,18 @@ the compose file. Without it you will see roughly 0.35× real time.
 **504 Gateway Time-out on long sentences**
 nginx's default 60 s read timeout is too short for a slow CPU; the supplied
 config sets 180 s. Check you copied it rather than editing an existing site.
+
+**`nginx: [emerg] zero size shared memory zone "reader"`**
+`limit_req zone=reader` is being read without the `limit_req_zone` that
+defines it. Earlier versions of this guide put that directive in a second file
+under `conf.d/`; it now lives at the top of the site config. Make sure you
+copied the current `deploy/nginx/reader.n2048.com.conf`, and delete any
+leftover `/etc/nginx/conf.d/reader-ratelimit.conf`.
+
+**Everything returns 401**
+The htpasswd file is missing or unreadable by nginx. It fails closed, which is
+the right way round, but `nginx -t` will not catch it — only requests do.
+Check `/var/log/nginx/reader.error.log` and re-run `htpasswd`.
 
 **`docker-compose up` fails with `KeyError: 'ContainerConfig'`**
 That is `docker-compose` v1 against a modern engine — see step 2. Use

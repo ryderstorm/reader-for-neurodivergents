@@ -10,7 +10,7 @@
  *    opens and tells you the server is unreachable", not "it still speaks".
  */
 
-const VERSION = 'v1.1.2';
+const VERSION = 'v1.1.3';
 const SHELL = `shell-${VERSION}`;
 const RUNTIME = `runtime-${VERSION}`;
 

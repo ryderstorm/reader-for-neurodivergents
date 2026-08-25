@@ -4,6 +4,28 @@ All notable changes to this project. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow
 [SemVer](https://semver.org/).
 
+## [v1.1.3] — 2026-08-25
+
+### Fixed
+- **`nginx: [emerg] zero size shared memory zone "reader"`.** The nginx site
+  config referenced a `limit_req` zone defined in a second file that had to be
+  copied separately into `conf.d/`. Miss that step and nginx fails with an
+  error that names neither the file nor the directive. `limit_req_zone` now
+  lives at the top of the site config itself: a file included from
+  `sites-enabled` is already in nginx's `http` context, so this is valid, and
+  it removes both the extra step and the failure mode.
+  `deploy/nginx/reader-ratelimit.conf` is gone.
+
+  Reproduced against a replica of Ubuntu's nginx layout, and the fix verified
+  in both layouts — included from `sites-enabled`, and dropped straight into
+  `conf.d/`.
+
+### Notes
+- Confirmed that a missing htpasswd file fails **closed** (401), not open, and
+  that `nginx -t` does not catch it — only requests do. Documented.
+
+[v1.1.3]: https://github.com/n2048-creative-technology/reader-for-neurodivergents/releases/tag/v1.1.3
+
 ## [v1.1.2] — 2026-08-25
 
 ### Fixed

@@ -42,7 +42,7 @@ logging.basicConfig(
 )
 log = logging.getLogger("t2s.app")
 
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 
 # Some minimal base images do not know these, and a manifest served as
 # application/octet-stream is silently ignored by the browser.
