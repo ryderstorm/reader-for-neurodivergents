@@ -68,8 +68,16 @@ Docker, nothing else installed:
 ```bash
 git clone git@github.com:n2048-creative-technology/reader-for-neurodivergents.git
 cd reader-for-neurodivergents
-docker compose up --build          # first build takes ~5 min
+./scripts-tools/check-docker.sh    # confirms you have Compose v2
+docker compose up -d --build       # first build takes ~5 min
 ```
+
+> **`docker compose`, with a space.** The standalone `docker-compose` (v1) is
+> end-of-life and fails against Docker Engine 26+ with
+> `KeyError: 'ContainerConfig'`, whatever the compose file says. Ubuntu's
+> `docker-compose` package still installs v1.
+> `./scripts-tools/check-docker.sh` detects this and prints the one-line,
+> no-sudo fix.
 
 Then open **<http://127.0.0.1:8765>** and press *Try the sample document*.
 
@@ -130,10 +138,13 @@ spaCy model and the espeak-ng library are baked in, and `HF_HUB_OFFLINE=1` is
 set, so the container never reaches the network. It runs as an unprivileged
 user on a read-only filesystem.
 
+**Requires Docker Compose v2** (`docker compose`, with a space). See the note
+in [Quick start](#quick-start); `./scripts-tools/check-docker.sh` verifies it.
+
 ### With Compose (recommended)
 
 ```bash
-docker compose up --build       # add -d to run in the background
+docker compose up -d --build    # first build takes ~5 min
 docker compose logs -f          # watch startup
 docker compose down             # stop
 ```
@@ -340,7 +351,7 @@ long sentence. The settings panel says so when you pick one.
 │   ├── fonts/                    OpenDyslexic, Atkinson Hyperlegible (OFL)
 │   └── vendor/                   marked, DOMPurify (MIT / Apache-2.0)
 ├── scripts-tools/
-│   ├── setup.sh, run.sh, make-cert.sh
+│   ├── setup.sh, run.sh, make-cert.sh, check-docker.sh
 │   ├── check_timestamps.py       verifies alignment on your hardware
 │   └── test_frontend.mjs         headless end-to-end test
 ├── samples/welcome.md
@@ -390,6 +401,19 @@ Kokoro 0.9.4 supports 3.10–3.12. Use `PYTHON=python3.12 ./scripts-tools/setup.
 
 **Highlight drifts in a non-English language**
 Expected — see [timing accuracy](#timing-accuracy-by-language). English is exact.
+
+**`docker-compose up` fails with `KeyError: 'ContainerConfig'`**
+You are running the standalone `docker-compose` v1, which is end-of-life and
+cannot talk to Docker Engine 26+. Nothing in the compose file can work around
+it. Run `./scripts-tools/check-docker.sh` for the fix, then use
+`docker compose` with a space.
+
+**`failed to bind host port 127.0.0.1:8765: address already in use`**
+Something else already holds the port — often `./scripts-tools/run.sh` from a
+host install. Stop it, then `docker compose down && docker compose up -d`.
+The `down` matters: a container whose port binding failed can be restarted by
+its restart policy and end up running *without* published ports, so it looks
+healthy while being unreachable.
 
 **Docker build is slow**
 Most of it is the PyTorch download. It is cached after the first build; only

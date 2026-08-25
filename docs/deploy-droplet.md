@@ -60,12 +60,26 @@ use IPv6). Confirm before running certbot, or issuance fails:
 dig +short reader.n2048.com
 ```
 
-### 2. Install Docker (if it is not there)
+### 2. Install Docker and Compose v2
 
 ```bash
 curl -fsSL https://get.docker.com | sudo sh
 sudo usermod -aG docker "$USER"   # log out and back in
 ```
+
+`get.docker.com` includes the Compose **v2** plugin. If Docker was already on
+the droplet — installed from Ubuntu's archive, say — you may instead have the
+standalone `docker-compose` v1, which is end-of-life and **cannot work** with
+Docker Engine 26+: every `docker-compose up` dies with
+`KeyError: 'ContainerConfig'` before it reaches your compose file.
+
+```bash
+./scripts-tools/check-docker.sh    # after cloning, in step 4
+sudo apt-get install -y docker-compose-plugin   # if it reports v2 missing
+```
+
+Throughout this guide, `docker compose` is two words. `docker-compose` with a
+hyphen is the broken one.
 
 ### 3. Add swap
 
@@ -77,6 +91,7 @@ most memory-hungry moment of the whole process.
 ```bash
 git clone https://github.com/n2048-creative-technology/reader-for-neurodivergents.git
 cd reader-for-neurodivergents
+./scripts-tools/check-docker.sh
 docker compose -f deploy/compose.prod.yaml up -d --build
 ```
 
@@ -172,8 +187,17 @@ the compose file. Without it you will see roughly 0.35× real time.
 nginx's default 60 s read timeout is too short for a slow CPU; the supplied
 config sets 180 s. Check you copied it rather than editing an existing site.
 
+**`docker-compose up` fails with `KeyError: 'ContainerConfig'`**
+That is `docker-compose` v1 against a modern engine — see step 2. Use
+`docker compose` with a space.
+
 **The container is killed during the build or first load**
 Out of memory. Add the swap file before building.
+
+**The container is healthy but nothing answers on the port**
+A failed port binding can leave a container that the restart policy brings up
+without its published ports. `docker compose down` then `up -d` — a plain
+restart will not fix it. Check with `docker port read-aloud`.
 
 **Playback stutters**
 Check `docker stats` while reading. If CPU is pinned at 200%, the droplet is at

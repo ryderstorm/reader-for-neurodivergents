@@ -4,6 +4,32 @@ All notable changes to this project. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow
 [SemVer](https://semver.org/).
 
+## [v1.1.2] — 2026-08-25
+
+### Fixed
+- **`docker-compose up --build` failed with `KeyError: 'ContainerConfig'`.**
+  Not a compose-file problem: the standalone `docker-compose` v1 (EOL since
+  July 2023, still what Ubuntu's `docker-compose` package installs) reads a
+  `ContainerConfig` field that Docker Engine 26+ no longer returns from image
+  inspect. It fails on both the create and the recreate path, so no compose
+  file can work around it. Verified working under Compose v2.
+
+### Added
+- `scripts-tools/check-docker.sh` — preflight that reports the Docker version,
+  daemon reachability and, critically, whether Compose v2 is present. When it
+  is not, it names the v1 incompatibility and prints a no-sudo install line.
+  Both the pass and fail paths are tested.
+- Troubleshooting for a subtler failure seen while testing: when a port
+  binding fails, the restart policy can bring the container back up *without*
+  its published ports, so it reports healthy while being unreachable.
+  `docker compose down` then `up -d` is the fix; a restart is not.
+
+### Changed
+- README and the deployment guide now state the Compose v2 requirement up
+  front and use `docker compose up -d --build` consistently.
+
+[v1.1.2]: https://github.com/n2048-creative-technology/reader-for-neurodivergents/releases/tag/v1.1.2
+
 ## [v1.1.1] — 2026-08-25
 
 Server deployment, and a performance bug that only shows up in a container.

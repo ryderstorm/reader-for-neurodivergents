@@ -58,7 +58,7 @@ FROM python:${PYTHON_VERSION}-slim AS runtime
 
 LABEL org.opencontainers.image.title="Read Aloud" \
       org.opencontainers.image.description="Markdown reader with real-time word highlighting, powered by Kokoro-82M" \
-      org.opencontainers.image.version="1.1.0" \
+      org.opencontainers.image.version="1.1.2" \
       org.opencontainers.image.licenses="MIT AND GPL-3.0-or-later" \
       org.opencontainers.image.source="https://github.com/n2048-creative-technology/reader-for-neurodivergents"
 
