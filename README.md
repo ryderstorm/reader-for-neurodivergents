@@ -10,6 +10,10 @@ Mobile-first, and **installable as an app** on a phone, tablet or desktop.
 Everything runs locally. The text you open never leaves your machine — the
 container image doesn't even have network access enabled.
 
+**Status: finished.** Actively maintained, feature-complete Python/Docker
+server with a PWA front-end; see also the
+[native Android port](https://github.com/n2048-creative-technology/reader-for-androids).
+
 ---
 
 ## Contents
