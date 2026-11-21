@@ -16,11 +16,12 @@ import os
 import threading
 import time
 import wave
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
 
 import numpy as np
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse
@@ -86,6 +87,43 @@ app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=["*"], 
 # of speech instead of 63. Level 5 rather than the default 9: on a small CPU
 # the compression time competes with synthesis for the same cores.
 app.add_middleware(GZipMiddleware, minimum_size=1024, compresslevel=5)
+
+_APP_CSP = (
+    "default-src 'self'; "
+    "script-src 'self'; "
+    "style-src 'self'; "
+    "img-src 'self' data: blob:; "
+    "media-src 'self' blob: data:; "
+    "font-src 'self'; "
+    "connect-src 'self'; "
+    "worker-src 'self'; "
+    "object-src 'none'; "
+    "base-uri 'self'; "
+    "frame-ancestors 'none'; "
+    "form-action 'self'"
+)
+
+
+@app.middleware("http")
+async def add_security_headers(
+    request: Request,
+    call_next: Callable[[Request], Awaitable[Response]],
+) -> Response:
+    """Attach baseline browser security headers to every HTTP response."""
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    response.headers.setdefault(
+        "Permissions-Policy",
+        "camera=(), microphone=(), geolocation=(), payment=()",
+    )
+    response.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+    response.headers.setdefault("Cross-Origin-Embedder-Policy", "require-corp")
+    response.headers.setdefault("Cross-Origin-Resource-Policy", "same-origin")
+    if not request.url.path.startswith("/api/docs"):
+        response.headers.setdefault("Content-Security-Policy", _APP_CSP)
+    return response
 
 
 class SpeakRequest(BaseModel):
