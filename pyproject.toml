@@ -48,14 +48,10 @@ max-complexity = 15
 
 [tool.mypy]
 python_version = "3.12"
-mypy_path = "server"
+mypy_path = ["server", "typings"]
 strict = true
 warn_unreachable = true
 files = ["server", "tests/python"]
-
-[[tool.mypy.overrides]]
-module = ["kokoro", "kokoro.*", "torch", "torch.*", "huggingface_hub", "huggingface_hub.*"]
-ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests/python"]

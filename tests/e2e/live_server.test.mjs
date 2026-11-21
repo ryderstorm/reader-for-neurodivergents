@@ -38,12 +38,16 @@ async function waitForHealth(timeoutMs = 15000) {
   throw new Error(`server failed to become healthy within ${timeoutMs}ms: ${lastError}`);
 }
 
+const serverEnv = { ...process.env, HF_HUB_OFFLINE: '1' };
+delete serverEnv.T2S_SSL_CERT;
+delete serverEnv.T2S_SSL_KEY;
+
 const server = spawn(
   PYTHON,
   ['server/app.py', '--host', '127.0.0.1', '--port', PORT, '--no-warm'],
   {
     cwd: ROOT,
-    env: { ...process.env, HF_HUB_OFFLINE: '1' },
+    env: serverEnv,
     stdio: ['ignore', 'pipe', 'pipe'],
   },
 );

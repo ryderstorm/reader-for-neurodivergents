@@ -10,7 +10,7 @@ Use this workflow whenever modifying word tokenization, sentence splitting, Koko
 ## Contract to Preserve
 
 1. `server/tts.py:split_words` and `web/js/document.js:WORD_RE` must agree on word boundaries across ASCII, contractions (`don't`), hyphenated words (`well-known`), decimals (`3.50`), accented Latin (`niño`, `leyó`), and Devanagari combining marks (`मुझे`).
-2. `POST /api/speak` returns `{sample_rate, duration, words: [{cs, ce, s, e}], audio}` where `words` are monotonic, inside `[0, duration]`, and `cs..ce` slice the exact submitted text.
+2. `POST /api/speak` strips leading/trailing whitespace via `req.text.strip()` before synthesis and returns `{sample_rate, duration, words: [{cs, ce, s, e}], audio}` where `words` are monotonic, `s` stays within `[0, duration]` (`e` may exceed `duration` by up to `0.01s` when `_fill_gaps` pads a trailing unmatched word), and `cs..ce` slice the stripped request text.
 3. `web/js/player.js:mapTimings` maps overlapping character ranges onto `.w` spans and falls back to positional zipping only if no character ranges overlap.
 
 ## Verification Steps

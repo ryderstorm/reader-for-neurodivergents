@@ -12,6 +12,8 @@
     "HF_HUB_OFFLINE": "1",
     "PIP_DISABLE_PIP_VERSION_CHECK": "1"
   },
+  "onCreateCommand": "sudo /usr/local/bin/init-firewall.sh",
+  "waitFor": "onCreateCommand",
   "postCreateCommand": "uv sync --python 3.12 && npm ci --no-audit --no-fund",
   "postStartCommand": "sudo /usr/local/bin/init-firewall.sh"
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 4,
-  "generated_at": "2026-11-21T07:26:28.026Z",
+  "generated_at": "2026-11-21T07:53:38.004Z",
   "repo_root": "/home/damien/personal_projects/reader-for-neurodivergents",
-  "target_commit": "bc622fe63a7e00039ed6c84bc5840da12122d3f1",
+  "target_commit": "f10bd1b6d505b6ad3823feb9649d68ba617c1cbc",
   "engine_commit": null,
   "skill_version": "3.0.1",
   "run": {
     "model": "google/gemini-4-neon",
-    "started_at": "2026-11-21T07:26:28.026Z",
-    "finished_at": "2026-11-21T07:27:11.696Z",
-    "duration_seconds": 44
+    "started_at": "2026-11-21T07:53:38.004Z",
+    "finished_at": "2026-11-21T07:54:17.840Z",
+    "duration_seconds": 40
   },
   "scope": [
     "reader-for-neurodivergents",
     "monorepo=No",
     "Planning=Yes",
-    "AI-review=No"
+    "AI-review=Yes"
   ],
   "target_harnesses": [
     "other"
@@ -29,28 +29,21 @@
         "other"
       ],
       "monorepo": "no",
-      "ai_review": "no",
+      "ai_review": "yes",
+      "ai_review_model": "different-model",
       "planning_workflow": "github-issues"
     },
     "paths_applied": {},
     "skips_applied": [],
-    "answer_discrepancies": [
-      {
-        "key": "ai_review",
-        "answer": "no",
-        "source": "config",
-        "found": "code_review.ai_review_inferred.configured: true (coderabbit (.coderabbit.yaml))",
-        "note": "The answer says no AI review, but the repo configures one."
-      }
-    ],
+    "answer_discrepancies": [],
     "warnings": []
   },
   "summary": {
-    "pass": 71,
-    "partial": 7,
-    "fail": 5,
-    "na": 11,
-    "narrative": "Local Foundations, Wayfinding, Tight Loops, and core Safe Passage/Handoff controls are now verified and in place across 8 documentation files (README.md links + docs/). Remaining gaps are primarily GitHub host settings (branch protection required checks, enabling CodeRabbit, opening the first spec issue), external infrastructure choices (alert paging, staged/canary rollouts, optional error tracking vs offline privacy), and scheduled readiness re-runs. The single highest-leverage next step is pushing the branch, opening a PR to run GitHub Actions CI, and enabling required status checks and approving review rules on main."
+    "pass": 77,
+    "partial": 6,
+    "fail": 2,
+    "na": 9,
+    "narrative": "Foundations, Wayfinding, Tight Loops, Safe Passage, and Handoff are largely complete across 8 documentation files (README.md links + docs/), with all 6 PR CI checks (including CodeQL and OWASP ZAP), CodeRabbit review, 11 template-formatted GitHub spec/bug issues, and main branch protection active. Momentum has the most room for improvement (scheduled readiness re-runs, offline privacy vs. error tracking, and agent-commit attribution), alongside single-container hosting limits on staged rollouts and on-call paging. The single highest-leverage next step is deciding which offline/single-container items belong in .ai-readiness.jsonc skips and adding a scheduled readiness workflow in CI."
   },
   "checks": [
     {
@@ -520,13 +513,13 @@
         "criterion": "System map"
       },
       "status": "Pass",
-      "evidence": "All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (254).",
+      "evidence": "All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (257).",
       "remediation": null,
       "method": "script",
       "why": "Docs under 500 lines give an agent more detail than AGENTS.md without overloading its context.",
       "checked": "Inputs: documentation_set.files[].under_500_lines, documentation_set.files[].line_count, documentation_set.excluded_generated",
-      "found": "All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (254).",
-      "verdict_why": "Pass based on: All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (254)."
+      "found": "All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (257).",
+      "verdict_why": "Pass based on: All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (257)."
     },
     {
       "id": "repo-structure-documented",
@@ -538,13 +531,13 @@
         "criterion": "System map"
       },
       "status": "N/A",
-      "evidence": "3,387 source lines, under 10,000: a small repo needs no structure doc.",
+      "evidence": "3,459 source lines, under 10,000: a small repo needs no structure doc.",
       "remediation": null,
       "method": "hybrid",
       "why": "When the docs explain the main folders, an agent knows where a change belongs without traversing the whole tree.",
       "checked": "Inputs: wayfinding.structure.apps[].source_lines, wayfinding.structure.boundary_tools, wayfinding.structure_docs.mentions, wayfinding.structure_docs.docs_skipped",
-      "found": "3,387 source lines, under 10,000: a small repo needs no structure doc.",
-      "verdict_why": "N/A based on: 3,387 source lines, under 10,000: a small repo needs no structure doc."
+      "found": "3,459 source lines, under 10,000: a small repo needs no structure doc.",
+      "verdict_why": "N/A based on: 3,459 source lines, under 10,000: a small repo needs no structure doc."
     },
     {
       "id": "commit-and-branch-conventions",
@@ -556,13 +549,13 @@
         "criterion": "Written conventions"
       },
       "status": "Pass",
-      "evidence": "commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 9/16 recent subjects conventional.",
+      "evidence": "commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 12/19 recent subjects conventional.",
       "remediation": null,
       "method": "hybrid",
       "why": "Agents write commits and branches all day, and can follow the team's naming only if it is written down.",
       "checked": "Inputs: briefing.file, agents_md_signals.conventions, git_history.shallow",
-      "found": "commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 9/16 recent subjects conventional.",
-      "verdict_why": "Pass based on: commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 9/16 recent subjects conventional."
+      "found": "commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 12/19 recent subjects conventional.",
+      "verdict_why": "Pass based on: commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 12/19 recent subjects conventional."
     },
     {
       "id": "coding-standards",
@@ -898,13 +891,13 @@
         "criterion": "Type safety"
       },
       "status": "Pass",
-      "evidence": "python strict (pyproject.toml:51); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)",
+      "evidence": "python strict (pyproject.toml:52); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)",
       "remediation": null,
       "method": "script",
       "why": "Strict type settings, with escape hatches kept rare, turn many of an agent's mistakes into errors it can see and fix itself.",
       "checked": "Inputs: tight-loops.apps[].ecosystems, tight-loops.apps[].types",
-      "found": "python strict (pyproject.toml:51); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)",
-      "verdict_why": "Pass based on: python strict (pyproject.toml:51); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)"
+      "found": "python strict (pyproject.toml:52); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)",
+      "verdict_why": "Pass based on: python strict (pyproject.toml:52); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)"
     },
     {
       "id": "pre-commit-format",
@@ -1067,13 +1060,13 @@
         "criterion": "Coverage floor"
       },
       "status": "Pass",
-      "evidence": "Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (87.7%) and pytest enforces 75% on server/ (78.0%) in CI.",
+      "evidence": "Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (88.5%) and pytest enforces 75% on server/ (78.5%) in CI.",
       "remediation": null,
       "method": "hybrid",
       "why": "A coverage floor enforced in CI keeps an agent's changes from landing without tests.",
       "checked": "Inputs: tight-loops.apps[].coverage",
-      "found": "Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (87.7%) and pytest enforces 75% on server/ (78.0%) in CI.",
-      "verdict_why": "Pass based on: Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (87.7%) and pytest enforces 75% on server/ (78.0%) in CI."
+      "found": "Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (88.5%) and pytest enforces 75% on server/ (78.5%) in CI.",
+      "verdict_why": "Pass based on: Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (88.5%) and pytest enforces 75% on server/ (78.5%) in CI."
     },
     {
       "id": "ci-on-git-lifecycle",
@@ -1102,14 +1095,14 @@
         "phase": "tight-loops",
         "criterion": "CI on every change, within budget"
       },
-      "status": "N/A",
-      "evidence": "Unverified: CI read access wasn't tested (--online: `gh run list --limit 100 --status completed` listed no runs). Run `gh run list --limit 1` (read-only): Pass if it lists runs, Fail if refused.",
-      "remediation": "Sign the host CLI in (gh, glab or az) with read access to CI, or configure the git host's MCP server, so an agent can read CI status and logs.",
-      "method": "hybrid",
+      "status": "Pass",
+      "evidence": "--online: `gh run list --limit 100 --status completed` listed a CI run.",
+      "remediation": null,
+      "method": "script",
       "why": "An agent that can't read CI status and logs can't tell which test failed, so the feedback loop is broken.",
       "checked": "Inputs: online.ci_read, ci_access.ci_mcp_servers, ci_access.read_commands, guardrails.ci_workflows.workflows[].provider",
-      "found": "Unverified: CI read access wasn't tested (--online: `gh run list --limit 100 --status completed` listed no runs). Run `gh run list --limit 1` (read-only): Pass if it lists runs, Fail if refused.",
-      "verdict_why": "N/A based on: Unverified: CI read access wasn't tested (--online: `gh run list --limit 100 --status completed` listed no runs). Run `gh run list --limit 1` (read-only): Pass if it lists runs, Fail if refused."
+      "found": "--online: `gh run list --limit 100 --status completed` listed a CI run.",
+      "verdict_why": "Pass based on: --online: `gh run list --limit 100 --status completed` listed a CI run."
     },
     {
       "id": "agents-trigger-ci",
@@ -1139,13 +1132,13 @@
         "criterion": "CI on every change, within budget"
       },
       "status": "Pass",
-      "evidence": "Run times weren't read (--online: no completed pull-request or default-branch runs); declared timeouts are a budget, not a runtime: every one is 10 min or less (.github/workflows/ci.yml, .github/work…",
+      "evidence": "--online: CI took a median 1.4 min per commit over the last 2 pull request commits (longest 1.5 min).",
       "remediation": null,
-      "method": "hybrid",
+      "method": "script",
       "why": "By the time a slow CI run fails, the agent has moved on, and fixing the issue costs more tokens and time.",
       "checked": "Inputs: online.ci_durations, security_gates.workflow_timeouts",
-      "found": "Run times weren't read (--online: no completed pull-request or default-branch runs); declared timeouts are a budget, not a runtime: every one is 10 min or less (.github/workflows/ci.yml, .github/work…",
-      "verdict_why": "Pass based on: Run times weren't read (--online: no completed pull-request or default-branch runs); declared timeouts are a budget, not a runtime: every one is 10 min or less (.github/workflows/ci.yml, .github/work…"
+      "found": "--online: CI took a median 1.4 min per commit over the last 2 pull request commits (longest 1.5 min).",
+      "verdict_why": "Pass based on: --online: CI took a median 1.4 min per commit over the last 2 pull request commits (longest 1.5 min)."
     },
     {
       "id": "hands-on-run-path",
@@ -1174,21 +1167,14 @@
         "phase": "safe-passage",
         "criterion": "Protected main line"
       },
-      "status": "Fail",
-      "evidence": "github branch protection and rulesets for main: 0 required check(s); pull-request jobs required 0/4, not required: Lint, Format, Typecheck & Code Health, Unit, Coverage, Smoke & E2E Tests, Dependency…",
-      "remediation": "Mark every pull-request CI job as a required status check on main: Lint, Format, Typecheck & Code Health, Unit, Coverage, Smoke & E2E Tests, Dependency Audit & Review, OWASP ZAP Baseline Scan.",
+      "status": "Pass",
+      "evidence": "github branch protection and rulesets for main: 6 required check(s) (Lint, Format, Typecheck & Code Health, Unit, Coverage, Smoke & E2E Tests, Dependency Audit & Review, OWASP ZAP Baseline Scan +2 mo…",
+      "remediation": null,
       "method": "hybrid",
       "why": "A check that can be bypassed at merge stops nothing, so every CI check must pass with no override culture.",
       "checked": "Inputs: online.status, online.required_checks, security_gates.required_checks_signals.github_settings_yml, answers.required_checks",
-      "found": "github branch protection and rulesets for main: 0 required check(s); pull-request jobs required 0/4, not required: Lint, Format, Typecheck & Code Health, Unit, Coverage, Smoke & E2E Tests, Dependency…",
-      "verdict_why": "Fail based on: github branch protection and rulesets for main: 0 required check(s); pull-request jobs required 0/4, not required: Lint, Format, Typecheck & Code Health, Unit, Coverage, Smoke & E2E Tests, Dependency…",
-      "effort": {
-        "scope": "low",
-        "friction": "low",
-        "band": "<1h",
-        "size": "S",
-        "why": "All 4 PR CI workflows exist locally; once pushed to GitHub, marking the 4 PR jobs as required status checks on main is a quick repository ruleset change."
-      }
+      "found": "github branch protection and rulesets for main: 6 required check(s) (Lint, Format, Typecheck & Code Health, Unit, Coverage, Smoke & E2E Tests, Dependency Audit & Review, OWASP ZAP Baseline Scan +2 mo…",
+      "verdict_why": "Pass based on: github branch protection and rulesets for main: 6 required check(s) (Lint, Format, Typecheck & Code Health, Unit, Coverage, Smoke & E2E Tests, Dependency Audit & Review, OWASP ZAP Baseline Scan +2 mo…"
     },
     {
       "id": "secrets-scanning",
@@ -1243,13 +1229,13 @@
         "criterion": "Clear ownership"
       },
       "status": "Pass",
-      "evidence": ".github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 89 tracked files.",
+      "evidence": ".github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 92 tracked files.",
       "remediation": null,
       "method": "script",
       "why": "Every piece of code needs a human owner who can explain, modify and fix what an agent changed there.",
       "checked": "Inputs: code_review.ownership.file, code_review.ownership.has_catch_all, code_review.ownership.coverage_percent, code_review.ownership.owners_files, code_review.ownership.unowned_sample, code_review.ownership.alternatives, code_review.ownership.invalid_lines",
-      "found": ".github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 89 tracked files.",
-      "verdict_why": "Pass based on: .github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 89 tracked files."
+      "found": ".github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 92 tracked files.",
+      "verdict_why": "Pass based on: .github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 92 tracked files."
     },
     {
       "id": "sca",
@@ -1440,21 +1426,14 @@
         "phase": "handoff",
         "criterion": "Well-shaped tickets"
       },
-      "status": "Partial",
-      "evidence": "\"answers.planning_workflow\": \"github-issues\" (config), documented in AGENTS.md:32, but gh issue list --state all returned 0 issues; no spec issue exists on GitHub yet.",
-      "remediation": "Create the first GitHub issue using .github/ISSUE_TEMPLATE/feature.yml before starting the next feature.",
+      "status": "Pass",
+      "evidence": "\"answers.planning_workflow\": \"github-issues\" (config), documented in AGENTS.md:32; verified 11 open spec/bug issues on ryderstorm/reader-for-neurodivergents (e.g. #11, #4-#8, #1-#3, #9-#10).",
+      "remediation": null,
       "method": "hybrid",
       "why": "Without a written plan an agent's output is only as good as the prompt, so the team writes specs and says where they live.",
       "checked": "Inputs: answers.planning_workflow, specs.planning_mentions",
-      "found": "\"answers.planning_workflow\": \"github-issues\" (config), documented in AGENTS.md:32, but gh issue list --state all returned 0 issues; no spec issue exists on GitHub yet.",
-      "verdict_why": "Partial based on: \"answers.planning_workflow\": \"github-issues\" (config), documented in AGENTS.md:32, but gh issue list --state all returned 0 issues; no spec issue exists on GitHub yet.",
-      "effort": {
-        "scope": "low",
-        "friction": "low",
-        "band": "<1h",
-        "size": "S",
-        "why": "AGENTS.md and .github/ISSUE_TEMPLATE/feature.yml are committed; only creating the first GitHub spec issue on the host remains."
-      }
+      "found": "\"answers.planning_workflow\": \"github-issues\" (config), documented in AGENTS.md:32; verified 11 open spec/bug issues on ryderstorm/reader-for-neurodivergents (e.g. #11, #4-#8, #1-#3, #9-#10).",
+      "verdict_why": "Pass based on: \"answers.planning_workflow\": \"github-issues\" (config), documented in AGENTS.md:32; verified 11 open spec/bug issues on ryderstorm/reader-for-neurodivergents (e.g. #11, #4-#8, #1-#3, #9-#10)."
     },
     {
       "id": "no-committed-specs",
@@ -1537,21 +1516,14 @@
         "phase": "handoff",
         "criterion": "Consistent review gate"
       },
-      "status": "Fail",
-      "evidence": "answers.ai_review: \"no\" (config); detected: coderabbit (.coderabbit.yaml).",
-      "remediation": "Add automated AI review on pull requests (e.g. CodeRabbit, or a review workflow running a different model).",
+      "status": "Pass",
+      "evidence": "answers.ai_review: \"yes\" (config); detected: coderabbit (.coderabbit.yaml).",
+      "remediation": null,
       "method": "script",
       "why": "Agents raise the volume of change, and automated AI review on every PR helps review keep pace.",
       "checked": "Inputs: answers.ai_review, code_review.ai_review_inferred.configured, code_review.ai_review_inferred.model_evidence",
-      "found": "answers.ai_review: \"no\" (config); detected: coderabbit (.coderabbit.yaml).",
-      "verdict_why": "Fail based on: answers.ai_review: \"no\" (config); detected: coderabbit (.coderabbit.yaml).",
-      "effort": {
-        "scope": "low",
-        "friction": "low",
-        "band": "<1h",
-        "size": "S",
-        "why": ".coderabbit.yaml is already committed with multi-dimension rules; only enabling the CodeRabbit GitHub App on the repository and updating ai_review in .ai-readiness.jsonc remains."
-      }
+      "found": "answers.ai_review: \"yes\" (config); detected: coderabbit (.coderabbit.yaml).",
+      "verdict_why": "Pass based on: answers.ai_review: \"yes\" (config); detected: coderabbit (.coderabbit.yaml)."
     },
     {
       "id": "independent-ai-review",
@@ -1562,14 +1534,14 @@
         "phase": "handoff",
         "criterion": "Consistent review gate"
       },
-      "status": "N/A",
-      "evidence": "answers.ai_review: \"no\" (config) — no AI review to separate; \"Automated AI code review is configured on PRs\" Fails.",
+      "status": "Pass",
+      "evidence": "answers.ai_review_model: \"different-model\" (config); detected: coderabbit (.coderabbit.yaml).",
       "remediation": null,
       "method": "script",
       "why": "A different model, or at least a fresh context, reviews without the dev agent's reasoning biasing it and catches blind spots same-model review misses.",
       "checked": "Inputs: answers.ai_review, answers.ai_review_model, code_review.ai_review_inferred.model_separation, code_review.ai_review_inferred.model_evidence",
-      "found": "answers.ai_review: \"no\" (config) — no AI review to separate; \"Automated AI code review is configured on PRs\" Fails.",
-      "verdict_why": "N/A based on: answers.ai_review: \"no\" (config) — no AI review to separate; \"Automated AI code review is configured on PRs\" Fails."
+      "found": "answers.ai_review_model: \"different-model\" (config); detected: coderabbit (.coderabbit.yaml).",
+      "verdict_why": "Pass based on: answers.ai_review_model: \"different-model\" (config); detected: coderabbit (.coderabbit.yaml)."
     },
     {
       "id": "multi-dimension-review",
@@ -1598,21 +1570,14 @@
         "phase": "handoff",
         "criterion": "Consistent review gate"
       },
-      "status": "Partial",
-      "evidence": "AGENTS.md:33, .github/pull_request_template.md:22, and .github/CODEOWNERS require human review and limit AI review to augmentation, but github requires 0 approving reviews on main.",
-      "remediation": "Require at least 1 approving human review (and Code Owner review) in main branch protection or rulesets on GitHub.",
-      "method": "hybrid",
+      "status": "Pass",
+      "evidence": "github requires 1 approving review(s) on main, including code owners.",
+      "remediation": null,
+      "method": "script",
       "why": "AI review catches patterns, but humans catch intent mismatches and business logic errors, so both are needed.",
       "checked": "Inputs: online.status, online.reviews.approving_review_count, online.reviews.code_owner_reviews",
-      "found": "AGENTS.md:33, .github/pull_request_template.md:22, and .github/CODEOWNERS require human review and limit AI review to augmentation, but github requires 0 approving reviews on main.",
-      "verdict_why": "Partial based on: AGENTS.md:33, .github/pull_request_template.md:22, and .github/CODEOWNERS require human review and limit AI review to augmentation, but github requires 0 approving reviews on main.",
-      "effort": {
-        "scope": "low",
-        "friction": "low",
-        "band": "<1h",
-        "size": "S",
-        "why": "AGENTS.md, .github/pull_request_template.md, and .github/CODEOWNERS are in place; only enabling 1 required approving review (and Code Owner review) on main in GitHub settings remains."
-      }
+      "found": "github requires 1 approving review(s) on main, including code owners.",
+      "verdict_why": "Pass based on: github requires 1 approving review(s) on main, including code owners."
     },
     {
       "id": "structured-observability",
@@ -1624,13 +1589,13 @@
         "criterion": "Observable behavior"
       },
       "status": "Pass",
-      "evidence": "2/2 apps have structured logs and traces/metrics; health: server/app.py:115 +1 more.",
+      "evidence": "2/2 apps have structured logs and traces/metrics; health: server/app.py:153 +1 more.",
       "remediation": null,
       "method": "script",
       "why": "Structured logs plus traces or metrics let an agent and the team confirm a change did what it claimed.",
       "checked": "Inputs: handoff.observability.apps, handoff.observability.non_app_projects, handoff.observability.repo_health",
-      "found": "2/2 apps have structured logs and traces/metrics; health: server/app.py:115 +1 more.",
-      "verdict_why": "Pass based on: 2/2 apps have structured logs and traces/metrics; health: server/app.py:115 +1 more."
+      "found": "2/2 apps have structured logs and traces/metrics; health: server/app.py:153 +1 more.",
+      "verdict_why": "Pass based on: 2/2 apps have structured logs and traces/metrics; health: server/app.py:153 +1 more."
     },
     {
       "id": "reversible-releases",
@@ -1710,13 +1675,13 @@
         "criterion": "Agents in the commit history"
       },
       "status": "Fail",
-      "evidence": "No agent markers in 16 commits since 2026-08-23 and no agent workflows in CI.",
+      "evidence": "No agent markers in 19 commits since 2026-08-23 and no agent workflows in CI.",
       "remediation": "Have agents open PRs through the normal gates with Co-Authored-By trailers, or add an agent workflow (e.g. claude-code-action).",
       "method": "script",
       "why": "Marked agent commits arriving through normal pull requests show the repo is being worked by agents, not just ready for them.",
       "checked": "Inputs: momentum.agent_commits, momentum.ci_agents[].agent, momentum.ci_agents[].path, git_history.shallow",
-      "found": "No agent markers in 16 commits since 2026-08-23 and no agent workflows in CI.",
-      "verdict_why": "Fail based on: No agent markers in 16 commits since 2026-08-23 and no agent workflows in CI.",
+      "found": "No agent markers in 19 commits since 2026-08-23 and no agent workflows in CI.",
+      "verdict_why": "Fail based on: No agent markers in 19 commits since 2026-08-23 and no agent workflows in CI.",
       "effort": {
         "scope": "low",
         "friction": "low",
@@ -1813,14 +1778,14 @@
         "phase": "momentum",
         "criterion": "ARM on a cadence"
       },
-      "status": "Fail",
-      "evidence": "No CI job runs the audit; no docs/ai-native-audit*.json tracked.",
-      "remediation": "Run the audit on a schedule in CI and commit docs/ai-native-audit.json each time so readiness can be compared.",
+      "status": "Partial",
+      "evidence": "No CI job runs the audit; results: docs/ai-native-audit.json (1 version).",
+      "remediation": "Run the audit in CI on a schedule or every PR (e.g. deterministic-report.mjs in a cron workflow).",
       "method": "script",
       "why": "A single readiness score says nothing about direction, so the audit runs on a cadence and keeps its results.",
       "checked": "Inputs: momentum.readiness_runs.runs, momentum.readiness_runs.results, git_history.shallow",
-      "found": "No CI job runs the audit; no docs/ai-native-audit*.json tracked.",
-      "verdict_why": "Fail based on: No CI job runs the audit; no docs/ai-native-audit*.json tracked.",
+      "found": "No CI job runs the audit; results: docs/ai-native-audit.json (1 version).",
+      "verdict_why": "Partial based on: No CI job runs the audit; results: docs/ai-native-audit.json (1 version).",
       "effort": {
         "scope": "low",
         "friction": "medium",

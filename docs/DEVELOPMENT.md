@@ -60,7 +60,7 @@ make test-py
 .venv/bin/pytest tests/python/test_app_api.py -k health
 
 make test-js
-node --test tests/js/document_and_player.test.mjs --test-name-pattern "splitSentences"
+node --test --test-name-pattern "splitSentences" tests/js/document_and_player.test.mjs
 ```
 
 Run the smoke test (starts the server, probes `/api/health`, `/api/metrics`, and `/`, then shuts down):

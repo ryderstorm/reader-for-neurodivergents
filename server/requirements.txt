@@ -1,10 +1,13 @@
 # Core TTS
 kokoro==0.9.4          # Kokoro-82M inference wrapper (Apache-2.0)
 misaki[en]==0.9.4      # G2P front-end, ships bundled espeak-ng via espeakng-loader
-numpy==2.5.5
+numpy==2.2.6; python_version < "3.11"
+numpy==2.4.6; python_version == "3.11"
+numpy==2.5.5; python_version >= "3.12"
 
 # Web server
-fastapi==0.165.0
+fastapi==0.162.5; python_version < "3.11"
+fastapi==0.165.0; python_version >= "3.11"
 uvicorn[standard]==0.54.0
 python-multipart==0.0.34
 

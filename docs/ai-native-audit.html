@@ -558,14 +558,14 @@
     <div class="eyebrow">AI native repo audit</div>
     <h1>reader-for-neurodivergents</h1>
     <dl class="meta">
-      <div><dt>Generated</dt><dd>November 21, 2026 at 2:26 AM</dd></div>
+      <div><dt>Generated</dt><dd>November 21, 2026 at 2:53 AM</dd></div>
       <div><dt>Version</dt><dd>v3.0.1</dd></div>
       <div><dt>Harnesses</dt><dd>other</dd></div>
       <div><dt>Model</dt><dd>google/gemini-4-neon</dd></div>
-      <div><dt>Run time</dt><dd>44s</dd></div>
+      <div><dt>Run time</dt><dd>40s</dd></div>
       <div><dt>monorepo</dt><dd>No</dd></div>
       <div><dt>Planning</dt><dd>Yes</dd></div>
-      <div><dt>AI-review</dt><dd>No</dd></div>
+      <div><dt>AI-review</dt><dd>Yes</dd></div>
       <div><dt>Config</dt><dd><a href="#config">.ai-readiness.jsonc</a></dd></div>
     </dl>
   </header>
@@ -574,26 +574,26 @@
     <div class="hero">
       <span class="card-title">Overall readiness</span>
       
-      <span class="hero-value">90%</span>
+      <span class="hero-value">94%</span>
       <span class="hero-note">94 checks</span>
     </div>
     <div class="summary-body">
       <div class="tiles" id="summary-tiles">
           <div class="tile s-pass" role="button" tabindex="0" data-filter="pass" aria-pressed="false">
             <span class="tile-label s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>Pass</span>
-            <span class="tile-value">71</span>
+            <span class="tile-value">77</span>
           </div>
           <div class="tile s-partial" role="button" tabindex="0" data-filter="partial" aria-pressed="false">
             <span class="tile-label s-partial"><svg class="ico" aria-hidden="true"><use href="#i-partial"/></svg>Partial</span>
-            <span class="tile-value">7</span>
+            <span class="tile-value">6</span>
           </div>
           <div class="tile s-fail" role="button" tabindex="0" data-filter="fail" aria-pressed="false">
             <span class="tile-label s-fail"><svg class="ico" aria-hidden="true"><use href="#i-fail"/></svg>Not yet</span>
-            <span class="tile-value">5</span>
+            <span class="tile-value">2</span>
           </div>
       </div>
-      <div class="bar bar-filter" role="group" aria-label="71 Pass, 7 Partial, 5 Not yet. Click a segment to filter."><span class="seg s-pass" style="flex-grow:71" data-tip="71 Pass" data-filter="pass" tabindex="0" role="button" aria-pressed="false" aria-label="71 Pass"></span><span class="seg s-partial" style="flex-grow:7" data-tip="7 Partial" data-filter="partial" tabindex="0" role="button" aria-pressed="false" aria-label="7 Partial"></span><span class="seg s-fail" style="flex-grow:5" data-tip="5 Not yet" data-filter="fail" tabindex="0" role="button" aria-pressed="false" aria-label="5 Not yet"></span></div>
-      <p class="narrative">Local Foundations, Wayfinding, Tight Loops, and core Safe Passage/Handoff controls are now verified and in place across 8 documentation files (README.md links + docs/). Remaining gaps are primarily GitHub host settings (branch protection required checks, enabling CodeRabbit, opening the first spec issue), external infrastructure choices (alert paging, staged/canary rollouts, optional error tracking vs offline privacy), and scheduled readiness re-runs. The single highest-leverage next step is pushing the branch, opening a PR to run GitHub Actions CI, and enabling required status checks and approving review rules on main.</p>
+      <div class="bar bar-filter" role="group" aria-label="77 Pass, 6 Partial, 2 Not yet. Click a segment to filter."><span class="seg s-pass" style="flex-grow:77" data-tip="77 Pass" data-filter="pass" tabindex="0" role="button" aria-pressed="false" aria-label="77 Pass"></span><span class="seg s-partial" style="flex-grow:6" data-tip="6 Partial" data-filter="partial" tabindex="0" role="button" aria-pressed="false" aria-label="6 Partial"></span><span class="seg s-fail" style="flex-grow:2" data-tip="2 Not yet" data-filter="fail" tabindex="0" role="button" aria-pressed="false" aria-label="2 Not yet"></span></div>
+      <p class="narrative">Foundations, Wayfinding, Tight Loops, Safe Passage, and Handoff are largely complete across 8 documentation files (README.md links + docs/), with all 6 PR CI checks (including CodeQL and OWASP ZAP), CodeRabbit review, 11 template-formatted GitHub spec/bug issues, and main branch protection active. Momentum has the most room for improvement (scheduled readiness re-runs, offline privacy vs. error tracking, and agent-commit attribution), alongside single-container hosting limits on staged rollouts and on-call paging. The single highest-leverage next step is deciding which offline/single-container items belong in .ai-readiness.jsonc skips and adding a scheduled readiness workflow in CI.</p>
     </div>
   </section>
 
@@ -628,27 +628,27 @@
         <div class="fix"><span class="fix-label">Remediation</span><p>Give agents a build command that runs without Docker, a running service or a login (keep image builds and publishing behind their own targets), and name it in AGENTS.md.</p><button type="button" class="fix-copy" data-copy="Give agents a build command that runs without Docker, a running service or a login (keep image builds and publishing behind their own targets), and name it in AGENTS.md." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
         <a class="jump" href="#check-54" data-jump-check="54">Open in full report →</a>
       </article>
-      <article class="fix-card s-partial">
+      <article class="fix-card s-fail">
         <div class="fix-card-top">
           <span class="fix-card-rank">Fix 2</span>
-          <span class="pill s-partial"><svg class="ico" aria-hidden="true"><use href="#i-partial"/></svg>Partial</span><span class="effort-size" tabindex="0" data-tip="&lt;1h — AGENTS.md and .github/ISSUE_TEMPLATE/feature.yml are committed; only creating the first GitHub spec issue on the host remains." aria-label="Effort S: &lt;1h — AGENTS.md and .github/ISSUE_TEMPLATE/feature.yml are committed; only creating the first GitHub spec issue on the host remains.">S</span>
+          <span class="pill s-fail"><svg class="ico" aria-hidden="true"><use href="#i-fail"/></svg>Not yet</span><span class="effort-size" tabindex="0" data-tip="&lt;1h — Commits used a Gemini Co-Authored-By trailer not matched by the detector's default list; merging a PR with a supported agent workflow or recognized agent trailer satisfies it." aria-label="Effort S: &lt;1h — Commits used a Gemini Co-Authored-By trailer not matched by the detector's default list; merging a PR with a supported agent workflow or recognized agent trailer satisfies it.">S</span>
         </div>
-        <h3>#76 Planning workflow is written down</h3>
-        <p class="fix-card-meta">Handoff</p>
-        <p class="why">Without a written plan an agent's output is only as good as the prompt, so the team writes specs and says where they live.</p>
-        <div class="fix"><span class="fix-label">Remediation</span><p>Create the first GitHub issue using .github/ISSUE_TEMPLATE/feature.yml before starting the next feature.</p><button type="button" class="fix-copy" data-copy="Create the first GitHub issue using .github/ISSUE_TEMPLATE/feature.yml before starting the next feature." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
-        <a class="jump" href="#check-76" data-jump-check="76">Open in full report →</a>
+        <h3>#89 Agents in the commit history</h3>
+        <p class="fix-card-meta">Momentum</p>
+        <p class="why">Marked agent commits arriving through normal pull requests show the repo is being worked by agents, not just ready for them.</p>
+        <div class="fix"><span class="fix-label">Remediation</span><p>Have agents open PRs through the normal gates with Co-Authored-By trailers, or add an agent workflow (e.g. claude-code-action).</p><button type="button" class="fix-copy" data-copy="Have agents open PRs through the normal gates with Co-Authored-By trailers, or add an agent workflow (e.g. claude-code-action)." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+        <a class="jump" href="#check-89" data-jump-check="89">Open in full report →</a>
       </article>
       <article class="fix-card s-partial">
         <div class="fix-card-top">
           <span class="fix-card-rank">Fix 3</span>
-          <span class="pill s-partial"><svg class="ico" aria-hidden="true"><use href="#i-partial"/></svg>Partial</span><span class="effort-size" tabindex="0" data-tip="&lt;1h — AGENTS.md, .github/pull_request_template.md, and .github/CODEOWNERS are in place; only enabling 1 required approving review (and Code Owner review) on main in GitHub settings remains." aria-label="Effort S: &lt;1h — AGENTS.md, .github/pull_request_template.md, and .github/CODEOWNERS are in place; only enabling 1 required approving review (and Code Owner review) on main in GitHub settings remains.">S</span>
+          <span class="pill s-partial"><svg class="ico" aria-hidden="true"><use href="#i-partial"/></svg>Partial</span><span class="effort-size" tabindex="0" data-tip="half-day — docs/DEVELOPMENT.md already resolves 16/16 commands; matching README.md's docker build in CI requires adding a cached Docker build job (PyTorch + Kokoro layers are ~1.9 GB)." aria-label="Effort M: half-day — docs/DEVELOPMENT.md already resolves 16/16 commands; matching README.md's docker build in CI requires adding a cached Docker build job (PyTorch + Kokoro layers are ~1.9 GB).">M</span>
         </div>
-        <h3>#84 Human review stays in the loop</h3>
-        <p class="fix-card-meta">Handoff</p>
-        <p class="why">AI review catches patterns, but humans catch intent mismatches and business logic errors, so both are needed.</p>
-        <div class="fix"><span class="fix-label">Remediation</span><p>Require at least 1 approving human review (and Code Owner review) in main branch protection or rulesets on GitHub.</p><button type="button" class="fix-copy" data-copy="Require at least 1 approving human review (and Code Owner review) in main branch protection or rulesets on GitHub." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
-        <a class="jump" href="#check-84" data-jump-check="84">Open in full report →</a>
+        <h3>#11 A development guide with exact build/test/lint commands</h3>
+        <p class="fix-card-meta">Foundations</p>
+        <p class="why">Agents run the documented build, test and lint commands verbatim, so those commands have to be exact.</p>
+        <div class="fix"><span class="fix-label">Remediation</span><p>Run &quot;docker build -t read-aloud .&quot; in CI, or document the build command CI actually runs.</p><button type="button" class="fix-copy" data-copy="Run &quot;docker build -t read-aloud .&quot; in CI, or document the build command CI actually runs." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+        <a class="jump" href="#check-11" data-jump-check="11">Open in full report →</a>
       </article>
     </div>
     <aside class="path-hint" id="path-hint">
@@ -690,7 +690,7 @@
             <span class="phase-num">3</span>
             <span class="journey-name"><strong>Tight Loops</strong><span>Fast, deterministic feedback</span></span>
             <span class="journey-bar">
-              <div class="bar" role="img" aria-label="15 Pass, 1 Partial, 0 Not yet"><span class="seg s-pass" style="flex-grow:15" data-tip="15 Pass"></span><span class="seg s-partial" style="flex-grow:1" data-tip="1 Partial"></span></div>
+              <div class="bar" role="img" aria-label="16 Pass, 1 Partial, 0 Not yet"><span class="seg s-pass" style="flex-grow:16" data-tip="16 Pass"></span><span class="seg s-partial" style="flex-grow:1" data-tip="1 Partial"></span></div>
               <span class="journey-meta">18 checks · 9 of 9 criteria covered</span>
             </span>
             <span class="journey-pct">97%</span>
@@ -701,10 +701,10 @@
             <span class="phase-num">4</span>
             <span class="journey-name"><strong>Safe Passage</strong><span>Mistakes are contained</span></span>
             <span class="journey-bar">
-              <div class="bar" role="img" aria-label="9 Pass, 1 Partial, 1 Not yet"><span class="seg s-pass" style="flex-grow:9" data-tip="9 Pass"></span><span class="seg s-partial" style="flex-grow:1" data-tip="1 Partial"></span><span class="seg s-fail" style="flex-grow:1" data-tip="1 Not yet"></span></div>
+              <div class="bar" role="img" aria-label="10 Pass, 1 Partial, 0 Not yet"><span class="seg s-pass" style="flex-grow:10" data-tip="10 Pass"></span><span class="seg s-partial" style="flex-grow:1" data-tip="1 Partial"></span></div>
               <span class="journey-meta">14 checks · 8 of 8 criteria covered</span>
             </span>
-            <span class="journey-pct">86%</span>
+            <span class="journey-pct">95%</span>
           </a>
         </li>
         <li>
@@ -712,10 +712,10 @@
             <span class="phase-num">5</span>
             <span class="journey-name"><strong>Handoff</strong><span>Work can be delegated</span></span>
             <span class="journey-bar">
-              <div class="bar" role="img" aria-label="7 Pass, 4 Partial, 1 Not yet"><span class="seg s-pass" style="flex-grow:7" data-tip="7 Pass"></span><span class="seg s-partial" style="flex-grow:4" data-tip="4 Partial"></span><span class="seg s-fail" style="flex-grow:1" data-tip="1 Not yet"></span></div>
+              <div class="bar" role="img" aria-label="11 Pass, 2 Partial, 0 Not yet"><span class="seg s-pass" style="flex-grow:11" data-tip="11 Pass"></span><span class="seg s-partial" style="flex-grow:2" data-tip="2 Partial"></span></div>
               <span class="journey-meta">13 checks · 7 of 8 criteria covered</span>
             </span>
-            <span class="journey-pct">75%</span>
+            <span class="journey-pct">92%</span>
           </a>
         </li>
         <li>
@@ -723,10 +723,10 @@
             <span class="phase-num">6</span>
             <span class="journey-name"><strong>Momentum</strong><span>The repo keeps improving</span></span>
             <span class="journey-bar">
-              <div class="bar" role="img" aria-label="3 Pass, 0 Partial, 3 Not yet"><span class="seg s-pass" style="flex-grow:3" data-tip="3 Pass"></span><span class="seg s-fail" style="flex-grow:3" data-tip="3 Not yet"></span></div>
+              <div class="bar" role="img" aria-label="3 Pass, 1 Partial, 2 Not yet"><span class="seg s-pass" style="flex-grow:3" data-tip="3 Pass"></span><span class="seg s-partial" style="flex-grow:1" data-tip="1 Partial"></span><span class="seg s-fail" style="flex-grow:2" data-tip="2 Not yet"></span></div>
               <span class="journey-meta">6 checks · 6 of 7 criteria covered</span>
             </span>
-            <span class="journey-pct">50%</span>
+            <span class="journey-pct">58%</span>
           </a>
         </li>
     </ol>
@@ -751,17 +751,17 @@
       <li><a href="#phase-4" class="phase-nav-link" title="Safe Passage" style="--pc:#b05d14">
         <span class="phase-num">4</span>
         <span class="phase-nav-name">Safe Passage</span>
-        <span class="phase-nav-pct">86%</span>
+        <span class="phase-nav-pct">95%</span>
       </a></li>
       <li><a href="#phase-5" class="phase-nav-link" title="Handoff" style="--pc:#a83254">
         <span class="phase-num">5</span>
         <span class="phase-nav-name">Handoff</span>
-        <span class="phase-nav-pct">75%</span>
+        <span class="phase-nav-pct">92%</span>
       </a></li>
       <li><a href="#phase-6" class="phase-nav-link" title="Momentum" style="--pc:#3f7d12">
         <span class="phase-num">6</span>
         <span class="phase-nav-name">Momentum</span>
-        <span class="phase-nav-pct">50%</span>
+        <span class="phase-nav-pct">58%</span>
       </a></li>
     </ol>
   </nav>
@@ -775,14 +775,7 @@
     <div class="config-grid">
       <div class="config-group">
         <h3>Answers</h3>
-        <dl><dt>Harnesses</dt><dd>other</dd><dt>Monorepo</dt><dd>No</dd><dt>AI review</dt><dd>no</dd><dt>Planning workflow</dt><dd>github-issues</dd></dl>
-      </div>
-      <div class="config-group">
-        <h3>Answers that don't match the scan</h3>
-        <ul class="config-discrepancies"><li><strong>AI review</strong>
-          <span>Answer: no <span class="config-mode">(config)</span></span>
-          <span>Scan found: code_review.ai_review_inferred.configured: true (coderabbit (.coderabbit.yaml))</span>
-          <span class="config-mode">The answer says no AI review, but the repo configures one.</span></li></ul>
+        <dl><dt>Harnesses</dt><dd>other</dd><dt>Monorepo</dt><dd>No</dd><dt>AI review</dt><dd>yes</dd><dt>AI review model</dt><dd>different-model</dd><dt>Planning workflow</dt><dd>github-issues</dd></dl>
       </div>
     </div>
   </section>
@@ -1485,13 +1478,13 @@
                 <h4>All documentation-set files are under 500 lines</h4>
               </div>
               <p class="why">Docs under 500 lines give an agent more detail than AGENTS.md without overloading its context.</p>
-              <p class="evidence">All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (254).</p>
+              <p class="evidence">All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (257).</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: documentation_set.files[].under_500_lines, documentation_set.files[].line_count, documentation_set.excluded_generated</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (254).</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (254).</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (257).</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (257).</dd></div>
                 </dl>
               </details>
               
@@ -1506,13 +1499,13 @@
                 <h4>Repo structure is documented</h4>
               </div>
               <p class="why">When the docs explain the main folders, an agent knows where a change belongs without traversing the whole tree.</p>
-              <p class="evidence">3,387 source lines, under 10,000: a small repo needs no structure doc.</p>
+              <p class="evidence">3,459 source lines, under 10,000: a small repo needs no structure doc.</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: wayfinding.structure.apps[].source_lines, wayfinding.structure.boundary_tools, wayfinding.structure_docs.mentions, wayfinding.structure_docs.docs_skipped</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>3,387 source lines, under 10,000: a small repo needs no structure doc.</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>N/A based on: 3,387 source lines, under 10,000: a small repo needs no structure doc.</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>3,459 source lines, under 10,000: a small repo needs no structure doc.</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>N/A based on: 3,459 source lines, under 10,000: a small repo needs no structure doc.</dd></div>
                 </dl>
               </details>
               
@@ -1540,13 +1533,13 @@
                 <h4>Commit message and branch naming conventions</h4>
               </div>
               <p class="why">Agents write commits and branches all day, and can follow the team's naming only if it is written down.</p>
-              <p class="evidence">commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 9/16 recent subjects conventional.</p>
+              <p class="evidence">commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 12/19 recent subjects conventional.</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: briefing.file, agents_md_signals.conventions, git_history.shallow</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 9/16 recent subjects conventional.</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 9/16 recent subjects conventional.</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 12/19 recent subjects conventional.</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 12/19 recent subjects conventional.</dd></div>
                 </dl>
               </details>
               
@@ -2045,13 +2038,13 @@
                 <h4>Strict type settings</h4>
               </div>
               <p class="why">Strict type settings, with escape hatches kept rare, turn many of an agent's mistakes into errors it can see and fix itself.</p>
-              <p class="evidence">python strict (pyproject.toml:51); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)</p>
+              <p class="evidence">python strict (pyproject.toml:52); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: tight-loops.apps[].ecosystems, tight-loops.apps[].types</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>python strict (pyproject.toml:51); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: python strict (pyproject.toml:51); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>python strict (pyproject.toml:52); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: python strict (pyproject.toml:52); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)</dd></div>
                 </dl>
               </details>
               
@@ -2299,13 +2292,13 @@
                 <h4>Coverage floor</h4>
               </div>
               <p class="why">A coverage floor enforced in CI keeps an agent's changes from landing without tests.</p>
-              <p class="evidence">Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (87.7%) and pytest enforces 75% on server/ (78.0%) in CI.</p>
+              <p class="evidence">Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (88.5%) and pytest enforces 75% on server/ (78.5%) in CI.</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: tight-loops.apps[].coverage</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (87.7%) and pytest enforces 75% on server/ (78.0%) in CI.</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (87.7%) and pytest enforces 75% on server/ (78.0%) in CI.</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (88.5%) and pytest enforces 75% on server/ (78.5%) in CI.</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (88.5%) and pytest enforces 75% on server/ (78.5%) in CI.</dd></div>
                 </dl>
               </details>
               
@@ -2317,12 +2310,12 @@
       <article class="criterion">
         <header class="crit-head">
           <h3>CI on every change, within budget</h3>
-          <span class="crit-counts"><span class="mini s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>3<span class="sr"> Pass</span></span><span class="mini s-na"><svg class="ico" aria-hidden="true"><use href="#i-na"/></svg>1<span class="sr"> N/A</span></span></span>
+          <span class="crit-counts"><span class="mini s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>4<span class="sr"> Pass</span></span></span>
         </header>
         <ol class="checks">
         </ol>
         <details class="collapsed-bucket">
-          <summary>Hidden by default · 3 passed, 1 N/A</summary>
+          <summary>Hidden by default · 4 passed</summary>
           <ol class="checks">
           <li class="check s-pass" data-check="57" data-status="pass" data-method="script" id="check-57">
             <span class="pill s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>Pass</span>
@@ -2340,6 +2333,27 @@
                   <div class="facet"><dt>Checked</dt><dd>Inputs: guardrails.ci_workflows.detected, security_gates.ci_lifecycle.union_events, security_gates.ci_lifecycle.providers, security_gates.ci_lifecycle.has_push, security_gates.ci_lifecycle.has_pull_request, security_gates.ci_lifecycle.has_merge_group, security_gates.ci_lifecycle.workflows</dd></div>
                   <div class="facet"><dt>Found</dt><dd>union_events: [&quot;pull_request&quot;,&quot;push&quot;,&quot;schedule&quot;,&quot;manual&quot;]; providers: [&quot;github-actions&quot;].</dd></div>
                   <div class="facet"><dt>Verdict</dt><dd>Pass based on: union_events: [&quot;pull_request&quot;,&quot;push&quot;,&quot;schedule&quot;,&quot;manual&quot;]; providers: [&quot;github-actions&quot;].</dd></div>
+                </dl>
+              </details>
+              
+            </div>
+          </li>
+          <li class="check s-pass" data-check="58" data-status="pass" data-method="script" id="check-58">
+            <span class="pill s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>Pass</span>
+            <div class="check-main">
+              <div class="check-head">
+                <span class="method script" title="How this check was scored">Script</span>
+                <span class="check-num">#58</span>
+                <h4>Agents can read CI status and logs</h4>
+              </div>
+              <p class="why">An agent that can't read CI status and logs can't tell which test failed, so the feedback loop is broken.</p>
+              <p class="evidence">--online: <code>gh run list --limit 100 --status completed</code> listed a CI run.</p>
+              <details class="how-scored">
+                <summary>Show what we checked</summary>
+                <dl class="facets">
+                  <div class="facet"><dt>Checked</dt><dd>Inputs: online.ci_read, ci_access.ci_mcp_servers, ci_access.read_commands, guardrails.ci_workflows.workflows[].provider</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>--online: `gh run list --limit 100 --status completed` listed a CI run.</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: --online: `gh run list --limit 100 --status completed` listed a CI run.</dd></div>
                 </dl>
               </details>
               
@@ -2366,46 +2380,25 @@
               
             </div>
           </li>
-          <li class="check s-pass" data-check="60" data-status="pass" data-method="hybrid" id="check-60">
+          <li class="check s-pass" data-check="60" data-status="pass" data-method="script" id="check-60">
             <span class="pill s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>Pass</span>
             <div class="check-main">
               <div class="check-head">
-                <span class="method hybrid" title="How this check was scored"><span class="method-sparkle" aria-hidden="true">✨</span>Script + AI</span>
+                <span class="method script" title="How this check was scored">Script</span>
                 <span class="check-num">#60</span>
                 <h4>CI feedback is fast (under 10 minutes)</h4>
               </div>
               <p class="why">By the time a slow CI run fails, the agent has moved on, and fixing the issue costs more tokens and time.</p>
-              <p class="evidence">Run times weren't read (--online: no completed pull-request or default-branch runs); declared timeouts are a budget, not a runtime: every one is 10 min or less (.github/workflows/ci.yml, .github/work…</p>
+              <p class="evidence">--online: CI took a median 1.4 min per commit over the last 2 pull request commits (longest 1.5 min).</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: online.ci_durations, security_gates.workflow_timeouts</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>Run times weren't read (--online: no completed pull-request or default-branch runs); declared timeouts are a budget, not a runtime: every one is 10 min or less (.github/workflows/ci.yml, .github/work…</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: Run times weren't read (--online: no completed pull-request or default-branch runs); declared timeouts are a budget, not a runtime: every one is 10 min or less (.github/workflows/ci.yml, .github/work…</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>--online: CI took a median 1.4 min per commit over the last 2 pull request commits (longest 1.5 min).</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: --online: CI took a median 1.4 min per commit over the last 2 pull request commits (longest 1.5 min).</dd></div>
                 </dl>
               </details>
               
-            </div>
-          </li>
-          <li class="check s-na" data-check="58" data-status="na" data-method="hybrid" id="check-58">
-            <span class="pill s-na"><svg class="ico" aria-hidden="true"><use href="#i-na"/></svg>N/A</span>
-            <div class="check-main">
-              <div class="check-head">
-                <span class="method hybrid" title="How this check was scored"><span class="method-sparkle" aria-hidden="true">✨</span>Script + AI</span>
-                <span class="check-num">#58</span>
-                <h4>Agents can read CI status and logs</h4>
-              </div>
-              <p class="why">An agent that can't read CI status and logs can't tell which test failed, so the feedback loop is broken.</p>
-              <p class="evidence">Unverified: CI read access wasn't tested (--online: <code>gh run list --limit 100 --status completed</code> listed no runs). Run <code>gh run list --limit 1</code> (read-only): Pass if it lists runs, Fail if refused.</p>
-              <details class="how-scored">
-                <summary>Show what we checked</summary>
-                <dl class="facets">
-                  <div class="facet"><dt>Checked</dt><dd>Inputs: online.ci_read, ci_access.ci_mcp_servers, ci_access.read_commands, guardrails.ci_workflows.workflows[].provider</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>Unverified: CI read access wasn't tested (--online: `gh run list --limit 100 --status completed` listed no runs). Run `gh run list --limit 1` (read-only): Pass if it lists runs, Fail if refused.</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>N/A based on: Unverified: CI read access wasn't tested (--online: `gh run list --limit 100 --status completed` listed no runs). Run `gh run list --limit 1` (read-only): Pass if it lists runs, Fail if refused.</dd></div>
-                </dl>
-              </details>
-              <div class="fix"><span class="fix-label">Suggestion</span><p>Sign the host CLI in (gh, glab or az) with read access to CI, or configure the git host's MCP server, so an agent can read CI status and logs.</p><button type="button" class="fix-copy" data-copy="Sign the host CLI in (gh, glab or az) with read access to CI, or configure the git host's MCP server, so an agent can read CI status and logs." aria-label="Copy suggestion" title="Copy suggestion"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
             </div>
           </li>
           </ol>
@@ -2455,7 +2448,7 @@
           <p>Mistakes are contained</p>
         </div>
         <div class="phase-score">
-          <span class="phase-pct">86%</span>
+          <span class="phase-pct">95%</span>
           <span class="phase-sub">14 checks</span>
         </div>
       </header>
@@ -2463,31 +2456,36 @@
       <article class="criterion">
         <header class="crit-head">
           <h3>Protected main line</h3>
-          <span class="crit-counts"><span class="mini s-fail"><svg class="ico" aria-hidden="true"><use href="#i-fail"/></svg>1<span class="sr"> Not yet</span></span></span>
+          <span class="crit-counts"><span class="mini s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>1<span class="sr"> Pass</span></span></span>
         </header>
         <ol class="checks">
-          <li class="check s-fail" data-check="62" data-status="fail" data-method="hybrid" id="check-62">
-            <span class="pill s-fail"><svg class="ico" aria-hidden="true"><use href="#i-fail"/></svg>Not yet</span>
+        </ol>
+        <details class="collapsed-bucket">
+          <summary>Hidden by default · 1 passed</summary>
+          <ol class="checks">
+          <li class="check s-pass" data-check="62" data-status="pass" data-method="hybrid" id="check-62">
+            <span class="pill s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>Pass</span>
             <div class="check-main">
               <div class="check-head">
                 <span class="method hybrid" title="How this check was scored"><span class="method-sparkle" aria-hidden="true">✨</span>Script + AI</span>
                 <span class="check-num">#62</span>
-                <h4>All CI checks are required before merge</h4><span class="effort-size" tabindex="0" data-tip="&lt;1h — All 4 PR CI workflows exist locally; once pushed to GitHub, marking the 4 PR jobs as required status checks on main is a quick repository ruleset change." aria-label="Effort S: &lt;1h — All 4 PR CI workflows exist locally; once pushed to GitHub, marking the 4 PR jobs as required status checks on main is a quick repository ruleset change.">S</span>
+                <h4>All CI checks are required before merge</h4>
               </div>
               <p class="why">A check that can be bypassed at merge stops nothing, so every CI check must pass with no override culture.</p>
-              <p class="evidence">github branch protection and rulesets for main: 0 required check(s); pull-request jobs required 0/4, not required: Lint, Format, Typecheck &amp; Code Health, Unit, Coverage, Smoke &amp; E2E Tests, Dependency…</p>
+              <p class="evidence">github branch protection and rulesets for main: 6 required check(s) (Lint, Format, Typecheck &amp; Code Health, Unit, Coverage, Smoke &amp; E2E Tests, Dependency Audit &amp; Review, OWASP ZAP Baseline Scan +2 mo…</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: online.status, online.required_checks, security_gates.required_checks_signals.github_settings_yml, answers.required_checks</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>github branch protection and rulesets for main: 0 required check(s); pull-request jobs required 0/4, not required: Lint, Format, Typecheck &amp; Code Health, Unit, Coverage, Smoke &amp; E2E Tests, Dependency…</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Fail based on: github branch protection and rulesets for main: 0 required check(s); pull-request jobs required 0/4, not required: Lint, Format, Typecheck &amp; Code Health, Unit, Coverage, Smoke &amp; E2E Tests, Dependency…</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>github branch protection and rulesets for main: 6 required check(s) (Lint, Format, Typecheck &amp; Code Health, Unit, Coverage, Smoke &amp; E2E Tests, Dependency Audit &amp; Review, OWASP ZAP Baseline Scan +2 mo…</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: github branch protection and rulesets for main: 6 required check(s) (Lint, Format, Typecheck &amp; Code Health, Unit, Coverage, Smoke &amp; E2E Tests, Dependency Audit &amp; Review, OWASP ZAP Baseline Scan +2 mo…</dd></div>
                 </dl>
               </details>
-              <div class="fix"><span class="fix-label">Remediation</span><p>Mark every pull-request CI job as a required status check on main: Lint, Format, Typecheck &amp; Code Health, Unit, Coverage, Smoke &amp; E2E Tests, Dependency Audit &amp; Review, OWASP ZAP Baseline Scan.</p><button type="button" class="fix-copy" data-copy="Mark every pull-request CI job as a required status check on main: Lint, Format, Typecheck &amp; Code Health, Unit, Coverage, Smoke &amp; E2E Tests, Dependency Audit &amp; Review, OWASP ZAP Baseline Scan." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+              
             </div>
           </li>
-        </ol>
+          </ol>
+        </details>
       </article>
       <article class="criterion">
         <header class="crit-head">
@@ -2563,13 +2561,13 @@
                 <h4>Human code ownership is declared</h4>
               </div>
               <p class="why">Every piece of code needs a human owner who can explain, modify and fix what an agent changed there.</p>
-              <p class="evidence">.github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 89 tracked files.</p>
+              <p class="evidence">.github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 92 tracked files.</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: code_review.ownership.file, code_review.ownership.has_catch_all, code_review.ownership.coverage_percent, code_review.ownership.owners_files, code_review.ownership.unowned_sample, code_review.ownership.alternatives, code_review.ownership.invalid_lines</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>.github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 89 tracked files.</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: .github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 89 tracked files.</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>.github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 92 tracked files.</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: .github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 92 tracked files.</dd></div>
                 </dl>
               </details>
               
@@ -2863,7 +2861,7 @@
           <p>Work can be delegated</p>
         </div>
         <div class="phase-score">
-          <span class="phase-pct">75%</span>
+          <span class="phase-pct">92%</span>
           <span class="phase-sub">13 checks</span>
         </div>
       </header>
@@ -2871,34 +2869,34 @@
       <article class="criterion">
         <header class="crit-head">
           <h3>Well-shaped tickets</h3>
-          <span class="crit-counts"><span class="mini s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>2<span class="sr"> Pass</span></span><span class="mini s-partial"><svg class="ico" aria-hidden="true"><use href="#i-partial"/></svg>1<span class="sr"> Partial</span></span></span>
+          <span class="crit-counts"><span class="mini s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>3<span class="sr"> Pass</span></span></span>
         </header>
         <ol class="checks">
-          <li class="check s-partial" data-check="76" data-status="partial" data-method="hybrid" id="check-76">
-            <span class="pill s-partial"><svg class="ico" aria-hidden="true"><use href="#i-partial"/></svg>Partial</span>
+        </ol>
+        <details class="collapsed-bucket">
+          <summary>Hidden by default · 3 passed</summary>
+          <ol class="checks">
+          <li class="check s-pass" data-check="76" data-status="pass" data-method="hybrid" id="check-76">
+            <span class="pill s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>Pass</span>
             <div class="check-main">
               <div class="check-head">
                 <span class="method hybrid" title="How this check was scored"><span class="method-sparkle" aria-hidden="true">✨</span>Script + AI</span>
                 <span class="check-num">#76</span>
-                <h4>Planning workflow is written down</h4><span class="effort-size" tabindex="0" data-tip="&lt;1h — AGENTS.md and .github/ISSUE_TEMPLATE/feature.yml are committed; only creating the first GitHub spec issue on the host remains." aria-label="Effort S: &lt;1h — AGENTS.md and .github/ISSUE_TEMPLATE/feature.yml are committed; only creating the first GitHub spec issue on the host remains.">S</span>
+                <h4>Planning workflow is written down</h4>
               </div>
               <p class="why">Without a written plan an agent's output is only as good as the prompt, so the team writes specs and says where they live.</p>
-              <p class="evidence">&quot;answers.planning_workflow&quot;: &quot;github-issues&quot; (config), documented in AGENTS.md:32, but gh issue list --state all returned 0 issues; no spec issue exists on GitHub yet.</p>
+              <p class="evidence">&quot;answers.planning_workflow&quot;: &quot;github-issues&quot; (config), documented in AGENTS.md:32; verified 11 open spec/bug issues on ryderstorm/reader-for-neurodivergents (e.g. #11, #4-#8, #1-#3, #9-#10).</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: answers.planning_workflow, specs.planning_mentions</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>&quot;answers.planning_workflow&quot;: &quot;github-issues&quot; (config), documented in AGENTS.md:32, but gh issue list --state all returned 0 issues; no spec issue exists on GitHub yet.</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Partial based on: &quot;answers.planning_workflow&quot;: &quot;github-issues&quot; (config), documented in AGENTS.md:32, but gh issue list --state all returned 0 issues; no spec issue exists on GitHub yet.</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>&quot;answers.planning_workflow&quot;: &quot;github-issues&quot; (config), documented in AGENTS.md:32; verified 11 open spec/bug issues on ryderstorm/reader-for-neurodivergents (e.g. #11, #4-#8, #1-#3, #9-#10).</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: &quot;answers.planning_workflow&quot;: &quot;github-issues&quot; (config), documented in AGENTS.md:32; verified 11 open spec/bug issues on ryderstorm/reader-for-neurodivergents (e.g. #11, #4-#8, #1-#3, #9-#10).</dd></div>
                 </dl>
               </details>
-              <div class="fix"><span class="fix-label">Remediation</span><p>Create the first GitHub issue using .github/ISSUE_TEMPLATE/feature.yml before starting the next feature.</p><button type="button" class="fix-copy" data-copy="Create the first GitHub issue using .github/ISSUE_TEMPLATE/feature.yml before starting the next feature." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+              
             </div>
           </li>
-        </ol>
-        <details class="collapsed-bucket">
-          <summary>Hidden by default · 2 passed</summary>
-          <ol class="checks">
           <li class="check s-pass" data-check="77" data-status="pass" data-method="script" id="check-77">
             <span class="pill s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>Pass</span>
             <div class="check-main">
@@ -3002,55 +3000,55 @@
       <article class="criterion">
         <header class="crit-head">
           <h3>Consistent review gate</h3>
-          <span class="crit-counts"><span class="mini s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>1<span class="sr"> Pass</span></span><span class="mini s-partial"><svg class="ico" aria-hidden="true"><use href="#i-partial"/></svg>1<span class="sr"> Partial</span></span><span class="mini s-fail"><svg class="ico" aria-hidden="true"><use href="#i-fail"/></svg>1<span class="sr"> Not yet</span></span><span class="mini s-na"><svg class="ico" aria-hidden="true"><use href="#i-na"/></svg>1<span class="sr"> N/A</span></span></span>
+          <span class="crit-counts"><span class="mini s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>4<span class="sr"> Pass</span></span></span>
         </header>
         <ol class="checks">
-          <li class="check s-fail" data-check="81" data-status="fail" data-method="script" id="check-81">
-            <span class="pill s-fail"><svg class="ico" aria-hidden="true"><use href="#i-fail"/></svg>Not yet</span>
+        </ol>
+        <details class="collapsed-bucket">
+          <summary>Hidden by default · 4 passed</summary>
+          <ol class="checks">
+          <li class="check s-pass" data-check="81" data-status="pass" data-method="script" id="check-81">
+            <span class="pill s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>Pass</span>
             <div class="check-main">
               <div class="check-head">
                 <span class="method script" title="How this check was scored">Script</span>
                 <span class="check-num">#81</span>
-                <h4>Automated AI code review is configured on PRs</h4><span class="effort-size" tabindex="0" data-tip="&lt;1h — .coderabbit.yaml is already committed with multi-dimension rules; only enabling the CodeRabbit GitHub App on the repository and updating ai_review in .ai-readiness.jsonc remains." aria-label="Effort S: &lt;1h — .coderabbit.yaml is already committed with multi-dimension rules; only enabling the CodeRabbit GitHub App on the repository and updating ai_review in .ai-readiness.jsonc remains.">S</span>
+                <h4>Automated AI code review is configured on PRs</h4>
               </div>
               <p class="why">Agents raise the volume of change, and automated AI review on every PR helps review keep pace.</p>
-              <p class="evidence">answers.ai_review: &quot;no&quot; (config); detected: coderabbit (.coderabbit.yaml).</p>
+              <p class="evidence">answers.ai_review: &quot;yes&quot; (config); detected: coderabbit (.coderabbit.yaml).</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: answers.ai_review, code_review.ai_review_inferred.configured, code_review.ai_review_inferred.model_evidence</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>answers.ai_review: &quot;no&quot; (config); detected: coderabbit (.coderabbit.yaml).</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Fail based on: answers.ai_review: &quot;no&quot; (config); detected: coderabbit (.coderabbit.yaml).</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>answers.ai_review: &quot;yes&quot; (config); detected: coderabbit (.coderabbit.yaml).</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: answers.ai_review: &quot;yes&quot; (config); detected: coderabbit (.coderabbit.yaml).</dd></div>
                 </dl>
               </details>
-              <div class="fix"><span class="fix-label">Remediation</span><p>Add automated AI review on pull requests (e.g. CodeRabbit, or a review workflow running a different model).</p><button type="button" class="fix-copy" data-copy="Add automated AI review on pull requests (e.g. CodeRabbit, or a review workflow running a different model)." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+              
             </div>
           </li>
-          <li class="check s-partial" data-check="84" data-status="partial" data-method="hybrid" id="check-84">
-            <span class="pill s-partial"><svg class="ico" aria-hidden="true"><use href="#i-partial"/></svg>Partial</span>
+          <li class="check s-pass" data-check="82" data-status="pass" data-method="script" id="check-82">
+            <span class="pill s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>Pass</span>
             <div class="check-main">
               <div class="check-head">
-                <span class="method hybrid" title="How this check was scored"><span class="method-sparkle" aria-hidden="true">✨</span>Script + AI</span>
-                <span class="check-num">#84</span>
-                <h4>Human review stays in the loop</h4><span class="effort-size" tabindex="0" data-tip="&lt;1h — AGENTS.md, .github/pull_request_template.md, and .github/CODEOWNERS are in place; only enabling 1 required approving review (and Code Owner review) on main in GitHub settings remains." aria-label="Effort S: &lt;1h — AGENTS.md, .github/pull_request_template.md, and .github/CODEOWNERS are in place; only enabling 1 required approving review (and Code Owner review) on main in GitHub settings remains.">S</span>
+                <span class="method script" title="How this check was scored">Script</span>
+                <span class="check-num">#82</span>
+                <h4>AI review uses a different model or fresh context</h4>
               </div>
-              <p class="why">AI review catches patterns, but humans catch intent mismatches and business logic errors, so both are needed.</p>
-              <p class="evidence">AGENTS.md:33, .github/pull_request_template.md:22, and .github/CODEOWNERS require human review and limit AI review to augmentation, but github requires 0 approving reviews on main.</p>
+              <p class="why">A different model, or at least a fresh context, reviews without the dev agent's reasoning biasing it and catches blind spots same-model review misses.</p>
+              <p class="evidence">answers.ai_review_model: &quot;different-model&quot; (config); detected: coderabbit (.coderabbit.yaml).</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
-                  <div class="facet"><dt>Checked</dt><dd>Inputs: online.status, online.reviews.approving_review_count, online.reviews.code_owner_reviews</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>AGENTS.md:33, .github/pull_request_template.md:22, and .github/CODEOWNERS require human review and limit AI review to augmentation, but github requires 0 approving reviews on main.</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Partial based on: AGENTS.md:33, .github/pull_request_template.md:22, and .github/CODEOWNERS require human review and limit AI review to augmentation, but github requires 0 approving reviews on main.</dd></div>
+                  <div class="facet"><dt>Checked</dt><dd>Inputs: answers.ai_review, answers.ai_review_model, code_review.ai_review_inferred.model_separation, code_review.ai_review_inferred.model_evidence</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>answers.ai_review_model: &quot;different-model&quot; (config); detected: coderabbit (.coderabbit.yaml).</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: answers.ai_review_model: &quot;different-model&quot; (config); detected: coderabbit (.coderabbit.yaml).</dd></div>
                 </dl>
               </details>
-              <div class="fix"><span class="fix-label">Remediation</span><p>Require at least 1 approving human review (and Code Owner review) in main branch protection or rulesets on GitHub.</p><button type="button" class="fix-copy" data-copy="Require at least 1 approving human review (and Code Owner review) in main branch protection or rulesets on GitHub." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+              
             </div>
           </li>
-        </ol>
-        <details class="collapsed-bucket">
-          <summary>Hidden by default · 1 passed, 1 N/A</summary>
-          <ol class="checks">
           <li class="check s-pass" data-check="83" data-status="pass" data-method="hybrid" id="check-83">
             <span class="pill s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>Pass</span>
             <div class="check-main">
@@ -3072,22 +3070,22 @@
               
             </div>
           </li>
-          <li class="check s-na" data-check="82" data-status="na" data-method="script" id="check-82">
-            <span class="pill s-na"><svg class="ico" aria-hidden="true"><use href="#i-na"/></svg>N/A</span>
+          <li class="check s-pass" data-check="84" data-status="pass" data-method="script" id="check-84">
+            <span class="pill s-pass"><svg class="ico" aria-hidden="true"><use href="#i-pass"/></svg>Pass</span>
             <div class="check-main">
               <div class="check-head">
                 <span class="method script" title="How this check was scored">Script</span>
-                <span class="check-num">#82</span>
-                <h4>AI review uses a different model or fresh context</h4>
+                <span class="check-num">#84</span>
+                <h4>Human review stays in the loop</h4>
               </div>
-              <p class="why">A different model, or at least a fresh context, reviews without the dev agent's reasoning biasing it and catches blind spots same-model review misses.</p>
-              <p class="evidence">answers.ai_review: &quot;no&quot; (config) — no AI review to separate; &quot;Automated AI code review is configured on PRs&quot; Fails.</p>
+              <p class="why">AI review catches patterns, but humans catch intent mismatches and business logic errors, so both are needed.</p>
+              <p class="evidence">github requires 1 approving review(s) on main, including code owners.</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
-                  <div class="facet"><dt>Checked</dt><dd>Inputs: answers.ai_review, answers.ai_review_model, code_review.ai_review_inferred.model_separation, code_review.ai_review_inferred.model_evidence</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>answers.ai_review: &quot;no&quot; (config) — no AI review to separate; &quot;Automated AI code review is configured on PRs&quot; Fails.</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>N/A based on: answers.ai_review: &quot;no&quot; (config) — no AI review to separate; &quot;Automated AI code review is configured on PRs&quot; Fails.</dd></div>
+                  <div class="facet"><dt>Checked</dt><dd>Inputs: online.status, online.reviews.approving_review_count, online.reviews.code_owner_reviews</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>github requires 1 approving review(s) on main, including code owners.</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: github requires 1 approving review(s) on main, including code owners.</dd></div>
                 </dl>
               </details>
               
@@ -3115,13 +3113,13 @@
                 <h4>Apps emit structured logs and traces or metrics</h4>
               </div>
               <p class="why">Structured logs plus traces or metrics let an agent and the team confirm a change did what it claimed.</p>
-              <p class="evidence">2/2 apps have structured logs and traces/metrics; health: server/app.py:115 +1 more.</p>
+              <p class="evidence">2/2 apps have structured logs and traces/metrics; health: server/app.py:153 +1 more.</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: handoff.observability.apps, handoff.observability.non_app_projects, handoff.observability.repo_health</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>2/2 apps have structured logs and traces/metrics; health: server/app.py:115 +1 more.</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: 2/2 apps have structured logs and traces/metrics; health: server/app.py:115 +1 more.</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>2/2 apps have structured logs and traces/metrics; health: server/app.py:153 +1 more.</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Pass based on: 2/2 apps have structured logs and traces/metrics; health: server/app.py:153 +1 more.</dd></div>
                 </dl>
               </details>
               
@@ -3232,7 +3230,7 @@
           <p>The repo keeps improving</p>
         </div>
         <div class="phase-score">
-          <span class="phase-pct">50%</span>
+          <span class="phase-pct">58%</span>
           <span class="phase-sub">6 checks</span>
         </div>
       </header>
@@ -3252,13 +3250,13 @@
                 <h4>Agents in the commit history</h4><span class="effort-size" tabindex="0" data-tip="&lt;1h — Commits used a Gemini Co-Authored-By trailer not matched by the detector's default list; merging a PR with a supported agent workflow or recognized agent trailer satisfies it." aria-label="Effort S: &lt;1h — Commits used a Gemini Co-Authored-By trailer not matched by the detector's default list; merging a PR with a supported agent workflow or recognized agent trailer satisfies it.">S</span>
               </div>
               <p class="why">Marked agent commits arriving through normal pull requests show the repo is being worked by agents, not just ready for them.</p>
-              <p class="evidence">No agent markers in 16 commits since 2026-08-23 and no agent workflows in CI.</p>
+              <p class="evidence">No agent markers in 19 commits since 2026-08-23 and no agent workflows in CI.</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: momentum.agent_commits, momentum.ci_agents[].agent, momentum.ci_agents[].path, git_history.shallow</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>No agent markers in 16 commits since 2026-08-23 and no agent workflows in CI.</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Fail based on: No agent markers in 16 commits since 2026-08-23 and no agent workflows in CI.</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>No agent markers in 19 commits since 2026-08-23 and no agent workflows in CI.</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Fail based on: No agent markers in 19 commits since 2026-08-23 and no agent workflows in CI.</dd></div>
                 </dl>
               </details>
               <div class="fix"><span class="fix-label">Remediation</span><p>Have agents open PRs through the normal gates with Co-Authored-By trailers, or add an agent workflow (e.g. claude-code-action).</p><button type="button" class="fix-copy" data-copy="Have agents open PRs through the normal gates with Co-Authored-By trailers, or add an agent workflow (e.g. claude-code-action)." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
@@ -3400,11 +3398,11 @@
       <article class="criterion">
         <header class="crit-head">
           <h3>ARM on a cadence</h3>
-          <span class="crit-counts"><span class="mini s-fail"><svg class="ico" aria-hidden="true"><use href="#i-fail"/></svg>1<span class="sr"> Not yet</span></span></span>
+          <span class="crit-counts"><span class="mini s-partial"><svg class="ico" aria-hidden="true"><use href="#i-partial"/></svg>1<span class="sr"> Partial</span></span></span>
         </header>
         <ol class="checks">
-          <li class="check s-fail" data-check="94" data-status="fail" data-method="script" id="check-94">
-            <span class="pill s-fail"><svg class="ico" aria-hidden="true"><use href="#i-fail"/></svg>Not yet</span>
+          <li class="check s-partial" data-check="94" data-status="partial" data-method="script" id="check-94">
+            <span class="pill s-partial"><svg class="ico" aria-hidden="true"><use href="#i-partial"/></svg>Partial</span>
             <div class="check-main">
               <div class="check-head">
                 <span class="method script" title="How this check was scored">Script</span>
@@ -3412,16 +3410,16 @@
                 <h4>Readiness re-run regularly</h4><span class="effort-size" tabindex="0" data-tip="half-day — Committing docs/ai-native-audit.json establishes tracked history; adding a scheduled CI job that runs the audit requires making the ai-readiness runner available in GitHub Actions." aria-label="Effort M: half-day — Committing docs/ai-native-audit.json establishes tracked history; adding a scheduled CI job that runs the audit requires making the ai-readiness runner available in GitHub Actions.">M</span>
               </div>
               <p class="why">A single readiness score says nothing about direction, so the audit runs on a cadence and keeps its results.</p>
-              <p class="evidence">No CI job runs the audit; no docs/ai-native-audit*.json tracked.</p>
+              <p class="evidence">No CI job runs the audit; results: docs/ai-native-audit.json (1 version).</p>
               <details class="how-scored">
                 <summary>Show what we checked</summary>
                 <dl class="facets">
                   <div class="facet"><dt>Checked</dt><dd>Inputs: momentum.readiness_runs.runs, momentum.readiness_runs.results, git_history.shallow</dd></div>
-                  <div class="facet"><dt>Found</dt><dd>No CI job runs the audit; no docs/ai-native-audit*.json tracked.</dd></div>
-                  <div class="facet"><dt>Verdict</dt><dd>Fail based on: No CI job runs the audit; no docs/ai-native-audit*.json tracked.</dd></div>
+                  <div class="facet"><dt>Found</dt><dd>No CI job runs the audit; results: docs/ai-native-audit.json (1 version).</dd></div>
+                  <div class="facet"><dt>Verdict</dt><dd>Partial based on: No CI job runs the audit; results: docs/ai-native-audit.json (1 version).</dd></div>
                 </dl>
               </details>
-              <div class="fix"><span class="fix-label">Remediation</span><p>Run the audit on a schedule in CI and commit docs/ai-native-audit.json each time so readiness can be compared.</p><button type="button" class="fix-copy" data-copy="Run the audit on a schedule in CI and commit docs/ai-native-audit.json each time so readiness can be compared." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+              <div class="fix"><span class="fix-label">Remediation</span><p>Run the audit in CI on a schedule or every PR (e.g. deterministic-report.mjs in a cron workflow).</p><button type="button" class="fix-copy" data-copy="Run the audit in CI on a schedule or every PR (e.g. deterministic-report.mjs in a cron workflow)." aria-label="Copy remediation" title="Copy remediation"><svg class="fix-copy-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H3A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><svg class="fix-copied-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
             </div>
           </li>
         </ol>

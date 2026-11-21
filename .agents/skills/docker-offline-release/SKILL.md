@@ -23,7 +23,7 @@ shellcheck scripts-tools/*.sh
 make smoke
 ```
 
-2. Tag the prior image before replacing a deployed container (`docker tag read-aloud:latest read-aloud:previous`).
+2. Tag the running container's immutable image ID before replacing a deployed container (`docker tag "$(docker inspect --type=container --format '{{.Image}}' read-aloud)" read-aloud:previous`).
 3. Verify offline container execution after building:
 
 ```bash

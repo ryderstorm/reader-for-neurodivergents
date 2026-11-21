@@ -205,10 +205,7 @@ test('PWA manifest, service worker precache list, and HTML DOM contract stay val
   for (const f of ['app.js', 'ui.js', 'settings.js', 'player.js', 'platform.js']) {
     const src = readFileSync(join(ROOT, 'web/js', f), 'utf8');
     for (const m of src.matchAll(/\$\('([a-zA-Z][\w-]*)'\)/g)) {
-      assert.ok(
-        present.has(m[1]) || present.has(`${m[1]}-out`),
-        `missing DOM id ${m[1]} referenced by ${f}`,
-      );
+      assert.ok(present.has(m[1]), `missing DOM id ${m[1]} referenced by ${f}`);
     }
   }
 

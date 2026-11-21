@@ -7,6 +7,7 @@ const { JSDOM } = require('jsdom');
 
 const dom = new JSDOM('<!doctype html><body><button id="install" hidden></button></body>', {
   url: 'https://reader.local/?text=Hello+world&title=Greeting',
+  pretendToBeVisual: true,
 });
 dom.window.matchMedia = () => ({ matches: false });
 Object.defineProperty(dom.window, 'isSecureContext', { value: true, configurable: true });
@@ -146,6 +147,8 @@ test('platform helpers wire install button, media session, wake lock, and share 
   btn.click();
   assert.match(instructions, /Install app|Add to Home/i);
 
+  const wakeLockCalls = [];
+  let lastSentinel = null;
   const actions = {};
   Object.defineProperty(globalThis, 'navigator', {
     value: {
@@ -163,14 +166,16 @@ test('platform helpers wire install button, media session, wake lock, and share 
         },
       },
       wakeLock: {
-        async request() {
-          return {
+        async request(type) {
+          wakeLockCalls.push(type);
+          lastSentinel = {
             released: false,
             addEventListener() {},
             async release() {
               this.released = true;
             },
           };
+          return lastSentinel;
         },
       },
       serviceWorker: {
@@ -208,7 +213,11 @@ test('platform helpers wire install button, media session, wake lock, and share 
   const wl = createWakeLock();
   assert.equal(wl.supported, true);
   await wl.enable();
+  assert.deepEqual(wakeLockCalls, ['screen']);
+  assert.ok(lastSentinel);
+  assert.equal(lastSentinel.released, false);
   await wl.disable();
+  assert.equal(lastSentinel.released, true);
 
   let received = '';
   receiveIncoming({

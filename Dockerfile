@@ -98,7 +98,7 @@ USER reader
 EXPOSE 8765
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=180s --retries=3 \
-  CMD if [ -n "$T2S_SSL_CERT" ]; then \
+  CMD if [ -n "$T2S_SSL_CERT" ] && [ -n "$T2S_SSL_KEY" ]; then \
         curl -fsS --cacert "$T2S_SSL_CERT" https://127.0.0.1:8765/api/health; \
       else \
         curl -fsS http://127.0.0.1:8765/api/health; \

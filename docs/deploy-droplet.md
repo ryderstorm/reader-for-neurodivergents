@@ -168,10 +168,10 @@ knowing if you read on a metered mobile plan.
 
 ## Updating
 
-Tag the currently running image before rebuilding so you can roll back immediately if needed:
+Tag the currently running container's immutable image ID before rebuilding so you can roll back immediately if needed:
 
 ```bash
-docker tag read-aloud:latest read-aloud:previous
+docker tag "$(docker inspect --type=container --format '{{.Image}}' read-aloud)" read-aloud:previous
 cd reader-for-neurodivergents && git pull
 docker compose -f deploy/compose.prod.yaml up -d --build
 ```
@@ -203,10 +203,13 @@ docker compose -f deploy/compose.prod.yaml up -d --build
 
 ```bash
 curl -fsS http://127.0.0.1:8765/api/health
-curl -fsS http://127.0.0.1:8765/api/metrics | grep read_aloud_speak
 ```
 
-Confirm `"ok": true`, `"loaded": true`, and `"threads"` matches your droplet vCPU count.
+Confirm `"ok": true`, `"loaded": true`, and `"threads"` matches your droplet vCPU count. For releases that expose Prometheus metrics (`v1.1.3+`), also check:
+
+```bash
+curl -fsS http://127.0.0.1:8765/api/metrics | grep read_aloud_speak
+```
 
 ## Troubleshooting
 

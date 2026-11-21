@@ -14,9 +14,9 @@
     // "no", or package globs that each own an AGENTS.md, e.g. ["packages/*", "apps/*"]
     "monorepo": "no",
     // Automated AI code review runs on pull requests: yes | partially | no
-    "ai_review": "no",
+    "ai_review": "yes",
     // Where that review runs relative to the development agent: different-model | fresh-context | same-agent | unsure
-    "ai_review_model": null,
+    "ai_review_model": "different-model",
     // Where the specs that document what you want built live, or no for none (planning workflow and issue acceptance criteria checks): github-issues | gitlab-issues | jira | linear | no | where specs live
     "planning_workflow": "github-issues",
     // Production errors open tickets automatically (errors become work check): yes | some | no
