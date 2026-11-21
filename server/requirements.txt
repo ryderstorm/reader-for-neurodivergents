@@ -1,12 +1,16 @@
 # Core TTS
 kokoro==0.9.4          # Kokoro-82M inference wrapper (Apache-2.0)
-misaki[en]>=0.9.4      # G2P front-end, ships bundled espeak-ng via espeakng-loader
-numpy>=1.26
+misaki[en]==0.9.4      # G2P front-end, ships bundled espeak-ng via espeakng-loader
+numpy==2.5.5
 
 # Web server
-fastapi>=0.115
-uvicorn[standard]>=0.30
-python-multipart>=0.0.9
+fastapi==0.165.0
+uvicorn[standard]==0.54.0
+python-multipart==0.0.34
+
+# Observability (structured JSON logs + offline Prometheus metrics)
+python-json-logger==4.2.0
+prometheus-client==0.26.0
 
 # WAV encoding uses the standard library's `wave` module, so libsndfile
 # (soundfile / LGPL-2.1) is deliberately NOT a dependency.

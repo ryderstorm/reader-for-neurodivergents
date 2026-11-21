@@ -13,34 +13,53 @@ import io
 import logging
 import mimetypes
 import os
-import sys
-import wave
 import threading
+import time
+import wave
 from pathlib import Path
+from typing import Any
 
 import numpy as np
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from numpy.typing import NDArray
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 from pydantic import BaseModel, Field
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-# limit_torch_threads must run before anything imports torch, so this import
-# and call come before the rest of the application.
-from tts import (  # noqa: E402
-    LANGUAGES, SAMPLE_RATE, KokoroEngine, available_cpus, limit_torch_threads,
+from pythonjsonlogger.json import JsonFormatter
+from tts import (
+    LANGUAGES,
+    SAMPLE_RATE,
+    KokoroEngine,
+    available_cpus,
+    limit_torch_threads,
 )
 
+# limit_torch_threads must run before anything imports torch.
 _THREADS = limit_torch_threads()
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s  %(levelname)-7s %(name)s  %(message)s",
-    datefmt="%H:%M:%S",
-)
+
+def configure_logging() -> None:
+    """Configure structured JSON logging on the root logger."""
+    handler = logging.StreamHandler()
+    handler.setFormatter(JsonFormatter("%(asctime)s %(levelname)s %(name)s %(message)s"))
+    logging.basicConfig(level=logging.INFO, handlers=[handler], force=True)
+
+
+configure_logging()
 log = logging.getLogger("t2s.app")
+
+SPEAK_REQUESTS = Counter(
+    "read_aloud_speak_requests_total",
+    "Total synthesis requests handled by /api/speak",
+    ["status"],
+)
+SPEAK_DURATION_SECONDS = Histogram(
+    "read_aloud_speak_duration_seconds",
+    "Wall-clock synthesis duration in seconds",
+)
 
 __version__ = "1.1.3"
 
@@ -61,9 +80,7 @@ app = FastAPI(title="Read Aloud", docs_url="/api/docs", redoc_url=None)
 # public deployment it means any website can spend your CPU generating speech
 # from a visitor's browser, so set T2S_CORS_ORIGINS to your own origin there.
 _origins = [o.strip() for o in os.environ.get("T2S_CORS_ORIGINS", "*").split(",") if o.strip()]
-app.add_middleware(
-    CORSMiddleware, allow_origins=_origins, allow_methods=["*"], allow_headers=["*"]
-)
+app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_methods=["*"], allow_headers=["*"])
 # Audio is returned as base64 WAV, which compresses to about 60%. Over a local
 # network that hardly matters; over the internet it is roughly 39 KB per second
 # of speech instead of 63. Level 5 rather than the default 9: on a small CPU
@@ -78,7 +95,7 @@ class SpeakRequest(BaseModel):
     speed: float = Field(default=1.0, ge=0.5, le=2.0)
 
 
-def wav_bytes(audio: np.ndarray) -> bytes:
+def wav_bytes(audio: NDArray[np.float32]) -> bytes:
     """Encode float32 mono audio as a 16-bit PCM WAV.
 
     Uses the standard library rather than libsndfile: it is one fewer
@@ -96,7 +113,7 @@ def wav_bytes(audio: np.ndarray) -> bytes:
 
 
 @app.get("/api/health")
-def health():
+def health() -> dict[str, Any]:
     return {
         "ok": True,
         "version": __version__,
@@ -108,13 +125,18 @@ def health():
     }
 
 
+@app.get("/api/metrics")
+def metrics() -> Response:
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
 @app.get("/api/voices")
-def voices():
+def voices() -> dict[str, Any]:
     return {"languages": LANGUAGES, "voices": engine.list_voices()}
 
 
 @app.post("/api/speak")
-def speak(req: SpeakRequest):
+def speak(req: SpeakRequest) -> dict[str, Any]:
     """Synthesise one chunk and return audio plus per-word timings.
 
     Timings are seconds from the start of *this* chunk's audio, and each word
@@ -123,14 +145,20 @@ def speak(req: SpeakRequest):
     """
     text = req.text.strip()
     if not text:
+        SPEAK_REQUESTS.labels(status="empty_text").inc()
         raise HTTPException(400, "empty text")
+    t0 = time.perf_counter()
     try:
         seg = engine.synth(text, voice=req.voice, lang_code=req.lang, speed=req.speed)
     except Exception as exc:
+        SPEAK_REQUESTS.labels(status="error").inc()
         log.exception("synthesis failed")
         raise HTTPException(500, f"synthesis failed: {exc}") from exc
     if seg.audio.size == 0:
+        SPEAK_REQUESTS.labels(status="empty_audio").inc()
         raise HTTPException(422, "model produced no audio for this text")
+    SPEAK_DURATION_SECONDS.observe(time.perf_counter() - t0)
+    SPEAK_REQUESTS.labels(status="ok").inc()
     return {
         "sample_rate": SAMPLE_RATE,
         "duration": seg.duration,
@@ -140,7 +168,7 @@ def speak(req: SpeakRequest):
 
 
 @app.api_route("/sw.js", methods=["GET", "HEAD"])
-def service_worker():
+def service_worker() -> FileResponse:
     """Served from the root so the worker's scope can cover the whole origin.
 
     no-cache matters: browsers check for a new worker on every navigation, and
@@ -154,7 +182,7 @@ def service_worker():
 
 
 @app.api_route("/manifest.webmanifest", methods=["GET", "HEAD"])
-def manifest():
+def manifest() -> FileResponse:
     return FileResponse(
         WEB_DIR / "manifest.webmanifest",
         media_type="application/manifest+json",
@@ -162,7 +190,7 @@ def manifest():
 
 
 @app.api_route("/", methods=["GET", "HEAD"])
-def index():
+def index() -> FileResponse:
     return FileResponse(WEB_DIR / "index.html", headers={"Cache-Control": "no-cache"})
 
 
@@ -175,15 +203,17 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Read Aloud - local Markdown TTS reader")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8765)
-    ap.add_argument("--device", default=os.environ.get("T2S_DEVICE", "auto"),
-                    choices=["auto", "cuda", "cpu"])
-    ap.add_argument("--no-warm", action="store_true",
-                    help="skip loading the model at startup")
-    ap.add_argument("--ssl-certfile", default=os.environ.get("T2S_SSL_CERT"),
-                    help="TLS certificate. Serving over https is required to "
-                         "install the reader as an app on a phone.")
-    ap.add_argument("--ssl-keyfile", default=os.environ.get("T2S_SSL_KEY"),
-                    help="TLS private key")
+    ap.add_argument(
+        "--device", default=os.environ.get("T2S_DEVICE", "auto"), choices=["auto", "cuda", "cpu"]
+    )
+    ap.add_argument("--no-warm", action="store_true", help="skip loading the model at startup")
+    ap.add_argument(
+        "--ssl-certfile",
+        default=os.environ.get("T2S_SSL_CERT"),
+        help="TLS certificate. Serving over https is required to "
+        "install the reader as an app on a phone.",
+    )
+    ap.add_argument("--ssl-keyfile", default=os.environ.get("T2S_SSL_KEY"), help="TLS private key")
     args = ap.parse_args()
 
     log.info("%d CPU(s) available to this process", available_cpus())
@@ -209,9 +239,10 @@ def main() -> None:
                     log.error(
                         "the file exists but is not readable by uid %d. In Docker, "
                         'run with --user "$(id -u):$(id -g)" so the container can '
-                        "read a key that stays mode 600 on the host.", os.getuid(),
+                        "read a key that stays mode 600 on the host.",
+                        os.getuid(),
                     )
-                raise SystemExit(1)
+                raise SystemExit(1) from exc
     scheme = "https" if tls else "http"
     log.info("%s://%s:%d", scheme, args.host, args.port)
     if not tls and args.host not in ("127.0.0.1", "localhost"):
@@ -220,7 +251,10 @@ def main() -> None:
             "install this as an app or use it offline. See ./scripts-tools/make-cert.sh"
         )
     uvicorn.run(
-        app, host=args.host, port=args.port, log_level="warning",
+        app,
+        host=args.host,
+        port=args.port,
+        log_level="warning",
         ssl_certfile=args.ssl_certfile if tls else None,
         ssl_keyfile=args.ssl_keyfile if tls else None,
     )
