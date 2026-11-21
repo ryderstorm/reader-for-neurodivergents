@@ -11,8 +11,12 @@ import { Player } from './player.js';
 import { load as loadSettings, save as saveSettings, apply as applySettings } from './settings.js';
 import { Ui, applyBionic, keepInView, moveRuler } from './ui.js';
 import {
-  registerServiceWorker, setupInstall, setupMediaSession, createWakeLock,
-  receiveIncoming, isStandalone,
+  registerServiceWorker,
+  setupInstall,
+  setupMediaSession,
+  createWakeLock,
+  receiveIncoming,
+  isStandalone,
 } from './platform.js';
 
 const $ = (id) => document.getElementById(id);
@@ -26,12 +30,12 @@ const ui = new Ui(settings);
 const wakeLock = createWakeLock();
 const media = setupMediaSession(player);
 
-let doc = null;          // { root, blocks }
-let source = '';         // raw markdown, kept so we can rebuild on setting change
+let doc = null; // { root, blocks }
+let source = ''; // raw markdown, kept so we can rebuild on setting change
 let docTitle = 'Read Aloud';
 let activeBlock = -1;
 let totalWords = 0;
-let wordsBefore = [];    // cumulative word count per block, for the progress bar
+let wordsBefore = []; // cumulative word count per block, for the progress bar
 
 // --------------------------------------------------------------- server link
 
@@ -70,7 +74,8 @@ async function loadVoices() {
       sel.innerHTML = '';
       for (const v of voices[langSel.value] || []) sel.add(new Option(prettyVoice(v), v));
       sel.value = (voices[langSel.value] || []).includes(settings.voice)
-        ? settings.voice : sel.options[0].value;
+        ? settings.voice
+        : sel.options[0].value;
       settings.voice = sel.value;
       settings.lang = langSel.value;
       saveSettings(settings);
@@ -99,9 +104,10 @@ function showLangNote(lang) {
   const el = $('lang-note');
   const native = lang === 'a' || lang === 'b';
   el.hidden = native;
-  el.textContent = native ? '' :
-    'In this language the highlight is estimated rather than measured, so it ' +
-    'can drift slightly within a long sentence. English is exact.';
+  el.textContent = native
+    ? ''
+    : 'In this language the highlight is estimated rather than measured, so it ' +
+      'can drift slightly within a long sentence. English is exact.';
 }
 
 /** af_heart -> "Heart (US female)" */
@@ -187,7 +193,9 @@ player.addEventListener('buffering', (e) => {
   if (!e.detail.buffering) return;
   const s = $('status');
   if (s.dataset.kind !== 'error') s.textContent = 'Synthesising…';
-  setTimeout(() => { if (s.textContent === 'Synthesising…') connect(); }, 400);
+  setTimeout(() => {
+    if (s.textContent === 'Synthesising…') connect();
+  }, 400);
 });
 let lastWordEl = null;
 player.addEventListener('word', (e) => {
@@ -197,7 +205,8 @@ player.addEventListener('word', (e) => {
 });
 player.addEventListener('progress', (e) => {
   const { index, time, duration } = e.detail;
-  const done = wordsBefore[index] + (duration ? (time / duration) * doc.blocks[index].words.length : 0);
+  const done =
+    wordsBefore[index] + (duration ? (time / duration) * doc.blocks[index].words.length : 0);
   $('progress-bar').style.width = `${Math.min(100, (done / totalWords) * 100).toFixed(2)}%`;
   updateCounter(index);
   media.setPosition(duration, time, settings.rate);
@@ -208,7 +217,8 @@ player.addEventListener('finished', () => {
 });
 player.addEventListener('error', (e) => toast(e.detail.message));
 player.addEventListener('needgesture', () =>
-  toast('Your browser blocked autoplay — press play once to allow it.'));
+  toast('Your browser blocked autoplay — press play once to allow it.'),
+);
 
 function markBlock(index) {
   if (!doc || index === activeBlock) return;
@@ -232,9 +242,8 @@ function markBlock(index) {
 
 function updateCounter(index) {
   if (!doc) return;
-  const left = (totalWords - wordsBefore[index]) / (165 * settings.rate) * 60;
-  $('counter').textContent =
-    `sentence ${index + 1} / ${doc.blocks.length} · ${fmtTime(left)} left`;
+  const left = ((totalWords - wordsBefore[index]) / (165 * settings.rate)) * 60;
+  $('counter').textContent = `sentence ${index + 1} / ${doc.blocks.length} · ${fmtTime(left)} left`;
 }
 
 function fmtTime(sec) {
@@ -300,23 +309,40 @@ ui.addEventListener('action', (e) => {
   const { action, delta } = e.detail;
   if (!doc && action !== 'escape') return;
   switch (action) {
-    case 'toggle': player.toggle(); break;
-    case 'next': player.next(); break;
-    case 'prev': player.prev(); break;
-    case 'repeat': player.jumpTo(player.index, true); break;
-    case 'rate': setRate(settings.rate + delta); toast(`${settings.rate.toFixed(2)}×`); break;
-    case 'focus-cycle': cycleFocus(); break;
-    case 'escape':
-      if (!$('panel').hidden) { $('panel').hidden = true; $('settings-btn').focus(); }
-      else player.pause();
+    case 'toggle':
+      player.toggle();
       break;
-    default: break;
+    case 'next':
+      player.next();
+      break;
+    case 'prev':
+      player.prev();
+      break;
+    case 'repeat':
+      player.jumpTo(player.index, true);
+      break;
+    case 'rate':
+      setRate(settings.rate + delta);
+      toast(`${settings.rate.toFixed(2)}×`);
+      break;
+    case 'focus-cycle':
+      cycleFocus();
+      break;
+    case 'escape':
+      if (!$('panel').hidden) {
+        $('panel').hidden = true;
+        $('settings-btn').focus();
+      } else player.pause();
+      break;
+    default:
+      break;
   }
 });
 
 ui.addEventListener('change', (e) => {
   const key = e.detail.key;
-  if (key === 'bionic' || key === '*') applyBionic(doc ? doc.root : document.createElement('div'), settings.bionic);
+  if (key === 'bionic' || key === '*')
+    applyBionic(doc ? doc.root : document.createElement('div'), settings.bionic);
   if (key === 'skipCode' && source) {
     const at = player.index;
     render(source);
@@ -327,7 +353,10 @@ ui.addEventListener('change', (e) => {
     if (settings.keepAwake && player.playing) wakeLock.enable();
     else wakeLock.disable();
   }
-  if (key === '*') { setRate(settings.rate); if (source) render(source); }
+  if (key === '*') {
+    setRate(settings.rate);
+    if (source) render(source);
+  }
 });
 
 // -------------------------------------------------------------- file loading
@@ -388,11 +417,16 @@ function toast(message, action) {
     const b = document.createElement('button');
     b.type = 'button';
     b.textContent = action.label;
-    b.addEventListener('click', () => { el.hidden = true; action.run(); });
+    b.addEventListener('click', () => {
+      el.hidden = true;
+      action.run();
+    });
     el.appendChild(b);
     return;
   }
-  toastTimer = setTimeout(() => { el.hidden = true; }, 4200);
+  toastTimer = setTimeout(() => {
+    el.hidden = true;
+  }, 4200);
 }
 
 // ----------------------------------------------------------------- start-up
@@ -409,8 +443,7 @@ loadVoices();
 if (!wakeLock.supported) $('wakeLock-row').hidden = true;
 
 registerServiceWorker({
-  onUpdate: (apply) => toast('A new version is ready.',
-    { label: 'Reload', run: apply }),
+  onUpdate: (apply) => toast('A new version is ready.', { label: 'Reload', run: apply }),
   onUnavailable: (reason) => {
     // Installing and offline use need a secure context. Over plain http on a
     // LAN address the browser refuses, and saying so beats silent absence.
@@ -418,9 +451,9 @@ registerServiceWorker({
     const note = $('pwa-note');
     note.hidden = false;
     note.textContent =
-      'Opening this over http://, so it cannot be installed or work offline. '
-      + 'Serve it over https (see the README) to install it on a phone. '
-      + 'Reading works either way.';
+      'Opening this over http://, so it cannot be installed or work offline. ' +
+      'Serve it over https (see the README) to install it on a phone. ' +
+      'Reading works either way.';
   },
 });
 
@@ -429,7 +462,10 @@ setupInstall($('install-btn'), { onInstructions: (text) => toast(text) });
 receiveIncoming({
   onText: (text) => render(text),
   onFile: (file) => openFile(file),
-  onPaste: () => { $('paste-dialog').showModal(); $('paste-text').focus(); },
+  onPaste: () => {
+    $('paste-dialog').showModal();
+    $('paste-text').focus();
+  },
 });
 
 if (isStandalone()) document.documentElement.dataset.standalone = 'on';
@@ -437,7 +473,9 @@ if (isStandalone()) document.documentElement.dataset.standalone = 'on';
 // The ruler is positioned from viewport coordinates, so it has to be redrawn
 // when the phone rotates or the browser chrome collapses.
 window.addEventListener('orientationchange', () => {
-  setTimeout(() => { if (settings.ruler && lastWordEl) moveRuler($('ruler'), lastWordEl); }, 250);
+  setTimeout(() => {
+    if (settings.ruler && lastWordEl) moveRuler($('ruler'), lastWordEl);
+  }, 250);
 });
 
 // Reposition the ruler when the layout moves under it.
