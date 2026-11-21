@@ -26,7 +26,7 @@ Operational guidance for agents working on **Reader for Neurodivergents**.
 
 ## Coding, Review, and Workflow Standards
 
-- Follow TDD for behavior changes; run `make check` before requesting review.
+- Follow TDD for behavior changes; run the full verification suite in [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) before requesting review.
 - Keep `mypy --strict` and `ruff` clean with zero lint or type-check suppressions. Pure formatting is enforced by `ruff format` and `prettier` in pre-commit.
 - **Commits & branches**: Use Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`, `ci:`), enforced by `commitlint`. Name branches `feat/<slug>`, `fix/<slug>`, or `chore/<slug>`.
 - **Planning**: Specs that define what to build live in GitHub issues. Never commit spec files to source control.
@@ -39,7 +39,7 @@ Operational guidance for agents working on **Reader for Neurodivergents**.
 - **Credentials**: Never read, print, or commit `.env`, `/certs/`, or `*.key` files; keep host credentials out of agent sandboxes.
 - **No-go zones**: Do not hand-edit vendored bundles in `web/vendor/` (replace from upstream releases only) or binary assets in `web/fonts/` and `web/icons/`.
 
-## Domain Glossary
+## Glossary
 
 - **Kokoro-82M**: Local 82M-parameter StyleTTS2-derived TTS model with an explicit phoneme duration predictor.
 - **misaki G2P**: Grapheme-to-phoneme front-end returning timed tokens that `tts.py::_align` maps to source words.

@@ -12,7 +12,6 @@
     "scripts-tools/**/*.mjs"
   ],
   "ignoreDependencies": [
-    "@commitlint/cli",
-    "@commitlint/config-conventional"
+    "@commitlint/cli"
   ]
 }
