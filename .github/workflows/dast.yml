@@ -1,0 +1,44 @@
+name: DAST Baseline
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  zap-baseline:
+    name: OWASP ZAP Baseline Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+
+      - name: Install Python dependencies
+        run: uv sync --python 3.12 --frozen
+
+      - name: Start FastAPI server for baseline scan
+        run: |
+          HF_HUB_OFFLINE=1 .venv/bin/python server/app.py --host 127.0.0.1 --port 8765 --no-warm &
+          for _ in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:8765/api/health >/dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 0.25
+          done
+          echo "Server did not become healthy in time" >&2
+          exit 1
+
+      - name: Run OWASP ZAP baseline scan
+        uses: zaproxy/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0.15.0
+        with:
+          target: "http://127.0.0.1:8765"
+          fail_action: true
+          allow_issue_writing: false

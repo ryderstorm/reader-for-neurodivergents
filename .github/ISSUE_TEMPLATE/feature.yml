@@ -1,0 +1,36 @@
+name: Feature Spec
+description: Document what should be built before implementation starts
+title: "feat: "
+labels: ["spec", "enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and intent
+      description: Why does this change matter for readers or maintainers?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Proposed behavior
+      description: Describe the expected UX, API, or operational behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Concrete, verifiable conditions that define when this work is done.
+      placeholder: |
+        - [ ] Behavior verified by automated unit or e2e test
+        - [ ] Documentation updated in the same PR
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope and risks
+      description: Explicitly note what this change will not touch and any rollback considerations.
+    validations:
+      required: false
