@@ -29,5 +29,10 @@ echo "==> Installing the spaCy English model"
 echo "==> Pre-downloading Kokoro-82M and verifying word timings"
 ./.venv/bin/python scripts-tools/check_timestamps.py
 
+if command -v npm >/dev/null 2>&1 && [ -f package-lock.json ]; then
+  echo "==> Installing Node test and lint dependencies"
+  npm ci --no-audit --no-fund
+fi
+
 echo
 echo "Setup complete.  Start the reader with:  ./scripts-tools/run.sh"

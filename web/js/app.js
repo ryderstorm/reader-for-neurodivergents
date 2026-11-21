@@ -47,7 +47,7 @@ async function connect() {
       `Voice engine: Kokoro‑82M (Apache‑2.0), running locally on ${h.device.toUpperCase()}. ` +
       `No text or audio leaves this machine.`;
     if (!h.loaded) setTimeout(connect, 2500);
-  } catch (err) {
+  } catch {
     status.dataset.kind = 'error';
     status.textContent = 'Server not reachable — is it running?';
     toast('Cannot reach the local TTS server. Start it with ./scripts-tools/run.sh');
@@ -357,7 +357,7 @@ $('paste-btn').addEventListener('click', () => {
   $('paste-dialog').showModal();
   $('paste-text').focus();
 });
-$('paste-dialog').addEventListener('close', (e) => {
+$('paste-dialog').addEventListener('close', () => {
   const dlg = $('paste-dialog');
   if (dlg.returnValue === 'ok') {
     const text = $('paste-text').value.trim();

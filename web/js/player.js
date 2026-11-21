@@ -177,7 +177,7 @@ export class Player extends EventTarget {
 
     try {
       await this.audio.play();
-    } catch (err) {
+    } catch {
       // Autoplay policy: needs a user gesture. Surface it rather than hanging.
       if (gen !== this.generation) return;
       this.playing = false;
