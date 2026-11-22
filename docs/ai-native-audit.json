@@ -1,0 +1,1798 @@
+{
+  "schema_version": 4,
+  "generated_at": "2026-11-21T07:53:38.004Z",
+  "repo_root": "/home/damien/personal_projects/reader-for-neurodivergents",
+  "target_commit": "f10bd1b6d505b6ad3823feb9649d68ba617c1cbc",
+  "engine_commit": null,
+  "skill_version": "3.0.1",
+  "run": {
+    "model": "google/gemini-4-neon",
+    "started_at": "2026-11-21T07:53:38.004Z",
+    "finished_at": "2026-11-21T07:54:17.840Z",
+    "duration_seconds": 40
+  },
+  "scope": [
+    "reader-for-neurodivergents",
+    "monorepo=No",
+    "Planning=Yes",
+    "AI-review=Yes"
+  ],
+  "target_harnesses": [
+    "other"
+  ],
+  "is_monorepo": false,
+  "config": {
+    "path": ".ai-readiness.jsonc",
+    "found": true,
+    "answers_applied": {
+      "harnesses": [
+        "other"
+      ],
+      "monorepo": "no",
+      "ai_review": "yes",
+      "ai_review_model": "different-model",
+      "planning_workflow": "github-issues"
+    },
+    "paths_applied": {},
+    "skips_applied": [],
+    "answer_discrepancies": [],
+    "warnings": []
+  },
+  "summary": {
+    "pass": 77,
+    "partial": 6,
+    "fail": 2,
+    "na": 9,
+    "narrative": "Foundations, Wayfinding, Tight Loops, Safe Passage, and Handoff are largely complete across 8 documentation files (README.md links + docs/), with all 6 PR CI checks (including CodeQL and OWASP ZAP), CodeRabbit review, 11 template-formatted GitHub spec/bug issues, and main branch protection active. Momentum has the most room for improvement (scheduled readiness re-runs, offline privacy vs. error tracking, and agent-commit attribution), alongside single-container hosting limits on staged rollouts and on-call paging. The single highest-leverage next step is deciding which offline/single-container items belong in .ai-readiness.jsonc skips and adding a scheduled readiness workflow in CI."
+  },
+  "checks": [
+    {
+      "id": "front-door-readme",
+      "number": 1,
+      "section": "Foundations",
+      "title": "Front-door README",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Front-door README"
+      },
+      "status": "Pass",
+      "evidence": "README.md: found what it is :3, install and run :68, where next :169. Confirm it says what the project is, how to install and run it, and where to go next.",
+      "remediation": "Make sure README.md says what the project is, how to install and run it, and where to go next (docs or contributing).",
+      "method": "hybrid",
+      "why": "Agents need a front door that orients humans and tools before they dig into the tree.",
+      "checked": "Inputs: foundations.readme.path, foundations.readme.non_blank_lines, foundations.readme.headings, foundations.readme.signals",
+      "found": "README.md: found what it is :3, install and run :68, where next :169. Confirm it says what the project is, how to install and run it, and where to go next.",
+      "verdict_why": "Pass based on: README.md: found what it is :3, install and run :68, where next :169. Confirm it says what the project is, how to install and run it, and where to go next."
+    },
+    {
+      "id": "locked-dependencies",
+      "number": 2,
+      "section": "Foundations",
+      "title": "Locked dependency versions",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Locked dependency versions"
+      },
+      "status": "Pass",
+      "evidence": "4/4 manifests locked.",
+      "remediation": null,
+      "method": "script",
+      "why": "Floating versions let the same clone resolve different dependencies from one day to the next, so an agent can't reproduce what the team built.",
+      "checked": "Inputs: foundations.locks",
+      "found": "4/4 manifests locked.",
+      "verdict_why": "Pass based on: 4/4 manifests locked."
+    },
+    {
+      "id": "smoke-tests",
+      "number": 3,
+      "section": "Foundations",
+      "title": "Smoke tests verify the app runs",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Clone-to-running path"
+      },
+      "status": "Pass",
+      "evidence": "App-launch signals: scripts-tools/smoke_test.sh, target Makefile:smoke, CI probe .github/workflows/dast.yml:31 +1 more.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Without a verified run path, agents “fix” setups they never actually booted.",
+      "checked": "Inputs: guardrails.tests.smoke_signals, guardrails.tests.smoke_directories, guardrails.tests.e2e_directories, inventory.task_runners[].targets, foundations.start_commands",
+      "found": "App-launch signals: scripts-tools/smoke_test.sh, target Makefile:smoke, CI probe .github/workflows/dast.yml:31 +1 more.",
+      "verdict_why": "Pass based on: App-launch signals: scripts-tools/smoke_test.sh, target Makefile:smoke, CI probe .github/workflows/dast.yml:31 +1 more."
+    },
+    {
+      "id": "clone-to-running",
+      "number": 4,
+      "section": "Foundations",
+      "title": "Clone-to-running path",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Clone-to-running path"
+      },
+      "status": "Pass",
+      "evidence": "README.md :68 Quick start: 1 step (docker compose up -d --build       # first build takes ~5 min).",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "An agent can't ask a teammate how to get started, so a fresh clone has to reach a running target from written steps that exist.",
+      "checked": "Inputs: foundations.run_path",
+      "found": "README.md :68 Quick start: 1 step (docker compose up -d --build       # first build takes ~5 min).",
+      "verdict_why": "Pass based on: README.md :68 Quick start: 1 step (docker compose up -d --build       # first build takes ~5 min)."
+    },
+    {
+      "id": "declared-configuration",
+      "number": 5,
+      "section": "Foundations",
+      "title": "Declared configuration",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Declared configuration"
+      },
+      "status": "Pass",
+      "evidence": ".env.example, README.md:268 declare 3/3 vars read in code.",
+      "remediation": null,
+      "method": "script",
+      "why": "An agent that can't see which environment variables the code reads will guess or invent config values.",
+      "checked": "Inputs: foundations.config",
+      "found": ".env.example, README.md:268 declare 3/3 vars read in code.",
+      "verdict_why": "Pass based on: .env.example, README.md:268 declare 3/3 vars read in code."
+    },
+    {
+      "id": "env-only-configuration",
+      "number": 6,
+      "section": "Foundations",
+      "title": "Credentials come from documented env vars",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Declared configuration"
+      },
+      "status": "Pass",
+      "evidence": "1/1 secret-looking vars declared.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "A cloud sandbox has no browser or keychain, so an agent can only authenticate with tokens it is given as environment variables; a login that only prompts stops it.",
+      "checked": "Inputs: foundations.auth",
+      "found": "1/1 secret-looking vars declared.",
+      "verdict_why": "Pass based on: 1/1 secret-looking vars declared."
+    },
+    {
+      "id": "ignore-rules",
+      "number": 7,
+      "section": "Foundations",
+      "title": "Ignore rules that protect the repo",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Ignore rules that protect the repo"
+      },
+      "status": "Pass",
+      "evidence": ".gitignore covers 4/4 categories (env, deps, build, editor).",
+      "remediation": null,
+      "method": "script",
+      "why": "Ignore rules stop an agent's commits from picking up env files, dependency folders and build output.",
+      "checked": "Inputs: foundations.ignore",
+      "found": ".gitignore covers 4/4 categories (env, deps, build, editor).",
+      "verdict_why": "Pass based on: .gitignore covers 4/4 categories (env, deps, build, editor)."
+    },
+    {
+      "id": "reproducible-workspace",
+      "number": 8,
+      "section": "Foundations",
+      "title": "Reproducible workspace",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Reproducible workspace"
+      },
+      "status": "Pass",
+      "evidence": "Reproducible workspace: .devcontainer/devcontainer.json, compose.yaml, deploy/compose.prod.yaml.",
+      "remediation": null,
+      "method": "script",
+      "why": "A devcontainer, Nix shell or setup script gives an agent the toolchain the team uses instead of whatever its environment happens to have.",
+      "checked": "Inputs: foundations.workspace",
+      "found": "Reproducible workspace: .devcontainer/devcontainer.json, compose.yaml, deploy/compose.prod.yaml.",
+      "verdict_why": "Pass based on: Reproducible workspace: .devcontainer/devcontainer.json, compose.yaml, deploy/compose.prod.yaml."
+    },
+    {
+      "id": "non-interactive-bootstrap",
+      "number": 9,
+      "section": "Foundations",
+      "title": "Non-interactive bootstrap",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Reproducible workspace"
+      },
+      "status": "Pass",
+      "evidence": "No prompts in make setup (Makefile:5, named at docs/DEVELOPMENT.md:25).",
+      "remediation": null,
+      "method": "script",
+      "why": "A cloud agent's sandbox has no terminal and often no Docker, so it needs a setup script it can find and run with no prompts.",
+      "checked": "Inputs: foundations.bootstrap, foundations.workspace.toolchain, foundations.workspace.devcontainer, foundations.workspace.containers, foundations.run_path.best",
+      "found": "No prompts in make setup (Makefile:5, named at docs/DEVELOPMENT.md:25).",
+      "verdict_why": "Pass based on: No prompts in make setup (Makefile:5, named at docs/DEVELOPMENT.md:25)."
+    },
+    {
+      "id": "local-service-stand-ins",
+      "number": 10,
+      "section": "Foundations",
+      "title": "Local stand-ins for services",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Local stand-ins for services"
+      },
+      "status": "N/A",
+      "evidence": "No service drivers in manifests and no service env vars (DATABASE_URL, REDIS_URL, ...).",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "With local stand-ins for databases, caches and queues, an agent can start the app and run its tests without access to shared services.",
+      "checked": "Inputs: foundations.services",
+      "found": "No service drivers in manifests and no service env vars (DATABASE_URL, REDIS_URL, ...).",
+      "verdict_why": "N/A based on: No service drivers in manifests and no service env vars (DATABASE_URL, REDIS_URL, ...)."
+    },
+    {
+      "id": "development-guide",
+      "number": 11,
+      "section": "Foundations",
+      "title": "A development guide with exact build/test/lint commands",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Build path written down"
+      },
+      "status": "Partial",
+      "evidence": "docs/DEVELOPMENT.md: 16/16 commands resolve; build \"docker build -t read-aloud .\" (README.md:162) not run in CI; CI runs no build step.",
+      "remediation": "Run \"docker build -t read-aloud .\" in CI, or document the build command CI actually runs.",
+      "method": "hybrid",
+      "why": "Agents run the documented build, test and lint commands verbatim, so those commands have to be exact.",
+      "checked": "Inputs: doc_signals.development, doc_signals.build_ci, doc_classification.development_candidates, inventory.task_runners",
+      "found": "docs/DEVELOPMENT.md: 16/16 commands resolve; build \"docker build -t read-aloud .\" (README.md:162) not run in CI; CI runs no build step.",
+      "verdict_why": "Partial based on: docs/DEVELOPMENT.md: 16/16 commands resolve; build \"docker build -t read-aloud .\" (README.md:162) not run in CI; CI runs no build step.",
+      "effort": {
+        "scope": "low",
+        "friction": "medium",
+        "band": "half-day",
+        "size": "M",
+        "why": "docs/DEVELOPMENT.md already resolves 16/16 commands; matching README.md's docker build in CI requires adding a cached Docker build job (PyTorch + Kokoro layers are ~1.9 GB)."
+      }
+    },
+    {
+      "id": "restricted-network-ready",
+      "number": 12,
+      "section": "Foundations",
+      "title": "Tooling works behind a proxy and from a shallow clone",
+      "arm": {
+        "phase": "foundations",
+        "criterion": "Ready for a restricted network"
+      },
+      "status": "Pass",
+      "evidence": "No TLS bypass, CA override, hard-coded proxy, proxy-unaware Node script or history-dependent tooling in 21 config, script and CI files.",
+      "remediation": null,
+      "method": "script",
+      "why": "A cloud agent's sandbox sends traffic through a proxy with its own CA bundle and clones shallow, so TLS bypasses, CA-file overrides, hard-coded proxies, tools that ignore proxy settings and tools that need git history break there.",
+      "checked": "Inputs: foundations.network",
+      "found": "No TLS bypass, CA override, hard-coded proxy, proxy-unaware Node script or history-dependent tooling in 21 config, script and CI files.",
+      "verdict_why": "Pass based on: No TLS bypass, CA override, hard-coded proxy, proxy-unaware Node script or history-dependent tooling in 21 config, script and CI files."
+    },
+    {
+      "id": "agents-md-only-instruction-file",
+      "number": 13,
+      "section": "Wayfinding",
+      "title": "AGENTS.md is the only instruction file",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Agent briefing file"
+      },
+      "status": "Pass",
+      "evidence": "AGENTS.md is the only instruction file.",
+      "remediation": null,
+      "method": "script",
+      "why": "When AGENTS.md is the one instruction file every harness reads, every agent gets the same instructions and no copy drifts.",
+      "checked": "Inputs: briefing.setup, briefing.harnesses, briefing.harness_source",
+      "found": "AGENTS.md is the only instruction file.",
+      "verdict_why": "Pass based on: AGENTS.md is the only instruction file."
+    },
+    {
+      "id": "agents-md-under-100-lines",
+      "number": 14,
+      "section": "Wayfinding",
+      "title": "AGENTS.md is under 100 lines, counting @ imports",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Agent briefing file"
+      },
+      "status": "Pass",
+      "evidence": "AGENTS.md 48 lines, no @ imports (100 or fewer).",
+      "remediation": null,
+      "method": "script",
+      "why": "Every line of the briefing competes with the task for attention, and models reliably follow only about 150 to 200 instructions.",
+      "checked": "Inputs: briefing.file, briefing.file, briefing.line_count, briefing.imports, briefing.unresolved_imports, briefing.total_lines",
+      "found": "AGENTS.md 48 lines, no @ imports (100 or fewer).",
+      "verdict_why": "Pass based on: AGENTS.md 48 lines, no @ imports (100 or fewer)."
+    },
+    {
+      "id": "agents-md-non-discoverable",
+      "number": 15,
+      "section": "Wayfinding",
+      "title": "Contains only what agents cannot discover",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Agent briefing file"
+      },
+      "status": "Pass",
+      "evidence": "agents_md_signals.discoverable: no directory trees, restated task-runner targets or linter-enforced style rules in AGENTS.md.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Lines that restate what the code already shows cost context in every session without telling the agent anything new.",
+      "checked": "Inputs: briefing.file, agents_md_signals.discoverable, inventory.task_runners, inventory.linter_configs",
+      "found": "agents_md_signals.discoverable: no directory trees, restated task-runner targets or linter-enforced style rules in AGENTS.md.",
+      "verdict_why": "Pass based on: agents_md_signals.discoverable: no directory trees, restated task-runner targets or linter-enforced style rules in AGENTS.md."
+    },
+    {
+      "id": "domain-glossary",
+      "number": 16,
+      "section": "Wayfinding",
+      "title": "Domain glossary (recommended)",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Agent briefing file"
+      },
+      "status": "Pass",
+      "evidence": "AGENTS.md:42 \"## Glossary\": 5 terms.",
+      "remediation": null,
+      "method": "script",
+      "why": "A glossary maps the team's business terms to code concepts, so an agent searches for the right names.",
+      "checked": "Inputs: briefing.file, agents_md_signals.glossary",
+      "found": "AGENTS.md:42 \"## Glossary\": 5 terms.",
+      "verdict_why": "Pass based on: AGENTS.md:42 \"## Glossary\": 5 terms."
+    },
+    {
+      "id": "long-form-doc-references",
+      "number": 17,
+      "section": "Wayfinding",
+      "title": "References to long-form docs",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Agent briefing file"
+      },
+      "status": "Pass",
+      "evidence": "all_refs: 6, same_repo_url_refs: 0, referenced_paths: 6 (Claude Code not targeted).",
+      "remediation": null,
+      "method": "script",
+      "why": "Pointing to long docs by plain path lets the agent load them when a task needs them instead of at every session start.",
+      "checked": "Inputs: briefing.file, agents_md_references.all_refs, agents_md_references.same_repo_url_refs, agents_md_references.referenced_paths, agents_md_references.broken_refs, agents_md_references.broken_same_repo_urls",
+      "found": "all_refs: 6, same_repo_url_refs: 0, referenced_paths: 6 (Claude Code not targeted).",
+      "verdict_why": "Pass based on: all_refs: 6, same_repo_url_refs: 0, referenced_paths: 6 (Claude Code not targeted)."
+    },
+    {
+      "id": "skill-and-tool-direction",
+      "number": 18,
+      "section": "Wayfinding",
+      "title": "Direction to use specific skills/tools",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Agent briefing file"
+      },
+      "status": "Pass",
+      "evidence": "4 tool directions: AGENTS.md:25 docker-offline-release, AGENTS.md:24 tts-alignment-testing, AGENTS.md:24 phrase +1 more.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Told which skills and tools the common workflows use, such as a Playwright MCP for screenshots, an agent reaches for them instead of improvising.",
+      "checked": "Inputs: briefing.file, agents_md_signals.tool_directions, skill_packages.packages[].name, mcp.global_servers[].name",
+      "found": "4 tool directions: AGENTS.md:25 docker-offline-release, AGENTS.md:24 tts-alignment-testing, AGENTS.md:24 phrase +1 more.",
+      "verdict_why": "Pass based on: 4 tool directions: AGENTS.md:25 docker-offline-release, AGENTS.md:24 tts-alignment-testing, AGENTS.md:24 phrase +1 more."
+    },
+    {
+      "id": "architecture-docs-referenced",
+      "number": 19,
+      "section": "Wayfinding",
+      "title": "Architecture and development docs are referenced from AGENTS.md",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Agent briefing file"
+      },
+      "status": "Pass",
+      "evidence": "arch: docs/architecture.md +1 more; dev: docs/DEVELOPMENT.md (of 3 arch / 1 dev candidates).",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Agents rarely open docs the briefing doesn't name, so ARCHITECTURE.md and DEVELOPMENT.md need a reference from AGENTS.md.",
+      "checked": "Inputs: briefing.file, doc_signals.architecture, doc_signals.development, agents_md_references.all_refs, agents_md_references.same_repo_url_refs",
+      "found": "arch: docs/architecture.md +1 more; dev: docs/DEVELOPMENT.md (of 3 arch / 1 dev candidates).",
+      "verdict_why": "Pass based on: arch: docs/architecture.md +1 more; dev: docs/DEVELOPMENT.md (of 3 arch / 1 dev candidates)."
+    },
+    {
+      "id": "no-long-code-blocks",
+      "number": 20,
+      "section": "Wayfinding",
+      "title": "No long code blocks or full scripts in AGENTS.md",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Agent briefing file"
+      },
+      "status": "Pass",
+      "evidence": "No code blocks in AGENTS.md.",
+      "remediation": null,
+      "method": "script",
+      "why": "Full scripts in the briefing get copied wholesale, while a short exemplar shows the convention without the bulk.",
+      "checked": "Inputs: briefing.file, briefing.file, briefing.code_blocks, briefing.code_block_files",
+      "found": "No code blocks in AGENTS.md.",
+      "verdict_why": "Pass based on: No code blocks in AGENTS.md."
+    },
+    {
+      "id": "no-placeholders",
+      "number": 21,
+      "section": "Wayfinding",
+      "title": "No placeholders",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Agent briefing file"
+      },
+      "status": "Pass",
+      "evidence": "placeholder_hits empty in agents_md_hygiene and every documentation_set file (code blocks skipped).",
+      "remediation": null,
+      "method": "script",
+      "why": "A \"coming soon\" or to-do note in the briefing invites the agent to leave its own work unfinished too.",
+      "checked": "Inputs: agents_md_hygiene.placeholder_hits, documentation_set.files[].placeholder_hits",
+      "found": "placeholder_hits empty in agents_md_hygiene and every documentation_set file (code blocks skipped).",
+      "verdict_why": "Pass based on: placeholder_hits empty in agents_md_hygiene and every documentation_set file (code blocks skipped)."
+    },
+    {
+      "id": "nested-agents-md",
+      "number": 22,
+      "section": "Wayfinding",
+      "title": "Nested AGENTS.md per package",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Agent briefing file"
+      },
+      "status": "N/A",
+      "evidence": "answers.monorepo: \"no\" — not a monorepo; nested AGENTS.md not needed.",
+      "remediation": null,
+      "method": "script",
+      "why": "Agents read the nearest AGENTS.md, so in a monorepo each package can carry instructions tailored to it.",
+      "checked": "Inputs: answers.monorepo, agents_md_signals.monorepo_packages, inventory.projects.suggested_monorepo, inventory.projects.list[].instruction, briefing.harnesses",
+      "found": "answers.monorepo: \"no\" — not a monorepo; nested AGENTS.md not needed.",
+      "verdict_why": "N/A based on: answers.monorepo: \"no\" — not a monorepo; nested AGENTS.md not needed."
+    },
+    {
+      "id": "agents-md-skill-extraction",
+      "number": 23,
+      "section": "Wayfinding",
+      "title": "AGENTS.md line count does not signal skill-extraction need",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Agent briefing file"
+      },
+      "status": "Pass",
+      "evidence": "briefing.total_lines: 48 (200 or fewer, with @ imports).",
+      "remediation": null,
+      "method": "script",
+      "why": "A briefing past 200 lines is a sign its domain and workflow guidance belongs in skills that load on demand.",
+      "checked": "Inputs: briefing.file, briefing.total_lines, skill_packages.detected",
+      "found": "briefing.total_lines: 48 (200 or fewer, with @ imports).",
+      "verdict_why": "Pass based on: briefing.total_lines: 48 (200 or fewer, with @ imports)."
+    },
+    {
+      "id": "long-form-docs",
+      "number": 24,
+      "section": "Wayfinding",
+      "title": "Long-form documentation exists",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "System map"
+      },
+      "status": "Pass",
+      "evidence": "documentation_set.files: 8 (docs/deploy-droplet.md, docs/mobile.md, docs/architecture.md +5 more).",
+      "remediation": null,
+      "method": "script",
+      "why": "A docs/ folder holds the detail an agent needs for specific areas without bloating the always-loaded briefing.",
+      "checked": "Inputs: documentation_set.files",
+      "found": "documentation_set.files: 8 (docs/deploy-droplet.md, docs/mobile.md, docs/architecture.md +5 more).",
+      "verdict_why": "Pass based on: documentation_set.files: 8 (docs/deploy-droplet.md, docs/mobile.md, docs/architecture.md +5 more)."
+    },
+    {
+      "id": "architecture-doc",
+      "number": 25,
+      "section": "Wayfinding",
+      "title": "An architecture/design doc exists",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "System map"
+      },
+      "status": "Pass",
+      "evidence": "docs/architecture.md (125 lines) covers components (document.js, tts.py, player.js), full Markdown-to-highlight pipeline, and key sync/caching/accessibility decisions (plus model-research.md).",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "An architecture doc gives an agent the high-level structure, patterns and key decisions before it changes code that depends on them.",
+      "checked": "Inputs: doc_signals.architecture, doc_signals.adr_dirs, doc_classification.architecture_candidates",
+      "found": "docs/architecture.md (125 lines) covers components (document.js, tts.py, player.js), full Markdown-to-highlight pipeline, and key sync/caching/accessibility decisions (plus model-research.md).",
+      "verdict_why": "Pass based on: docs/architecture.md (125 lines) covers components (document.js, tts.py, player.js), full Markdown-to-highlight pipeline, and key sync/caching/accessibility decisions (plus model-research.md)."
+    },
+    {
+      "id": "doc-files-under-500-lines",
+      "number": 26,
+      "section": "Wayfinding",
+      "title": "All documentation-set files are under 500 lines",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "System map"
+      },
+      "status": "Pass",
+      "evidence": "All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (257).",
+      "remediation": null,
+      "method": "script",
+      "why": "Docs under 500 lines give an agent more detail than AGENTS.md without overloading its context.",
+      "checked": "Inputs: documentation_set.files[].under_500_lines, documentation_set.files[].line_count, documentation_set.excluded_generated",
+      "found": "All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (257).",
+      "verdict_why": "Pass based on: All 8 documentation_set.files under_500_lines: true; largest docs/deploy-droplet.md (257)."
+    },
+    {
+      "id": "repo-structure-documented",
+      "number": 27,
+      "section": "Wayfinding",
+      "title": "Repo structure is documented",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "System map"
+      },
+      "status": "N/A",
+      "evidence": "3,459 source lines, under 10,000: a small repo needs no structure doc.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "When the docs explain the main folders, an agent knows where a change belongs without traversing the whole tree.",
+      "checked": "Inputs: wayfinding.structure.apps[].source_lines, wayfinding.structure.boundary_tools, wayfinding.structure_docs.mentions, wayfinding.structure_docs.docs_skipped",
+      "found": "3,459 source lines, under 10,000: a small repo needs no structure doc.",
+      "verdict_why": "N/A based on: 3,459 source lines, under 10,000: a small repo needs no structure doc."
+    },
+    {
+      "id": "commit-and-branch-conventions",
+      "number": 28,
+      "section": "Wayfinding",
+      "title": "Commit message and branch naming conventions",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Written conventions"
+      },
+      "status": "Pass",
+      "evidence": "commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 12/19 recent subjects conventional.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Agents write commits and branches all day, and can follow the team's naming only if it is written down.",
+      "checked": "Inputs: briefing.file, agents_md_signals.conventions, git_history.shallow",
+      "found": "commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 12/19 recent subjects conventional.",
+      "verdict_why": "Pass based on: commit: AGENTS.md:31; branch: AGENTS.md:31; config: commitlint.config.cjs; 12/19 recent subjects conventional."
+    },
+    {
+      "id": "coding-standards",
+      "number": 29,
+      "section": "Wayfinding",
+      "title": "General coding standards and practices",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Written conventions"
+      },
+      "status": "Pass",
+      "evidence": "AGENTS.md:29-34 sets TDD, strict typing, and human-review standards with no pure formatting prose; \"lint_conventions\" enforces Ruff N/I and ESLint naming/unused-var rules.",
+      "remediation": null,
+      "method": "ai",
+      "why": "Practices a linter can't enforce, such as TDD or a review checklist for finished work, reach an agent only when they are written down.",
+      "checked": "Rubric for “General coding standards and practices” in references/04-checks.md",
+      "found": "AGENTS.md:29-34 sets TDD, strict typing, and human-review standards with no pure formatting prose; \"lint_conventions\" enforces Ruff N/I and ESLint naming/unused-var rules.",
+      "verdict_why": "Pass based on: AGENTS.md:29-34 sets TDD, strict typing, and human-review standards with no pure formatting prose; \"lint_conventions\" enforces Ruff N/I and ESLint naming/unused-var rules."
+    },
+    {
+      "id": "contracts-in-source",
+      "number": 30,
+      "section": "Wayfinding",
+      "title": "Contracts in source",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Contracts in source"
+      },
+      "status": "Pass",
+      "evidence": ".: API (fastapi) → pyproject.toml (fastapi).",
+      "remediation": null,
+      "method": "script",
+      "why": "API and data schemas in the repo tell an agent what a correct change looks like at the boundaries.",
+      "checked": "Inputs: wayfinding.contracts.apps, wayfinding.contracts.shared, inventory.projects.list[].dir",
+      "found": ".: API (fastapi) → pyproject.toml (fastapi).",
+      "verdict_why": "Pass based on: .: API (fastapi) → pyproject.toml (fastapi)."
+    },
+    {
+      "id": "docs-kept-current",
+      "number": 31,
+      "section": "Wayfinding",
+      "title": "Guidance for keeping docs current",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Docs that keep pace"
+      },
+      "status": "Pass",
+      "evidence": "Doc upkeep instruction at AGENTS.md:34: \"- **Keep docs current**: Update `README.md`, `docs/architecture.md`, and `docs/D\".",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Without a habit of updating docs as part of the work they drift, and an agent trusts whatever they say.",
+      "checked": "Inputs: briefing.file, agents_md_signals.docs_upkeep",
+      "found": "Doc upkeep instruction at AGENTS.md:34: \"- **Keep docs current**: Update `README.md`, `docs/architecture.md`, and `docs/D\".",
+      "verdict_why": "Pass based on: Doc upkeep instruction at AGENTS.md:34: \"- **Keep docs current**: Update `README.md`, `docs/architecture.md`, and `docs/D\"."
+    },
+    {
+      "id": "doc-paths-resolve",
+      "number": 32,
+      "section": "Wayfinding",
+      "title": "Doc paths resolve",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Docs that keep pace"
+      },
+      "status": "Pass",
+      "evidence": "All 47 paths the key docs name resolve (README.md, AGENTS.md, docs/DEVELOPMENT.md); 1 only as the tail of a longer path, e.g. README.md:344 `css/app.css`.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "A path in the key docs that points nowhere sends an agent looking for a file that doesn't exist.",
+      "checked": "Inputs: wayfinding.docs_refs.docs, wayfinding.docs_refs.checked, wayfinding.docs_refs.broken, wayfinding.docs_refs.missing_names, wayfinding.docs_refs.missing_names_count",
+      "found": "All 47 paths the key docs name resolve (README.md, AGENTS.md, docs/DEVELOPMENT.md); 1 only as the tail of a longer path, e.g. README.md:344 `css/app.css`.",
+      "verdict_why": "Pass based on: All 47 paths the key docs name resolve (README.md, AGENTS.md, docs/DEVELOPMENT.md); 1 only as the tail of a longer path, e.g. README.md:344 `css/app.css`."
+    },
+    {
+      "id": "docs-match-code",
+      "number": 33,
+      "section": "Wayfinding",
+      "title": "Docs match the code",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Docs that keep pace"
+      },
+      "status": "Pass",
+      "evidence": "Judged README.md, AGENTS.md, and docs/DEVELOPMENT.md (0 high/medium stale claims; commands, paths, env vars, /api/metrics, and scripts match live code).",
+      "remediation": null,
+      "method": "ai",
+      "why": "Out-of-date docs are worse than none, because an agent will trust them.",
+      "checked": "Rubric for “Docs match the code” in references/04-checks.md",
+      "found": "Judged README.md, AGENTS.md, and docs/DEVELOPMENT.md (0 high/medium stale claims; commands, paths, env vars, /api/metrics, and scripts match live code).",
+      "verdict_why": "Pass based on: Judged README.md, AGENTS.md, and docs/DEVELOPMENT.md (0 high/medium stale claims; commands, paths, env vars, /api/metrics, and scripts match live code)."
+    },
+    {
+      "id": "ships-agent-skills",
+      "number": 34,
+      "section": "Wayfinding",
+      "title": "The repo ships agent skills",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Reusable agent playbooks"
+      },
+      "status": "Pass",
+      "evidence": "2 committed skill packages: .agents/skills (2).",
+      "remediation": null,
+      "method": "script",
+      "why": "Packaging team practices as installable skills lets agents load them on demand instead of carrying them in AGENTS.md.",
+      "checked": "Inputs: skills_directory.shipped.folders, skills_directory.shipped.plugins, skills_directory.shipped.submodules, skills_directory.shipped.remote_plugins",
+      "found": "2 committed skill packages: .agents/skills (2).",
+      "verdict_why": "Pass based on: 2 committed skill packages: .agents/skills (2)."
+    },
+    {
+      "id": "skills-in-every-harness",
+      "number": 35,
+      "section": "Wayfinding",
+      "title": "Skills ship where every targeted harness reads them",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Reusable agent playbooks"
+      },
+      "status": "Pass",
+      "evidence": "2 skills; found by other 2/2.",
+      "remediation": null,
+      "method": "script",
+      "why": "Skills help only the harnesses that find them, so they belong in the folders every targeted harness reads.",
+      "checked": "Inputs: skills_directory.shipped.reach, skills_directory.shipped.submodules, skills_directory.shipped.remote_plugins, skills_directory.agents_skills_dir.configured_paths, inventory.harness_files.suggested_harnesses",
+      "found": "2 skills; found by other 2/2.",
+      "verdict_why": "Pass based on: 2 skills; found by other 2/2."
+    },
+    {
+      "id": "skill-descriptions",
+      "number": 36,
+      "section": "Wayfinding",
+      "title": "Each skill package has a description: field",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Reusable agent playbooks"
+      },
+      "status": "Pass",
+      "evidence": "skill_packages.all_have_descriptions: true (2 packages).",
+      "remediation": null,
+      "method": "script",
+      "why": "A skill's description is the part an agent always sees and decides when the rest loads, so a skill without one may never be used.",
+      "checked": "Inputs: skill_packages.detected, skill_packages.all_have_descriptions, skill_packages.packages[].has_description, skill_packages.untracked",
+      "found": "skill_packages.all_have_descriptions: true (2 packages).",
+      "verdict_why": "Pass based on: skill_packages.all_have_descriptions: true (2 packages)."
+    },
+    {
+      "id": "skills-cover-org-knowledge",
+      "number": 37,
+      "section": "Wayfinding",
+      "title": "Skills cover organizational knowledge",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Reusable agent playbooks"
+      },
+      "status": "Pass",
+      "evidence": "2 committed repo-specific skills under .agents/skills/ (tts-alignment-testing, docker-offline-release); neither is a stub and both encode repo workflows.",
+      "remediation": null,
+      "method": "ai",
+      "why": "Skills that capture framework guidance and discipline expertise, such as testing strategy or security review, give agents the team's know-how rather than generic defaults.",
+      "checked": "Rubric for “Skills cover organizational knowledge” in references/04-checks.md",
+      "found": "2 committed repo-specific skills under .agents/skills/ (tts-alignment-testing, docker-offline-release); neither is a stub and both encode repo workflows.",
+      "verdict_why": "Pass based on: 2 committed repo-specific skills under .agents/skills/ (tts-alignment-testing, docker-offline-release); neither is a stub and both encode repo workflows."
+    },
+    {
+      "id": "monorepo-skill-scoping",
+      "number": 38,
+      "section": "Wayfinding",
+      "title": "Monorepo: file-path-scoped rules say which skills apply where",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Reusable agent playbooks"
+      },
+      "status": "N/A",
+      "evidence": "\"answers.monorepo\": \"no\" — single-package repo; per-package skill scoping is N/A.",
+      "remediation": null,
+      "method": "ai",
+      "why": "A frontend skill shouldn't load while an agent works in a backend service, so a monorepo's rules say which skills apply where.",
+      "checked": "Rubric for “Monorepo: file-path-scoped rules say which skills apply where” in references/04-checks.md",
+      "found": "\"answers.monorepo\": \"no\" — single-package repo; per-package skill scoping is N/A.",
+      "verdict_why": "N/A based on: \"answers.monorepo\": \"no\" — single-package repo; per-package skill scoping is N/A."
+    },
+    {
+      "id": "skills-versioned",
+      "number": 39,
+      "section": "Wayfinding",
+      "title": "Skills are version-controlled and updated",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Reusable agent playbooks"
+      },
+      "status": "Pass",
+      "evidence": "All 2 skill packages git_tracked; latest last_commit_iso 2026-11-21T02:21:59-05:00 (.agents/skills/docker-offline-release), within 6 months.",
+      "remediation": null,
+      "method": "script",
+      "why": "Skills kept in version control and updated as practices evolve stop agents from following practices the team has dropped.",
+      "checked": "Inputs: skill_packages.detected, skill_packages.packages[].committed, skill_packages.packages[].last_commit_iso, skill_packages.untracked, repo_first_commit_iso, generated_at, git_history.shallow",
+      "found": "All 2 skill packages git_tracked; latest last_commit_iso 2026-11-21T02:21:59-05:00 (.agents/skills/docker-offline-release), within 6 months.",
+      "verdict_why": "Pass based on: All 2 skill packages git_tracked; latest last_commit_iso 2026-11-21T02:21:59-05:00 (.agents/skills/docker-offline-release), within 6 months."
+    },
+    {
+      "id": "mcp-server-docs",
+      "number": 40,
+      "section": "Wayfinding",
+      "title": "Docs say when and how to use each MCP server, and how to authenticate",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Reusable agent playbooks"
+      },
+      "status": "N/A",
+      "evidence": "No MCP servers in the repo's settings, subagents or docs.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "An agent uses a configured MCP server well only when the docs say when to use it and how to authenticate.",
+      "checked": "Inputs: answers.harnesses, mcp.server_docs.servers, mcp.agent_configs[].description",
+      "found": "No MCP servers in the repo's settings, subagents or docs.",
+      "verdict_why": "N/A based on: No MCP servers in the repo's settings, subagents or docs."
+    },
+    {
+      "id": "destructive-action-guardrails",
+      "number": 41,
+      "section": "Wayfinding",
+      "title": "Guardrails against destructive actions",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "No-go zones stated"
+      },
+      "status": "Pass",
+      "evidence": "AGENTS.md names rm -rf, git push --force, git reset --hard +1 more; no targeted agent tool has committed guard settings.",
+      "remediation": null,
+      "method": "script",
+      "why": "Guardrails against destructive commands lower the blast radius when an agent misjudges an action.",
+      "checked": "Inputs: agents_md_signals.destructive.harness_guards, agents_md_signals.destructive.prose_commands, agents_md_signals.destructive.prose_hits",
+      "found": "AGENTS.md names rm -rf, git push --force, git reset --hard +1 more; no targeted agent tool has committed guard settings.",
+      "verdict_why": "Pass based on: AGENTS.md names rm -rf, git push --force, git reset --hard +1 more; no targeted agent tool has committed guard settings."
+    },
+    {
+      "id": "no-go-zones",
+      "number": 42,
+      "section": "Wayfinding",
+      "title": "No-go zones stated",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "No-go zones stated"
+      },
+      "status": "Pass",
+      "evidence": "1 no-go path; covered for other 1/1; AGENTS.md:36 \"Guardrails & No-Go Zones\".",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Agents need explicit boundaries: generated code, vendored folders and migrations each need a stated alternative to editing them by hand.",
+      "checked": "Inputs: briefing.file, wayfinding.no_go_zones.zones, wayfinding.no_go_zones.boundaries_section, wayfinding.no_go_zones.block_files, briefing.file",
+      "found": "1 no-go path; covered for other 1/1; AGENTS.md:36 \"Guardrails & No-Go Zones\".",
+      "verdict_why": "Pass based on: 1 no-go path; covered for other 1/1; AGENTS.md:36 \"Guardrails & No-Go Zones\"."
+    },
+    {
+      "id": "files-under-1000-lines",
+      "number": 43,
+      "section": "Wayfinding",
+      "title": "Files stay under 1,000 lines",
+      "arm": {
+        "phase": "wayfinding",
+        "criterion": "Navigable structure"
+      },
+      "status": "Pass",
+      "evidence": "2/2 apps pass; .: 14 files, no file >1k lines, web/js: 7 files, no file >1k lines.",
+      "remediation": null,
+      "method": "script",
+      "why": "A god file forces an agent to load thousands of lines to change one function.",
+      "checked": "Inputs: wayfinding.structure.apps[].oversized_count, wayfinding.structure.apps[].source_files, wayfinding.structure.apps[].oversized_sample, wayfinding.structure.generated_excluded",
+      "found": "2/2 apps pass; .: 14 files, no file >1k lines, web/js: 7 files, no file >1k lines.",
+      "verdict_why": "Pass based on: 2/2 apps pass; .: 14 files, no file >1k lines, web/js: 7 files, no file >1k lines."
+    },
+    {
+      "id": "pre-commit-lint",
+      "number": 44,
+      "section": "Tight Loops",
+      "title": "Linting runs in pre-commit",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "Lint gate"
+      },
+      "status": "Pass",
+      "evidence": "pre_commit.tools.lint: eslint, ruff check, ruff +1 more.",
+      "remediation": null,
+      "method": "script",
+      "why": "Linting before commit catches style and syntax issues before code leaves the agent's machine, while the change is still in context.",
+      "checked": "Inputs: guardrails.pre_commit.detected, guardrails.pre_commit.tools.lint, guardrails.pre_commit.pre_push_only.lint, inventory.ecosystems.detected[].name, guardrails.lint_suppressions",
+      "found": "pre_commit.tools.lint: eslint, ruff check, ruff +1 more.",
+      "verdict_why": "Pass based on: pre_commit.tools.lint: eslint, ruff check, ruff +1 more."
+    },
+    {
+      "id": "pre-commit-in-ci",
+      "number": 45,
+      "section": "Tight Loops",
+      "title": "All pre-commit checks also run in CI",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "Lint gate"
+      },
+      "status": "Pass",
+      "evidence": "coverage (pre-commit/CI): lint pc/ci, format pc/ci, typecheck pc/ci, test pc/ci.",
+      "remediation": null,
+      "method": "script",
+      "why": "Hooks can be skipped, so CI enforcing the same checks gives defense in depth.",
+      "checked": "Inputs: guardrails.coverage, guardrails.ci_workflows.detected",
+      "found": "coverage (pre-commit/CI): lint pc/ci, format pc/ci, typecheck pc/ci, test pc/ci.",
+      "verdict_why": "Pass based on: coverage (pre-commit/CI): lint pc/ci, format pc/ci, typecheck pc/ci, test pc/ci."
+    },
+    {
+      "id": "pre-commit-type-check",
+      "number": 46,
+      "section": "Tight Loops",
+      "title": "Type checking runs in pre-commit where applicable",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "Type safety"
+      },
+      "status": "Pass",
+      "evidence": "pre_commit.tools.typecheck: mypy.",
+      "remediation": null,
+      "method": "script",
+      "why": "Type errors caught at commit time reach the agent in seconds rather than after a CI run.",
+      "checked": "Inputs: guardrails.pre_commit.tools.typecheck, guardrails.pre_commit.compile, guardrails.pre_commit.compile_pre_push, guardrails.pre_commit.pre_push_only, guardrails.ci_workflows.tools.typecheck, inventory.ecosystems.detected[].typecheck, inventory.ecosystems.languages",
+      "found": "pre_commit.tools.typecheck: mypy.",
+      "verdict_why": "Pass based on: pre_commit.tools.typecheck: mypy."
+    },
+    {
+      "id": "strict-types",
+      "number": 47,
+      "section": "Tight Loops",
+      "title": "Strict type settings",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "Type safety"
+      },
+      "status": "Pass",
+      "evidence": "python strict (pyproject.toml:52); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)",
+      "remediation": null,
+      "method": "script",
+      "why": "Strict type settings, with escape hatches kept rare, turn many of an agent's mistakes into errors it can see and fix itself.",
+      "checked": "Inputs: tight-loops.apps[].ecosystems, tight-loops.apps[].types",
+      "found": "python strict (pyproject.toml:52); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)",
+      "verdict_why": "Pass based on: python strict (pyproject.toml:52); CI .github/workflows/ci.yml: mypy, typecheck; 0/1k-line escape hatches (0)"
+    },
+    {
+      "id": "pre-commit-format",
+      "number": 48,
+      "section": "Tight Loops",
+      "title": "Formatting runs in pre-commit",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "Automatic formatting"
+      },
+      "status": "Pass",
+      "evidence": "pre_commit.tools.format: prettier, ruff format, ruff-format.",
+      "remediation": null,
+      "method": "script",
+      "why": "Formatting in a hook is deterministic, so no agent spends tokens on style a tool can apply.",
+      "checked": "Inputs: guardrails.pre_commit.detected, guardrails.pre_commit.tools.format, guardrails.pre_commit.pre_push_only.format, inventory.ecosystems.detected[].name",
+      "found": "pre_commit.tools.format: prettier, ruff format, ruff-format.",
+      "verdict_why": "Pass based on: pre_commit.tools.format: prettier, ruff format, ruff-format."
+    },
+    {
+      "id": "pre-commit-framework",
+      "number": 49,
+      "section": "Tight Loops",
+      "title": "Pre-commit framework is configured",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "Checks before commit"
+      },
+      "status": "Pass",
+      "evidence": "pre_commit.detected: true; frameworks: pre-commit (.pre-commit-config.yaml).",
+      "remediation": null,
+      "method": "script",
+      "why": "A pre-commit framework installs the same hooks for every contributor, human or agent.",
+      "checked": "Inputs: guardrails.pre_commit.detected, guardrails.pre_commit.frameworks[].name, guardrails.pre_commit.frameworks[].config_path",
+      "found": "pre_commit.detected: true; frameworks: pre-commit (.pre-commit-config.yaml).",
+      "verdict_why": "Pass based on: pre_commit.detected: true; frameworks: pre-commit (.pre-commit-config.yaml)."
+    },
+    {
+      "id": "agent-tool-hooks",
+      "number": 50,
+      "section": "Tight Loops",
+      "title": "Agent tool hooks are configured",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "Checks before commit"
+      },
+      "status": "N/A",
+      "evidence": "No targeted harness has a repo-level hook config the script reads (other).",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Agent tool hooks run formatting and linting after each edit, so the agent doesn't have to remember to.",
+      "checked": "Inputs: guardrails.agent_hooks.by_harness, guardrails.agent_hooks.hooks[].kind, answers.harnesses",
+      "found": "No targeted harness has a repo-level hook config the script reads (other).",
+      "verdict_why": "N/A based on: No targeted harness has a repo-level hook config the script reads (other)."
+    },
+    {
+      "id": "pre-commit-unit-tests",
+      "number": 51,
+      "section": "Tight Loops",
+      "title": "Unit tests run in pre-commit",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "One-command tests"
+      },
+      "status": "Pass",
+      "evidence": "pre_commit.tools.test: pytest, node --test, npm test.",
+      "remediation": null,
+      "method": "script",
+      "why": "Unit tests at commit time are the shortest loop an agent has for learning whether its change still works.",
+      "checked": "Inputs: guardrails.pre_commit.tools.test, guardrails.pre_commit.pre_push_only.test, guardrails.ci_workflows.tools.test",
+      "found": "pre_commit.tools.test: pytest, node --test, npm test.",
+      "verdict_why": "Pass based on: pre_commit.tools.test: pytest, node --test, npm test."
+    },
+    {
+      "id": "readable-test-cases",
+      "number": 52,
+      "section": "Tight Loops",
+      "title": "Human-readable test cases exist",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "One-command tests"
+      },
+      "status": "Pass",
+      "evidence": "tests.files.total: 5; avg_name_words: 7.9; e.g. [\"splitSentences breaks long runs, preserv\",\"buildDocument skips code blocks, keeps t\",\"buildDocument preserves accented Latin w\",\"mapTimings sweeps ev…",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Human-readable test cases give an agent a way to check its own change against what the code is meant to do.",
+      "checked": "Inputs: guardrails.tests.files.total, guardrails.tests.files.avg_name_words, guardrails.tests.files.names, guardrails.tests.test_directories",
+      "found": "tests.files.total: 5; avg_name_words: 7.9; e.g. [\"splitSentences breaks long runs, preserv\",\"buildDocument skips code blocks, keeps t\",\"buildDocument preserves accented Latin w\",\"mapTimings sweeps ev…",
+      "verdict_why": "Pass based on: tests.files.total: 5; avg_name_words: 7.9; e.g. [\"splitSentences breaks long runs, preserv\",\"buildDocument skips code blocks, keeps t\",\"buildDocument preserves accented Latin w\",\"mapTimings sweeps ev…"
+    },
+    {
+      "id": "one-command-tests",
+      "number": 53,
+      "section": "Tight Loops",
+      "title": "One-command tests",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "One-command tests"
+      },
+      "status": "Pass",
+      "evidence": "Override: web/js/package.json is an ESM marker with 0 deps/scripts; root Makefile and package.json run pytest and node --test with single-test filters (docs/DEVELOPMENT.md:53-64).",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "One documented command that can also run a single file lets an agent test what it changed in seconds instead of minutes.",
+      "checked": "Inputs: tight-loops.apps[].tests",
+      "found": "Override: web/js/package.json is an ESM marker with 0 deps/scripts; root Makefile and package.json run pytest and node --test with single-test filters (docs/DEVELOPMENT.md:53-64).",
+      "verdict_why": "Pass based on: Override: web/js/package.json is an ESM marker with 0 deps/scripts; root Makefile and package.json run pytest and node --test with single-test filters (docs/DEVELOPMENT.md:53-64)."
+    },
+    {
+      "id": "headless-dev-loop",
+      "number": 54,
+      "section": "Tight Loops",
+      "title": "Headless dev loop",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "One-command tests"
+      },
+      "status": "Partial",
+      "evidence": "Build: README.md:162 `docker build -t read-aloud .` needs Docker (`docker build -t read-aloud .` in the recipe, README.md:162); README.md:173 `docker build --build-arg TORCH_VARIANT=cu128 -t read-alo…",
+      "remediation": "Give agents a build command that runs without Docker, a running service or a login (keep image builds and publishing behind their own targets), and name it in AGENTS.md.",
+      "method": "script",
+      "why": "A cloud agent's sandbox has no Docker daemon, running services, signed-in CLI or linked account, so builds and tests that need one of them can't run where the agent works.",
+      "checked": "Inputs: tight-loops.apps[].tests.test_files, tight-loops.apps[].headless",
+      "found": "Build: README.md:162 `docker build -t read-aloud .` needs Docker (`docker build -t read-aloud .` in the recipe, README.md:162); README.md:173 `docker build --build-arg TORCH_VARIANT=cu128 -t read-alo…",
+      "verdict_why": "Partial based on: Build: README.md:162 `docker build -t read-aloud .` needs Docker (`docker build -t read-aloud .` in the recipe, README.md:162); README.md:173 `docker build --build-arg TORCH_VARIANT=cu128 -t read-alo…",
+      "effort": {
+        "scope": "low",
+        "friction": "low",
+        "band": "<1h",
+        "size": "S",
+        "why": "All unit, lint, typecheck, smoke, and e2e commands already run headless without Docker; only the documented container image build commands in README.md:162,173 use Docker."
+      }
+    },
+    {
+      "id": "end-to-end-confidence",
+      "number": 55,
+      "section": "Tight Loops",
+      "title": "End-to-end confidence",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "End-to-end confidence"
+      },
+      "status": "Pass",
+      "evidence": "Override: web/js/package.json is an ESM marker; tests/e2e/live_server.test.mjs tests live FastAPI server + web/js pipeline and runs on PRs in .github/workflows/ci.yml.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Unit tests can pass while the system breaks, and integration or end-to-end suites in CI catch what they miss.",
+      "checked": "Inputs: tight-loops.apps[].e2e.suites",
+      "found": "Override: web/js/package.json is an ESM marker; tests/e2e/live_server.test.mjs tests live FastAPI server + web/js pipeline and runs on PRs in .github/workflows/ci.yml.",
+      "verdict_why": "Pass based on: Override: web/js/package.json is an ESM marker; tests/e2e/live_server.test.mjs tests live FastAPI server + web/js pipeline and runs on PRs in .github/workflows/ci.yml."
+    },
+    {
+      "id": "coverage-floor",
+      "number": 56,
+      "section": "Tight Loops",
+      "title": "Coverage floor",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "Coverage floor"
+      },
+      "status": "Pass",
+      "evidence": "Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (88.5%) and pytest enforces 75% on server/ (78.5%) in CI.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "A coverage floor enforced in CI keeps an agent's changes from landing without tests.",
+      "checked": "Inputs: tight-loops.apps[].coverage",
+      "found": "Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (88.5%) and pytest enforces 75% on server/ (78.5%) in CI.",
+      "verdict_why": "Pass based on: Override: web/js/package.json is an ESM marker; root npm test enforces --test-coverage-lines=75 on web/js/**/*.js (88.5%) and pytest enforces 75% on server/ (78.5%) in CI."
+    },
+    {
+      "id": "ci-on-git-lifecycle",
+      "number": 57,
+      "section": "Tight Loops",
+      "title": "CI runs are tied to the git lifecycle",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "CI on every change, within budget"
+      },
+      "status": "Pass",
+      "evidence": "union_events: [\"pull_request\",\"push\",\"schedule\",\"manual\"]; providers: [\"github-actions\"].",
+      "remediation": null,
+      "method": "script",
+      "why": "CI on every pull request and merge means no agent change reaches the main line unchecked.",
+      "checked": "Inputs: guardrails.ci_workflows.detected, security_gates.ci_lifecycle.union_events, security_gates.ci_lifecycle.providers, security_gates.ci_lifecycle.has_push, security_gates.ci_lifecycle.has_pull_request, security_gates.ci_lifecycle.has_merge_group, security_gates.ci_lifecycle.workflows",
+      "found": "union_events: [\"pull_request\",\"push\",\"schedule\",\"manual\"]; providers: [\"github-actions\"].",
+      "verdict_why": "Pass based on: union_events: [\"pull_request\",\"push\",\"schedule\",\"manual\"]; providers: [\"github-actions\"]."
+    },
+    {
+      "id": "agents-read-ci",
+      "number": 58,
+      "section": "Tight Loops",
+      "title": "Agents can read CI status and logs",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "CI on every change, within budget"
+      },
+      "status": "Pass",
+      "evidence": "--online: `gh run list --limit 100 --status completed` listed a CI run.",
+      "remediation": null,
+      "method": "script",
+      "why": "An agent that can't read CI status and logs can't tell which test failed, so the feedback loop is broken.",
+      "checked": "Inputs: online.ci_read, ci_access.ci_mcp_servers, ci_access.read_commands, guardrails.ci_workflows.workflows[].provider",
+      "found": "--online: `gh run list --limit 100 --status completed` listed a CI run.",
+      "verdict_why": "Pass based on: --online: `gh run list --limit 100 --status completed` listed a CI run."
+    },
+    {
+      "id": "agents-trigger-ci",
+      "number": 59,
+      "section": "Tight Loops",
+      "title": "Agents can trigger CI runs",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "CI on every change, within budget"
+      },
+      "status": "Pass",
+      "evidence": "--online: `gh api repos/ryderstorm/reader-for-neurodivergents` says the signed-in identity can push and CI runs on pull_request, push, manual.",
+      "remediation": null,
+      "method": "script",
+      "why": "An agent that can start a CI run can confirm its fix without waiting for a person to rerun the pipeline.",
+      "checked": "Inputs: online.push_access, security_gates.ci_lifecycle.union_events, ci_access.ci_mcp_servers, ci_access.trigger_commands, ci_access.push_ci_lines",
+      "found": "--online: `gh api repos/ryderstorm/reader-for-neurodivergents` says the signed-in identity can push and CI runs on pull_request, push, manual.",
+      "verdict_why": "Pass based on: --online: `gh api repos/ryderstorm/reader-for-neurodivergents` says the signed-in identity can push and CI runs on pull_request, push, manual."
+    },
+    {
+      "id": "fast-ci",
+      "number": 60,
+      "section": "Tight Loops",
+      "title": "CI feedback is fast (under 10 minutes)",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "CI on every change, within budget"
+      },
+      "status": "Pass",
+      "evidence": "--online: CI took a median 1.4 min per commit over the last 2 pull request commits (longest 1.5 min).",
+      "remediation": null,
+      "method": "script",
+      "why": "By the time a slow CI run fails, the agent has moved on, and fixing the issue costs more tokens and time.",
+      "checked": "Inputs: online.ci_durations, security_gates.workflow_timeouts",
+      "found": "--online: CI took a median 1.4 min per commit over the last 2 pull request commits (longest 1.5 min).",
+      "verdict_why": "Pass based on: --online: CI took a median 1.4 min per commit over the last 2 pull request commits (longest 1.5 min)."
+    },
+    {
+      "id": "hands-on-run-path",
+      "number": 61,
+      "section": "Tight Loops",
+      "title": "Hands-on run path",
+      "arm": {
+        "phase": "tight-loops",
+        "criterion": "Hands-on run path"
+      },
+      "status": "Pass",
+      "evidence": "All 2 apps pass (root, web/js); start docs/DEVELOPMENT.md:39 `make run`; install docs/DEVELOPMENT.md:17; interaction docs/DEVELOPMENT.md:36; login isn't scored (only an app with auth needs one).",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Written steps to install, start, log in and try one real interaction let an agent see its change working, not just its tests passing.",
+      "checked": "Inputs: tight-loops.apps[].run",
+      "found": "All 2 apps pass (root, web/js); start docs/DEVELOPMENT.md:39 `make run`; install docs/DEVELOPMENT.md:17; interaction docs/DEVELOPMENT.md:36; login isn't scored (only an app with auth needs one).",
+      "verdict_why": "Pass based on: All 2 apps pass (root, web/js); start docs/DEVELOPMENT.md:39 `make run`; install docs/DEVELOPMENT.md:17; interaction docs/DEVELOPMENT.md:36; login isn't scored (only an app with auth needs one)."
+    },
+    {
+      "id": "required-ci-checks",
+      "number": 62,
+      "section": "Safe Passage",
+      "title": "All CI checks are required before merge",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Protected main line"
+      },
+      "status": "Pass",
+      "evidence": "github branch protection and rulesets for main: 6 required check(s) (Lint, Format, Typecheck & Code Health, Unit, Coverage, Smoke & E2E Tests, Dependency Audit & Review, OWASP ZAP Baseline Scan +2 mo…",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "A check that can be bypassed at merge stops nothing, so every CI check must pass with no override culture.",
+      "checked": "Inputs: online.status, online.required_checks, security_gates.required_checks_signals.github_settings_yml, answers.required_checks",
+      "found": "github branch protection and rulesets for main: 6 required check(s) (Lint, Format, Typecheck & Code Health, Unit, Coverage, Smoke & E2E Tests, Dependency Audit & Review, OWASP ZAP Baseline Scan +2 mo…",
+      "verdict_why": "Pass based on: github branch protection and rulesets for main: 6 required check(s) (Lint, Format, Typecheck & Code Health, Unit, Coverage, Smoke & E2E Tests, Dependency Audit & Review, OWASP ZAP Baseline Scan +2 mo…"
+    },
+    {
+      "id": "secrets-scanning",
+      "number": 63,
+      "section": "Safe Passage",
+      "title": "Secrets scanning is active",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Secrets never in code"
+      },
+      "status": "Pass",
+      "evidence": "No secrets scanner in CI or pre-commit; github secret scanning on, push protection on (--online).",
+      "remediation": null,
+      "method": "script",
+      "why": "Agents reproduce hardcoded secrets like any pattern they learned from, so a scanner should block credentials before they are committed.",
+      "checked": "Inputs: security_gates.secrets_scanning.detected, security_gates.secrets_scanning.sources[].source, online.secret_scanning, answers.secret_scanning",
+      "found": "No secrets scanner in CI or pre-commit; github secret scanning on, push protection on (--online).",
+      "verdict_why": "Pass based on: No secrets scanner in CI or pre-commit; github secret scanning on, push protection on (--online)."
+    },
+    {
+      "id": "secrets-out-of-code",
+      "number": 64,
+      "section": "Safe Passage",
+      "title": "Secrets stay out of code",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Secrets never in code"
+      },
+      "status": "Partial",
+      "evidence": "No committed secret files or tokens; no secrets manager, encrypted secrets or CI secret refs.",
+      "remediation": "Keep secrets in a manager (SOPS, Vault, a cloud secret store) or CI secrets.",
+      "method": "script",
+      "why": "A secret in the repo is readable by every agent and tool that works in it, so secrets belong in a manager, encrypted store or CI secrets.",
+      "checked": "Inputs: safe-passage.secrets.committed_files, safe-passage.secrets.token_hits, safe-passage.secrets.tracked_env_files, safe-passage.secrets.env_ignored, safe-passage.secrets.managers, safe-passage.scan.truncated",
+      "found": "No committed secret files or tokens; no secrets manager, encrypted secrets or CI secret refs.",
+      "verdict_why": "Partial based on: No committed secret files or tokens; no secrets manager, encrypted secrets or CI secret refs.",
+      "effort": {
+        "scope": "low",
+        "friction": "medium",
+        "band": "half-day",
+        "size": "M",
+        "why": "No secrets are committed and .env*/certs/*.key are gitignored; the app is offline-only with no third-party API secrets unless deployment secrets (e.g. registry/SSH) are added to GitHub Actions."
+      }
+    },
+    {
+      "id": "code-owners",
+      "number": 65,
+      "section": "Safe Passage",
+      "title": "Human code ownership is declared",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Clear ownership"
+      },
+      "status": "Pass",
+      "evidence": ".github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 92 tracked files.",
+      "remediation": null,
+      "method": "script",
+      "why": "Every piece of code needs a human owner who can explain, modify and fix what an agent changed there.",
+      "checked": "Inputs: code_review.ownership.file, code_review.ownership.has_catch_all, code_review.ownership.coverage_percent, code_review.ownership.owners_files, code_review.ownership.unowned_sample, code_review.ownership.alternatives, code_review.ownership.invalid_lines",
+      "found": ".github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 92 tracked files.",
+      "verdict_why": "Pass based on: .github/CODEOWNERS: has_catch_all: true, coverage_percent: 100 of 92 tracked files."
+    },
+    {
+      "id": "sca",
+      "number": 66,
+      "section": "Safe Passage",
+      "title": "SCA scans dependencies",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Dependency hygiene"
+      },
+      "status": "Pass",
+      "evidence": "sca.detected: true (dependency-review-action); dependency bot config: .github/dependabot.yml.",
+      "remediation": null,
+      "method": "script",
+      "why": "Agents pull in vulnerable dependencies as readily as safe ones, and SCA flags the ones with known vulnerabilities.",
+      "checked": "Inputs: security_gates.sca.detected, security_gates.sca.tools, security_gates.required_checks_signals.dependabot_config, security_gates.required_checks_signals.renovate_config",
+      "found": "sca.detected: true (dependency-review-action); dependency bot config: .github/dependabot.yml.",
+      "verdict_why": "Pass based on: sca.detected: true (dependency-review-action); dependency bot config: .github/dependabot.yml."
+    },
+    {
+      "id": "update-bot-waiting-period",
+      "number": 67,
+      "section": "Safe Passage",
+      "title": "Update bot with a waiting period",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Dependency hygiene"
+      },
+      "status": "Pass",
+      "evidence": ".github/dependabot.yml; shortest wait: node (7 days); waiting days: node 7, python 7, docker 7, github-actions 7; grouping: false.",
+      "remediation": null,
+      "method": "script",
+      "why": "Most compromised releases are pulled within days, so an update bot that waits keeps agents and bots from installing one in the meantime.",
+      "checked": "Inputs: safe-passage.dependency_updates.bots, safe-passage.dependency_updates.ecosystems, safe-passage.dependency_updates.waiting_periods, safe-passage.dependency_updates.grouping, guardrails.ci_workflows.github_actions_workflow_count",
+      "found": ".github/dependabot.yml; shortest wait: node (7 days); waiting days: node 7, python 7, docker 7, github-actions 7; grouping: false.",
+      "verdict_why": "Pass based on: .github/dependabot.yml; shortest wait: node (7 days); waiting days: node 7, python 7, docker 7, github-actions 7; grouping: false."
+    },
+    {
+      "id": "sast",
+      "number": 68,
+      "section": "Safe Passage",
+      "title": "SAST runs in CI and blocks merges",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Security scanning in the pipeline"
+      },
+      "status": "Pass",
+      "evidence": "sast.tools: codeql, github/codeql-action; sources: .github/workflows/codeql.yml [ci, PR].",
+      "remediation": null,
+      "method": "script",
+      "why": "Agents reproduce insecure patterns such as SQL injection from their training data, so SAST should block merges on critical findings.",
+      "checked": "Inputs: security_gates.sast.detected, security_gates.sast.sources[].runs_on_pr, security_gates.sast.sources[].non_blocking, security_gates.ci_lifecycle.workflows[].normalized_events",
+      "found": "sast.tools: codeql, github/codeql-action; sources: .github/workflows/codeql.yml [ci, PR].",
+      "verdict_why": "Pass based on: sast.tools: codeql, github/codeql-action; sources: .github/workflows/codeql.yml [ci, PR]."
+    },
+    {
+      "id": "dast",
+      "number": 69,
+      "section": "Safe Passage",
+      "title": "DAST runs against the app in CI",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Security scanning in the pipeline"
+      },
+      "status": "Pass",
+      "evidence": "dast.tools: zaproxy/action-baseline; sources: .github/workflows/dast.yml [ci, PR]; apps: . (fastapi), server (fastapi).",
+      "remediation": null,
+      "method": "script",
+      "why": "Scanning the running app or API in CI catches vulnerabilities that only show at runtime, before the merge that would ship them.",
+      "checked": "Inputs: security_gates.dast.detected, security_gates.dast.sources[].runs_on_pr, security_gates.dast.sources[].non_blocking, safe-passage.dast_targets.apps, security_gates.ci_lifecycle.workflows[].normalized_events",
+      "found": "dast.tools: zaproxy/action-baseline; sources: .github/workflows/dast.yml [ci, PR]; apps: . (fastapi), server (fastapi).",
+      "verdict_why": "Pass based on: dast.tools: zaproxy/action-baseline; sources: .github/workflows/dast.yml [ci, PR]; apps: . (fastapi), server (fastapi)."
+    },
+    {
+      "id": "dependency-audit",
+      "number": 70,
+      "section": "Safe Passage",
+      "title": "Dependency audit runs automatically",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Security scanning in the pipeline"
+      },
+      "status": "Pass",
+      "evidence": "dependency_audit.tools: npm audit, pip-audit; sources: .github/workflows/ci.yml [ci].",
+      "remediation": null,
+      "method": "script",
+      "why": "AI-generated code often introduces unfamiliar or fabricated dependencies, which an automatic dependency audit catches.",
+      "checked": "Inputs: security_gates.dependency_audit.detected, security_gates.dependency_audit.sources, security_gates.sca.detected, inventory.ecosystems.detected[].dep_audit_tools",
+      "found": "dependency_audit.tools: npm audit, pip-audit; sources: .github/workflows/ci.yml [ci].",
+      "verdict_why": "Pass based on: dependency_audit.tools: npm audit, pip-audit; sources: .github/workflows/ci.yml [ci]."
+    },
+    {
+      "id": "least-privilege-workflows",
+      "number": 71,
+      "section": "Safe Passage",
+      "title": "Least-privilege workflows",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Least-privilege automation"
+      },
+      "status": "Pass",
+      "evidence": "4 workflows set permissions without write-all; 6 third-party actions, all SHA-pinned.",
+      "remediation": null,
+      "method": "script",
+      "why": "An agent running in CI can do whatever the workflow token allows, so tokens start read-only and third-party actions are pinned to a SHA.",
+      "checked": "Inputs: safe-passage.workflows.files",
+      "found": "4 workflows set permissions without write-all; 6 third-party actions, all SHA-pinned.",
+      "verdict_why": "Pass based on: 4 workflows set permissions without write-all; 6 third-party actions, all SHA-pinned."
+    },
+    {
+      "id": "mcp-on-demand",
+      "number": 72,
+      "section": "Safe Passage",
+      "title": "MCP tools load on demand",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Agent sandbox boundaries"
+      },
+      "status": "N/A",
+      "evidence": "No MCP config in the repo and no MCP setup in AGENTS.md or the docs.",
+      "remediation": null,
+      "method": "script",
+      "why": "Tool definitions loaded into every prompt crowd out the task's context, so few MCP servers should load all their tools up front.",
+      "checked": "Inputs: answers.harnesses, mcp.settings_files, mcp.claude_settings, mcp.agent_configs[].mcp_servers, mcp.doc_setup_lines",
+      "found": "No MCP config in the repo and no MCP setup in AGENTS.md or the docs.",
+      "verdict_why": "N/A based on: No MCP config in the repo and no MCP setup in AGENTS.md or the docs."
+    },
+    {
+      "id": "mcp-scoped",
+      "number": 73,
+      "section": "Safe Passage",
+      "title": "MCP servers are scoped to the agent or task that uses them",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Agent sandbox boundaries"
+      },
+      "status": "N/A",
+      "evidence": "No MCP servers in the repo's settings or subagents for other.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "A code review agent doesn't need the browser automation MCP, and scoping servers to the agent or task that uses them limits both context and reach.",
+      "checked": "Inputs: answers.harnesses, mcp.settings_files[].mcp_servers[].tool_filters, mcp.claude_settings[].mcp_permission_rules.deny, mcp.agent_configs, mcp.tool_lists",
+      "found": "No MCP servers in the repo's settings or subagents for other.",
+      "verdict_why": "N/A based on: No MCP servers in the repo's settings or subagents for other."
+    },
+    {
+      "id": "agent-sandbox",
+      "number": 74,
+      "section": "Safe Passage",
+      "title": "Agent sandbox boundaries",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Agent sandbox boundaries"
+      },
+      "status": "Pass",
+      "evidence": "devcontainer .devcontainer/devcontainer.json + .devcontainer/Dockerfile, sandbox doc AGENTS.md:39 +2 more.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Instructions alone don't stop an agent, so a sandbox should limit its network egress and keep production credentials out of reach.",
+      "checked": "Inputs: safe-passage.sandbox.claude, safe-passage.sandbox.codex, safe-passage.sandbox.gemini, safe-passage.sandbox.devcontainer, safe-passage.sandbox.docs, safe-passage.sandbox.docker",
+      "found": "devcontainer .devcontainer/devcontainer.json + .devcontainer/Dockerfile, sandbox doc AGENTS.md:39 +2 more.",
+      "verdict_why": "Pass based on: devcontainer .devcontainer/devcontainer.json + .devcontainer/Dockerfile, sandbox doc AGENTS.md:39 +2 more."
+    },
+    {
+      "id": "sensitive-data-care",
+      "number": 75,
+      "section": "Safe Passage",
+      "title": "Sensitive data care",
+      "arm": {
+        "phase": "safe-passage",
+        "criterion": "Sensitive data care"
+      },
+      "status": "N/A",
+      "evidence": "No personal-data fields in schema or model files across 2 apps.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "An agent working on an app with personal or regulated data needs redacted logs, synthetic test data and written rules to follow.",
+      "checked": "Inputs: safe-passage.sensitive_data.app_count, safe-passage.sensitive_data.apps, safe-passage.sensitive_data.written_rules",
+      "found": "No personal-data fields in schema or model files across 2 apps.",
+      "verdict_why": "N/A based on: No personal-data fields in schema or model files across 2 apps."
+    },
+    {
+      "id": "planning-workflow",
+      "number": 76,
+      "section": "Handoff",
+      "title": "Planning workflow is written down",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Well-shaped tickets"
+      },
+      "status": "Pass",
+      "evidence": "\"answers.planning_workflow\": \"github-issues\" (config), documented in AGENTS.md:32; verified 11 open spec/bug issues on ryderstorm/reader-for-neurodivergents (e.g. #11, #4-#8, #1-#3, #9-#10).",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "Without a written plan an agent's output is only as good as the prompt, so the team writes specs and says where they live.",
+      "checked": "Inputs: answers.planning_workflow, specs.planning_mentions",
+      "found": "\"answers.planning_workflow\": \"github-issues\" (config), documented in AGENTS.md:32; verified 11 open spec/bug issues on ryderstorm/reader-for-neurodivergents (e.g. #11, #4-#8, #1-#3, #9-#10).",
+      "verdict_why": "Pass based on: \"answers.planning_workflow\": \"github-issues\" (config), documented in AGENTS.md:32; verified 11 open spec/bug issues on ryderstorm/reader-for-neurodivergents (e.g. #11, #4-#8, #1-#3, #9-#10)."
+    },
+    {
+      "id": "no-committed-specs",
+      "number": 77,
+      "section": "Handoff",
+      "title": "Spec files are not committed to source control",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Well-shaped tickets"
+      },
+      "status": "Pass",
+      "evidence": "No spec files are committed.",
+      "remediation": null,
+      "method": "script",
+      "why": "Spec files merged with the code go stale once the work ships and mislead the next agent.",
+      "checked": "Inputs: specs.tracked_roots, specs.tracked_files, specs.tracked_count, specs.root",
+      "found": "No spec files are committed.",
+      "verdict_why": "Pass based on: No spec files are committed."
+    },
+    {
+      "id": "issue-acceptance-criteria",
+      "number": 78,
+      "section": "Handoff",
+      "title": "Issue templates ask for acceptance criteria",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Well-shaped tickets"
+      },
+      "status": "Pass",
+      "evidence": "2/2 issue templates ask for criteria, e.g. .github/ISSUE_TEMPLATE/bug.yml:16 \"Acceptance criteria\".",
+      "remediation": null,
+      "method": "script",
+      "why": "Acceptance criteria in the issue template tell an agent when a ticket is finished.",
+      "checked": "Inputs: answers.planning_workflow, handoff.issue_templates.templates, handoff.issue_templates.with_criteria",
+      "found": "2/2 issue templates ask for criteria, e.g. .github/ISSUE_TEMPLATE/bug.yml:16 \"Acceptance criteria\".",
+      "verdict_why": "Pass based on: 2/2 issue templates ask for criteria, e.g. .github/ISSUE_TEMPLATE/bug.yml:16 \"Acceptance criteria\"."
+    },
+    {
+      "id": "pr-template",
+      "number": 79,
+      "section": "Handoff",
+      "title": "PR template asks for summary, testing and risk",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Change description template"
+      },
+      "status": "Pass",
+      "evidence": "PR template sections: summary (.github/pull_request_template.md:5), testing (.github/pull_request_template.md:9), risk (.github/pull_request_template.md:17).",
+      "remediation": null,
+      "method": "script",
+      "why": "A PR template that asks what changed, how it was tested and what the risk is gives reviewers evidence for every agent change.",
+      "checked": "Inputs: code_review.pr_template.exists, code_review.pr_template.path, code_review.pr_template.sections",
+      "found": "PR template sections: summary (.github/pull_request_template.md:5), testing (.github/pull_request_template.md:9), risk (.github/pull_request_template.md:17).",
+      "verdict_why": "Pass based on: PR template sections: summary (.github/pull_request_template.md:5), testing (.github/pull_request_template.md:9), risk (.github/pull_request_template.md:17)."
+    },
+    {
+      "id": "pr-template-intent",
+      "number": 80,
+      "section": "Handoff",
+      "title": "PR template prompts for intent",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Change description template"
+      },
+      "status": "Pass",
+      "evidence": "Intent prompt: .github/pull_request_template.md:1 \"## Intent\".",
+      "remediation": null,
+      "method": "script",
+      "why": "A PR that states its intent lets reviewers check whether the change solves the right problem, not just what it touched.",
+      "checked": "Inputs: code_review.pr_template.exists, code_review.pr_template.template_paths, code_review.pr_template.intent_prompts, code_review.pr_template.change_prompts",
+      "found": "Intent prompt: .github/pull_request_template.md:1 \"## Intent\".",
+      "verdict_why": "Pass based on: Intent prompt: .github/pull_request_template.md:1 \"## Intent\"."
+    },
+    {
+      "id": "ai-code-review",
+      "number": 81,
+      "section": "Handoff",
+      "title": "Automated AI code review is configured on PRs",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Consistent review gate"
+      },
+      "status": "Pass",
+      "evidence": "answers.ai_review: \"yes\" (config); detected: coderabbit (.coderabbit.yaml).",
+      "remediation": null,
+      "method": "script",
+      "why": "Agents raise the volume of change, and automated AI review on every PR helps review keep pace.",
+      "checked": "Inputs: answers.ai_review, code_review.ai_review_inferred.configured, code_review.ai_review_inferred.model_evidence",
+      "found": "answers.ai_review: \"yes\" (config); detected: coderabbit (.coderabbit.yaml).",
+      "verdict_why": "Pass based on: answers.ai_review: \"yes\" (config); detected: coderabbit (.coderabbit.yaml)."
+    },
+    {
+      "id": "independent-ai-review",
+      "number": 82,
+      "section": "Handoff",
+      "title": "AI review uses a different model or fresh context",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Consistent review gate"
+      },
+      "status": "Pass",
+      "evidence": "answers.ai_review_model: \"different-model\" (config); detected: coderabbit (.coderabbit.yaml).",
+      "remediation": null,
+      "method": "script",
+      "why": "A different model, or at least a fresh context, reviews without the dev agent's reasoning biasing it and catches blind spots same-model review misses.",
+      "checked": "Inputs: answers.ai_review, answers.ai_review_model, code_review.ai_review_inferred.model_separation, code_review.ai_review_inferred.model_evidence",
+      "found": "answers.ai_review_model: \"different-model\" (config); detected: coderabbit (.coderabbit.yaml).",
+      "verdict_why": "Pass based on: answers.ai_review_model: \"different-model\" (config); detected: coderabbit (.coderabbit.yaml)."
+    },
+    {
+      "id": "multi-dimension-review",
+      "number": 83,
+      "section": "Handoff",
+      "title": "Reviews cover multiple dimensions",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Consistent review gate"
+      },
+      "status": "Pass",
+      "evidence": "review_dimensions: security (.coderabbit.yaml:12), architecture (.coderabbit.yaml:13), performance (.coderabbit.yaml:14) +3 more.",
+      "remediation": null,
+      "method": "hybrid",
+      "why": "A single \"review this PR\" pass misses whole classes of issues that separate security, architecture and testability passes catch.",
+      "checked": "Inputs: answers.ai_review, code_review.ai_review_inferred.configured, code_review.review_dimensions.dimensions, code_review.review_dimensions.hits, code_review.review_dimensions.sources_scanned",
+      "found": "review_dimensions: security (.coderabbit.yaml:12), architecture (.coderabbit.yaml:13), performance (.coderabbit.yaml:14) +3 more.",
+      "verdict_why": "Pass based on: review_dimensions: security (.coderabbit.yaml:12), architecture (.coderabbit.yaml:13), performance (.coderabbit.yaml:14) +3 more."
+    },
+    {
+      "id": "human-review",
+      "number": 84,
+      "section": "Handoff",
+      "title": "Human review stays in the loop",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Consistent review gate"
+      },
+      "status": "Pass",
+      "evidence": "github requires 1 approving review(s) on main, including code owners.",
+      "remediation": null,
+      "method": "script",
+      "why": "AI review catches patterns, but humans catch intent mismatches and business logic errors, so both are needed.",
+      "checked": "Inputs: online.status, online.reviews.approving_review_count, online.reviews.code_owner_reviews",
+      "found": "github requires 1 approving review(s) on main, including code owners.",
+      "verdict_why": "Pass based on: github requires 1 approving review(s) on main, including code owners."
+    },
+    {
+      "id": "structured-observability",
+      "number": 85,
+      "section": "Handoff",
+      "title": "Apps emit structured logs and traces or metrics",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Observable behavior"
+      },
+      "status": "Pass",
+      "evidence": "2/2 apps have structured logs and traces/metrics; health: server/app.py:153 +1 more.",
+      "remediation": null,
+      "method": "script",
+      "why": "Structured logs plus traces or metrics let an agent and the team confirm a change did what it claimed.",
+      "checked": "Inputs: handoff.observability.apps, handoff.observability.non_app_projects, handoff.observability.repo_health",
+      "found": "2/2 apps have structured logs and traces/metrics; health: server/app.py:153 +1 more.",
+      "verdict_why": "Pass based on: 2/2 apps have structured logs and traces/metrics; health: server/app.py:153 +1 more."
+    },
+    {
+      "id": "reversible-releases",
+      "number": 86,
+      "section": "Handoff",
+      "title": "Releases are reversible",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Reversible releases"
+      },
+      "status": "Partial",
+      "evidence": "flags: none; staged rollout: none; rollback docs: docs/RUNBOOK.md:58.",
+      "remediation": "Add a feature-flag SDK (e.g. OpenFeature), a canary or staged rollout (Argo Rollouts, Flagger).",
+      "method": "hybrid",
+      "why": "With more change coming from agents, feature flags, staged rollouts and a written rollback make a bad release cheap to undo.",
+      "checked": "Inputs: handoff.deployable, handoff.reversibility.feature_flags, handoff.reversibility.staged_rollout, handoff.reversibility.rollback_docs",
+      "found": "flags: none; staged rollout: none; rollback docs: docs/RUNBOOK.md:58.",
+      "verdict_why": "Partial based on: flags: none; staged rollout: none; rollback docs: docs/RUNBOOK.md:58.",
+      "effort": {
+        "scope": "high",
+        "friction": "high",
+        "band": "multi-day",
+        "size": "XL",
+        "why": "Rollback procedures are documented in docs/deploy-droplet.md and docs/RUNBOOK.md, but adding feature flags and canary/staged rollouts requires moving beyond single-container Docker Compose."
+      }
+    },
+    {
+      "id": "pipeline-releases",
+      "number": 87,
+      "section": "Handoff",
+      "title": "Releases run from a pipeline with generated notes",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Pipeline-driven releases"
+      },
+      "status": "Pass",
+      "evidence": "release pipeline .github/workflows/release.yml (tag); notes: gh-release-generate-notes (.github/workflows/release.yml), github-generated-notes (.github/release.yml).",
+      "remediation": null,
+      "method": "script",
+      "why": "Releases from a pipeline with generated notes keep agent contributions traceable, so the team can tell which change to roll back.",
+      "checked": "Inputs: handoff.release.pipelines, handoff.release.notes_tools, handoff.release.default_branch",
+      "found": "release pipeline .github/workflows/release.yml (tag); notes: gh-release-generate-notes (.github/workflows/release.yml), github-generated-notes (.github/release.yml).",
+      "verdict_why": "Pass based on: release pipeline .github/workflows/release.yml (tag); notes: gh-release-generate-notes (.github/workflows/release.yml), github-generated-notes (.github/release.yml)."
+    },
+    {
+      "id": "incident-playbooks",
+      "number": 88,
+      "section": "Handoff",
+      "title": "Incident playbooks and paging are defined",
+      "arm": {
+        "phase": "handoff",
+        "criterion": "Incident playbooks and paging"
+      },
+      "status": "Partial",
+      "evidence": "alerts: none; procedures: docs/RUNBOOK.md (file).",
+      "remediation": "Define alerts as code (Prometheus rules, Datadog or CloudWatch monitors) that page the on-call rotation.",
+      "method": "hybrid",
+      "why": "When something breaks, alerts that page someone and written procedures tell both people and agents what to do next.",
+      "checked": "Inputs: handoff.deployable, handoff.incident.alerts, handoff.incident.procedures",
+      "found": "alerts: none; procedures: docs/RUNBOOK.md (file).",
+      "verdict_why": "Partial based on: alerts: none; procedures: docs/RUNBOOK.md (file).",
+      "effort": {
+        "scope": "medium",
+        "friction": "high",
+        "band": "multi-day",
+        "size": "XL",
+        "why": "docs/RUNBOOK.md covers incident triage and recovery, but alert rules as code that page on-call require choosing and provisioning an external monitoring and paging stack."
+      }
+    },
+    {
+      "id": "agents-in-history",
+      "number": 89,
+      "section": "Momentum",
+      "title": "Agents in the commit history",
+      "arm": {
+        "phase": "momentum",
+        "criterion": "Agents in the commit history"
+      },
+      "status": "Fail",
+      "evidence": "No agent markers in 19 commits since 2026-08-23 and no agent workflows in CI.",
+      "remediation": "Have agents open PRs through the normal gates with Co-Authored-By trailers, or add an agent workflow (e.g. claude-code-action).",
+      "method": "script",
+      "why": "Marked agent commits arriving through normal pull requests show the repo is being worked by agents, not just ready for them.",
+      "checked": "Inputs: momentum.agent_commits, momentum.ci_agents[].agent, momentum.ci_agents[].path, git_history.shallow",
+      "found": "No agent markers in 19 commits since 2026-08-23 and no agent workflows in CI.",
+      "verdict_why": "Fail based on: No agent markers in 19 commits since 2026-08-23 and no agent workflows in CI.",
+      "effort": {
+        "scope": "low",
+        "friction": "low",
+        "band": "<1h",
+        "size": "S",
+        "why": "Commits used a Gemini Co-Authored-By trailer not matched by the detector's default list; merging a PR with a supported agent workflow or recognized agent trailer satisfies it."
+      }
+    },
+    {
+      "id": "self-checking-briefing",
+      "number": 90,
+      "section": "Momentum",
+      "title": "Self-checking briefing",
+      "arm": {
+        "phase": "momentum",
+        "criterion": "Self-checking briefing"
+      },
+      "status": "Pass",
+      "evidence": "Briefing checked by script scripts-tools/check_docs.py (ci .github/workflows/ci.yml), script scripts-tools/check_docs.py (hook .pre-commit-config.yaml).",
+      "remediation": null,
+      "method": "script",
+      "why": "A briefing ages as the repo changes, so CI or a hook should check that its links and commands still work.",
+      "checked": "Inputs: agents_md.exists, claude_md.exists, momentum.briefing_checks",
+      "found": "Briefing checked by script scripts-tools/check_docs.py (ci .github/workflows/ci.yml), script scripts-tools/check_docs.py (hook .pre-commit-config.yaml).",
+      "verdict_why": "Pass based on: Briefing checked by script scripts-tools/check_docs.py (ci .github/workflows/ci.yml), script scripts-tools/check_docs.py (hook .pre-commit-config.yaml)."
+    },
+    {
+      "id": "loop-speed-tracked",
+      "number": 91,
+      "section": "Momentum",
+      "title": "Loop speed tracked",
+      "arm": {
+        "phase": "momentum",
+        "criterion": "Loop speed tracked"
+      },
+      "status": "Pass",
+      "evidence": "caching: CI cache key (.github/workflows/ci.yml); timing: pytest --durations (.github/workflows/ci.yml); flaky handling: none.",
+      "remediation": null,
+      "method": "script",
+      "why": "Builds slow down and tests turn flaky under high change volume unless caching, test timing and flaky-test handling are tracked.",
+      "checked": "Inputs: momentum.loop_speed.caching, momentum.loop_speed.timing, momentum.loop_speed.flaky",
+      "found": "caching: CI cache key (.github/workflows/ci.yml); timing: pytest --durations (.github/workflows/ci.yml); flaky handling: none.",
+      "verdict_why": "Pass based on: caching: CI cache key (.github/workflows/ci.yml); timing: pytest --durations (.github/workflows/ci.yml); flaky handling: none."
+    },
+    {
+      "id": "code-health-watched",
+      "number": 92,
+      "section": "Momentum",
+      "title": "Code health watched",
+      "arm": {
+        "phase": "momentum",
+        "criterion": "Code health watched"
+      },
+      "status": "Pass",
+      "evidence": "2/2 apps cover 2+ areas on PRs; short: none; found eslint complexity, ruff C90 / mccabe +2 more.",
+      "remediation": null,
+      "method": "script",
+      "why": "Code health slips under high change volume, so complexity, duplication and unused code are measured on every pull request.",
+      "checked": "Inputs: momentum.code_health.apps, momentum.code_health.platforms, momentum.code_health.analyzers, online.hosted_checks",
+      "found": "2/2 apps cover 2+ areas on PRs; short: none; found eslint complexity, ruff C90 / mccabe +2 more.",
+      "verdict_why": "Pass based on: 2/2 apps cover 2+ areas on PRs; short: none; found eslint complexity, ruff C90 / mccabe +2 more."
+    },
+    {
+      "id": "errors-become-work",
+      "number": 93,
+      "section": "Momentum",
+      "title": "Errors become work",
+      "arm": {
+        "phase": "momentum",
+        "criterion": "Errors become work"
+      },
+      "status": "Fail",
+      "evidence": "No error tracker in . manifests (entry Dockerfile); no in-repo ticket creation.",
+      "remediation": "Add error tracking (e.g. Sentry) to . and route new errors to the issue tracker automatically.",
+      "method": "hybrid",
+      "why": "Production errors that turn into tickets automatically feed problems back as work an agent or a person can pick up.",
+      "checked": "Inputs: answers.error_tickets, momentum.error_tracking.apps, momentum.error_tracking.integrations",
+      "found": "No error tracker in . manifests (entry Dockerfile); no in-repo ticket creation.",
+      "verdict_why": "Fail based on: No error tracker in . manifests (entry Dockerfile); no in-repo ticket creation.",
+      "effort": {
+        "scope": "medium",
+        "friction": "high",
+        "band": "multi-day",
+        "size": "XL",
+        "why": "The app is explicitly offline-first with no outbound telemetry (HF_HUB_OFFLINE=1); integrating Sentry and issue creation requires an external service and a privacy-boundary decision (or a config skip)."
+      }
+    },
+    {
+      "id": "readiness-re-run",
+      "number": 94,
+      "section": "Momentum",
+      "title": "Readiness re-run regularly",
+      "arm": {
+        "phase": "momentum",
+        "criterion": "ARM on a cadence"
+      },
+      "status": "Partial",
+      "evidence": "No CI job runs the audit; results: docs/ai-native-audit.json (1 version).",
+      "remediation": "Run the audit in CI on a schedule or every PR (e.g. deterministic-report.mjs in a cron workflow).",
+      "method": "script",
+      "why": "A single readiness score says nothing about direction, so the audit runs on a cadence and keeps its results.",
+      "checked": "Inputs: momentum.readiness_runs.runs, momentum.readiness_runs.results, git_history.shallow",
+      "found": "No CI job runs the audit; results: docs/ai-native-audit.json (1 version).",
+      "verdict_why": "Partial based on: No CI job runs the audit; results: docs/ai-native-audit.json (1 version).",
+      "effort": {
+        "scope": "low",
+        "friction": "medium",
+        "band": "half-day",
+        "size": "M",
+        "why": "Committing docs/ai-native-audit.json establishes tracked history; adding a scheduled CI job that runs the audit requires making the ai-readiness runner available in GitHub Actions."
+      }
+    }
+  ]
+}

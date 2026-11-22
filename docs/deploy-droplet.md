@@ -168,7 +168,10 @@ knowing if you read on a metered mobile plan.
 
 ## Updating
 
+Tag the currently running container's immutable image ID before rebuilding so you can roll back immediately if needed:
+
 ```bash
+docker tag "$(docker inspect --type=container --format '{{.Image}}' read-aloud)" read-aloud:previous
 cd reader-for-neurodivergents && git pull
 docker compose -f deploy/compose.prod.yaml up -d --build
 ```
@@ -176,6 +179,48 @@ docker compose -f deploy/compose.prod.yaml up -d --build
 Only the layers after the dependency install rebuild, so this takes a minute or
 two rather than twenty. Installed copies of the app pick up the new front-end
 through the service worker and offer a **Reload** prompt.
+
+## Rollback
+
+If a release causes synthesis failures, alignment drift, or startup errors:
+
+1. **Fast image rollback** (when `read-aloud:previous` was tagged before updating):
+
+```bash
+docker tag read-aloud:previous read-aloud:latest
+docker compose -f deploy/compose.prod.yaml up -d --no-build
+```
+
+2. **Git tag rollback** (when rebuilding from a known-good release):
+
+```bash
+cd reader-for-neurodivergents
+git checkout v1.1.2
+docker compose -f deploy/compose.prod.yaml up -d --build
+```
+
+3. **Verify recovery**:
+
+```bash
+curl -fsS http://127.0.0.1:8765/api/health
+```
+
+Wait briefly for startup warm-up and confirm `"ok": true` and `"threads"` matches the container's effective CPU limit (`2` with `cpus: 2.0` in `deploy/compose.prod.yaml`). Then verify synthesis readiness by **either**:
+
+- Confirming `/api/health` reports `"loaded": true` and `docker logs read-aloud` shows `model warm on ... - ready` with no `"warm-up failed"` entry, **or**
+- Running a synthesis smoke request (which also recovers and verifies service after a transient warm-up failure):
+
+```bash
+curl -fsS -X POST http://127.0.0.1:8765/api/speak \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"Ready."}' | grep -q '"audio"'
+```
+
+If the target release includes `GET /api/metrics` (added after `v1.1.3`), also check:
+
+```bash
+curl -fsS http://127.0.0.1:8765/api/metrics | grep read_aloud_speak
+```
 
 ## Troubleshooting
 

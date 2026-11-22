@@ -1,0 +1,58 @@
+// ai-readiness audit config (optional). Add it only when the scan misreads this
+// repo; audit.mjs and deterministic-report.mjs read it on every run.
+// null or [] means "use the built-in behavior". Answer flags such as
+// --harnesses beat `answers`; --save-config fills them in here. Paths are repo-relative files or directories (no globs)
+// and add to the built-in search; write { "replace": ["path", ...] } instead of
+// a list to use only your paths. Run audit.mjs --init-config to print this template.
+{
+  "version": 1,
+
+  // Pre-flight answers the audit would otherwise ask for.
+  "answers": {
+    // Agent harnesses this repo targets: claude-code | cursor | windsurf | aider | codex | copilot | gemini | other
+    "harnesses": ["other"],
+    // "no", or package globs that each own an AGENTS.md, e.g. ["packages/*", "apps/*"]
+    "monorepo": "no",
+    // Automated AI code review runs on pull requests: yes | partially | no
+    "ai_review": "yes",
+    // Where that review runs relative to the development agent: different-model | fresh-context | same-agent | unsure
+    "ai_review_model": "different-model",
+    // Where the specs that document what you want built live, or no for none (planning workflow and issue acceptance criteria checks): github-issues | gitlab-issues | jira | linear | no | where specs live
+    "planning_workflow": "github-issues",
+    // Production errors open tickets automatically (errors become work check): yes | some | no
+    "error_tickets": null,
+    // Branch protection requires every CI check to pass before merge (required CI checks, when --online can't read it): yes | no
+    "required_checks": null,
+    // The host scans pushes for secrets: with push protection, scanning only, or not at all (secrets scanning, when --online can't read it): push-protection | scanning | no
+    "secret_scanning": null
+  },
+
+  // Extra places the detectors look.
+  "paths": {
+    // Documentation-set roots scanned for docs, beyond docs/, doc/, documentation/ and .github/
+    "docs": [],
+    // Files that count as architecture docs regardless of filename
+    "arch_docs": [],
+    // Files that count as development (build/test/run) docs regardless of filename
+    "dev_docs": [],
+    // Architecture decision record directories
+    "adr": [],
+    // Spec roots, left out of the documentation set
+    "specs": [],
+    // CI config files or directories the built-in discovery misses
+    "ci": [],
+    // Git hook directories
+    "hooks": [],
+    // Directories searched for skill packages (dirs holding a SKILL.md)
+    "skills": [],
+    // Code ownership files (CODEOWNERS, OWNERS)
+    "codeowners": []
+  },
+
+  // Checks to set aside, keyed by check ID, each with a required reason.
+  // A skip keeps the scanner's verdict but leaves the check out of the scores;
+  // reports can still show every check. Ask the agent for a check's ID.
+  "skips": {
+    // "structured-observability": { "reason": "Docs-only repo: no running service to observe." }
+  }
+}

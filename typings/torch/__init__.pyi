@@ -1,0 +1,3 @@
+from . import cuda as cuda
+
+def set_num_threads(threads: int) -> None: ...

@@ -24,7 +24,11 @@ export class Api {
     });
     if (!r.ok) {
       let detail = `${r.status}`;
-      try { detail = (await r.json()).detail || detail; } catch { /* ignore */ }
+      try {
+        detail = (await r.json()).detail || detail;
+      } catch {
+        /* ignore */
+      }
       throw new Error(`synthesis failed: ${detail}`);
     }
     return r.json();

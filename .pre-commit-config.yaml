@@ -1,0 +1,79 @@
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+exclude: ^(web/vendor/|web/fonts/|web/icons/|docs/ai-native-audit\.(html|json)$)
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+
+  - repo: https://github.com/betterleaks/betterleaks
+    rev: v1.10.1
+    hooks:
+      - id: betterleaks
+
+  - repo: local
+    hooks:
+      - id: commitlint
+        name: commitlint
+        entry: npx --no-install commitlint --edit
+        language: system
+        stages: [commit-msg]
+        pass_filenames: true
+
+      - id: ruff-check
+        name: ruff check
+        entry: .venv/bin/ruff check
+        language: system
+        types_or: [python, pyi]
+
+      - id: ruff-format
+        name: ruff format
+        entry: .venv/bin/ruff format --check
+        language: system
+        types_or: [python, pyi]
+
+      - id: mypy
+        name: mypy strict
+        entry: .venv/bin/mypy server tests/python
+        language: system
+        pass_filenames: false
+        types_or: [python, pyi]
+
+      - id: eslint
+        name: eslint
+        entry: npx --no-install eslint
+        language: system
+        files: ^(web/js/.*\.js|tests/.*\.mjs|scripts-tools/.*\.mjs)$
+
+      - id: prettier
+        name: prettier check
+        entry: npx --no-install prettier --check
+        language: system
+        files: ^(web/js/.*\.js|tests/.*\.mjs)$
+
+      - id: shellcheck
+        name: shellcheck
+        entry: shellcheck
+        language: system
+        types: [shell]
+
+      - id: check-docs
+        name: verify AGENTS.md and docs links
+        entry: .venv/bin/python scripts-tools/check_docs.py
+        language: system
+        pass_filenames: false
+        files: ^(AGENTS\.md|README\.md|docs/.*\.md)$
+
+      - id: unit-tests
+        name: fast offline unit tests (pytest + node:test)
+        entry: make test
+        language: system
+        pass_filenames: false
+        always_run: true

@@ -284,7 +284,8 @@ docker run -e T2S_DEVICE=cpu -p 9000:8765 read-aloud
 
 | Route | Purpose |
 |---|---|
-| `GET /api/health` | `{ok, model, device, sample_rate, loaded}` |
+| `GET /api/health` | `{ok, version, model, device, threads, sample_rate, loaded}` |
+| `GET /api/metrics` | Prometheus text exposition metrics for synthesis counts and latency |
 | `GET /api/voices` | Languages and the voices available in each |
 | `POST /api/speak` | `{text, voice, lang, speed}` → `{audio (base64 WAV), duration, words:[{cs, ce, s, e}]}` |
 | `GET /api/docs` | Interactive OpenAPI docs |
@@ -387,6 +388,10 @@ synthesises a spread of blocks against a running server, and asserts that every
 word span receives a monotonic, in-range timing. It is the test that catches
 sync drift, and it covers sentence splitting, accented Latin, Devanagari, and
 over-long paragraphs.
+
+For offline unit tests, coverage, linting, type-checking, and smoke tests, see
+[`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md). For production triage and
+recovery procedures, see [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
 
 ---
 

@@ -1,0 +1,6 @@
+# OWASP ZAP baseline passive rules explicitly waived for this offline PWA.
+# Real security findings (vulnerable libraries, missing CSP/clickjacking/nosniff/
+# permissions/COEP headers, XSS, error disclosure) remain enforced with fail_action: true.
+10027	IGNORE	(Information Disclosure - Suspicious Comments: benign source comments in unminified ES modules and SVG)
+10049	IGNORE	(Storable and Cacheable Content: intentional for offline-installable PWA static assets)
+10202	IGNORE	(Absence of Anti-CSRF Tokens: stateless local reader with no login, cookies, or sessions)

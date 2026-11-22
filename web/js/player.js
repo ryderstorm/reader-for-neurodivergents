@@ -30,14 +30,14 @@ export class Player extends EventTarget {
     super();
     this.api = api;
     this.blocks = [];
-    this.cache = new Map();   // block index -> Promise<{url, words, duration}>
+    this.cache = new Map(); // block index -> Promise<{url, words, duration}>
     this.index = 0;
     this.playing = false;
     this.rate = 1.0;
     this.voice = 'af_heart';
     this.lang = 'a';
     this.gapTimer = null;
-    this.generation = 0;      // bumped on every seek, to drop stale callbacks
+    this.generation = 0; // bumped on every seek, to drop stale callbacks
 
     this.audio = new Audio();
     this.audio.preload = 'auto';
@@ -86,7 +86,7 @@ export class Player extends EventTarget {
 
   async play() {
     if (!this.blocks.length) return;
-    this._unlock();          // must happen before the first await
+    this._unlock(); // must happen before the first await
     this.playing = true;
     this._emit('state', { playing: true });
     await this._playBlock(this.index);
@@ -134,8 +134,12 @@ export class Player extends EventTarget {
     }
   }
 
-  next() { this.jumpTo(this.index + 1); }
-  prev() { this.jumpTo(this.index - 1); }
+  next() {
+    this.jumpTo(this.index + 1);
+  }
+  prev() {
+    this.jumpTo(this.index - 1);
+  }
 
   /** Start reading from the block containing a given word element. */
   jumpToWord(wordEl) {
@@ -148,7 +152,10 @@ export class Player extends EventTarget {
   async _playBlock(index) {
     const gen = this.generation;
     const block = this.blocks[index];
-    if (!block) { this._finish(); return; }
+    if (!block) {
+      this._finish();
+      return;
+    }
 
     this._emit('buffering', { buffering: true, index });
     let data;
@@ -167,7 +174,10 @@ export class Player extends EventTarget {
 
     // A voice change clears the cache, but a request already in flight can
     // still land here; drop it rather than speaking in the old voice.
-    if (data.key !== `${this.voice}|${this.lang}`) { this._playBlock(index); return; }
+    if (data.key !== `${this.voice}|${this.lang}`) {
+      this._playBlock(index);
+      return;
+    }
 
     this.current = data;
     this.audio.src = data.url;
@@ -177,7 +187,7 @@ export class Player extends EventTarget {
 
     try {
       await this.audio.play();
-    } catch (err) {
+    } catch {
       // Autoplay policy: needs a user gesture. Surface it rather than hanging.
       if (gen !== this.generation) return;
       this.playing = false;
@@ -196,7 +206,12 @@ export class Player extends EventTarget {
     this.audio.src = SILENT_WAV;
     const p = this.audio.play();
     if (p && p.catch) {
-      p.then(() => this.audio.pause(), () => { this._unlocked = false; });
+      p.then(
+        () => this.audio.pause(),
+        () => {
+          this._unlocked = false;
+        },
+      );
     }
   }
 
@@ -204,11 +219,14 @@ export class Player extends EventTarget {
     if (!this.playing) return;
     this._stopTicking();
     const block = this.blocks[this.index];
-    const gap = ((block && block.pauseAfter) || 0) * 1000 / this.rate;
+    const gap = (((block && block.pauseAfter) || 0) * 1000) / this.rate;
     const gen = this.generation;
     this.gapTimer = setTimeout(() => {
       if (gen !== this.generation || !this.playing) return;
-      if (this.index + 1 >= this.blocks.length) { this._finish(); return; }
+      if (this.index + 1 >= this.blocks.length) {
+        this._finish();
+        return;
+      }
       this.index += 1;
       this._playBlock(this.index);
     }, gap);
@@ -274,13 +292,19 @@ export class Player extends EventTarget {
       if (Math.abs(idx - this.index) < keep / 2) continue;
       const p = this.cache.get(idx);
       this.cache.delete(idx);
-      Promise.resolve(p).then((d) => d && d.url && URL.revokeObjectURL(d.url), () => {});
+      Promise.resolve(p).then(
+        (d) => d && d.url && URL.revokeObjectURL(d.url),
+        () => {},
+      );
     }
   }
 
   _revokeAll() {
     for (const p of this.cache.values()) {
-      Promise.resolve(p).then((d) => d && d.url && URL.revokeObjectURL(d.url), () => {});
+      Promise.resolve(p).then(
+        (d) => d && d.url && URL.revokeObjectURL(d.url),
+        () => {},
+      );
     }
   }
 
@@ -297,7 +321,10 @@ export class Player extends EventTarget {
   }
 
   _tick() {
-    if (!this.playing || !this.current) { this._raf = null; return; }
+    if (!this.playing || !this.current) {
+      this._raf = null;
+      return;
+    }
     const t = this.audio.currentTime;
     const tl = this.current.timeline;
 
@@ -305,7 +332,10 @@ export class Player extends EventTarget {
     // than a binary search and handles the common forward case in O(1).
     let hit = null;
     for (let i = 0; i < tl.length; i++) {
-      if (t >= tl[i].s && t < tl[i].e) { hit = tl[i]; break; }
+      if (t >= tl[i].s && t < tl[i].e) {
+        hit = tl[i];
+        break;
+      }
       if (tl[i].s > t) break;
     }
     if (!hit && tl.length && t >= tl[tl.length - 1].e) hit = tl[tl.length - 1];
@@ -346,7 +376,10 @@ export function mapTimings(block, timings) {
     let best = null;
     for (const t of timings) {
       // Any overlap between the span's char range and the timing's range.
-      if (t.ce > w.cs && t.cs < w.ce) { best = t; break; }
+      if (t.ce > w.cs && t.cs < w.ce) {
+        best = t;
+        break;
+      }
     }
     if (best) out.push({ el: w.el, s: best.s, e: best.e });
   }
