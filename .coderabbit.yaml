@@ -5,6 +5,9 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
+  slop_detection:
+    enabled: true
+    include_all_authors: true
   merge_risk_instructions: >-
     High risk: any change that weakens offline/privacy isolation (HF_HUB_OFFLINE=1
     or outbound network/telemetry calls), alters word-splitter parity between
