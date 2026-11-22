@@ -1,0 +1,19 @@
+name: Bug Report
+description: Report broken alignment, audio playback, PWA, or deployment behavior
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Exact input, environment (host vs Docker, browser/OS), and observed behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Expected behavior and regression test required to close this issue.
+    validations:
+      required: true

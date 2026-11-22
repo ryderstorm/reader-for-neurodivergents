@@ -1,0 +1,151 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, Format, Typecheck & Code Health
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+
+      - name: Install Python dev dependencies
+        run: uv sync --python 3.12 --frozen
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install Node dev dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run Python lint, format, strict mypy, and dead-code check
+        run: |
+          .venv/bin/ruff check server tests scripts-tools
+          .venv/bin/ruff format --check server tests scripts-tools
+          .venv/bin/mypy server tests/python
+          .venv/bin/vulture server --min-confidence 80
+
+      - name: Run JavaScript lint, format, and unused-code check
+        run: |
+          npm run lint
+          npm run format:check
+          npm run knip
+
+      - name: Run ShellCheck on shell scripts
+        run: shellcheck scripts-tools/*.sh .devcontainer/init-firewall.sh
+
+      - name: Verify AGENTS.md and documentation links
+        run: .venv/bin/python scripts-tools/check_docs.py
+
+  test:
+    name: Unit, Coverage, Smoke & E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+
+      - name: Install Python dev dependencies
+        run: uv sync --python 3.12 --frozen
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install Node dev dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Verify server/requirements.txt pins match uv.lock
+        run: .venv/bin/python scripts-tools/check_deps_sync.py
+
+      - name: Run Python unit tests with coverage floor and timings
+        run: |
+          mkdir -p test-results
+          .venv/bin/pytest --cov=server --cov-fail-under=75 --durations=10 --junitxml=test-results/pytest.xml
+
+      - name: Run JavaScript unit tests with coverage floor
+        run: npm test
+
+      - name: Run live server smoke test
+        run: ./scripts-tools/smoke_test.sh
+
+      - name: Run live server end-to-end test
+        run: npm run test:e2e
+
+      - name: Upload test timing report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pytest-junit
+          path: test-results/pytest.xml
+
+  dependency-audit:
+    name: Dependency Audit & Review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Dependency Review (PRs)
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
+        with:
+          fail-on-severity: high
+          fail-on-scopes: runtime, development, unknown
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+
+      - name: Install Python dev dependencies
+        run: uv sync --python 3.12 --frozen
+
+      - name: Run pip-audit (dev environment + production TTS graph)
+        run: |
+          .venv/bin/pip-audit
+          uv export --frozen --extra tts --no-dev --no-emit-project -o /tmp/requirements-tts.txt
+          .venv/bin/pip-audit -r /tmp/requirements-tts.txt --no-deps --disable-pip
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high

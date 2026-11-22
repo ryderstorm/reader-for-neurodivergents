@@ -4,6 +4,7 @@
 Run it after setup. It prints the alignment for a few tricky sentences and
 reports the synthesis speed (real-time factor) for the resolved device.
 """
+
 import sys
 import time
 from pathlib import Path
@@ -34,7 +35,7 @@ def main() -> int:
         print(f'"{text}"')
         print(f"  audio {seg.duration:.2f}s in {dt:.2f}s  ->  {rtf:.0f}x real time")
         src = split_words(text)
-        for (cs, ce, word), w in zip(src, seg.words):
+        for (cs, ce, word), w in zip(src, seg.words, strict=False):
             flag = "" if (cs, ce) == (w["cs"], w["ce"]) else "  <-- OFFSET MISMATCH"
             print(f"    {w['s']:6.2f} → {w['e']:6.2f}   {word}{flag}")
             if flag:

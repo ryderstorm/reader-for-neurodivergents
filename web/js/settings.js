@@ -11,20 +11,20 @@ const KEY = 't2s.settings.v1';
 
 export const DEFAULTS = {
   // Typography
-  font: 'atkinson',      // atkinson | opendyslexic | serif | sans
-  fontSize: 21,          // px
+  font: 'atkinson', // atkinson | opendyslexic | serif | sans
+  fontSize: 21, // px
   lineHeight: 1.75,
-  letterSpacing: 0.02,   // em
-  wordSpacing: 0.16,     // em
-  measure: 62,           // characters per line
-  align: 'left',         // left | justify  (left is recommended for dyslexia)
+  letterSpacing: 0.02, // em
+  wordSpacing: 0.16, // em
+  measure: 62, // characters per line
+  align: 'left', // left | justify  (left is recommended for dyslexia)
   bionic: false,
 
   // Colour
-  theme: 'cream',        // cream | peach | blue | mint | grey | paper | night
+  theme: 'cream', // cream | peach | blue | mint | grey | paper | night
 
   // Reading aids
-  focus: 'sentence',     // off | sentence | paragraph
+  focus: 'sentence', // off | sentence | paragraph
   ruler: false,
   autoScroll: true,
   highlightWord: true,
@@ -50,7 +50,9 @@ export function load() {
 export function save(settings) {
   try {
     localStorage.setItem(KEY, JSON.stringify(settings));
-  } catch { /* private browsing, quota - not worth failing over */ }
+  } catch {
+    /* private browsing, quota - not worth failing over */
+  }
 }
 
 /** Push settings onto the document as CSS custom properties + data attributes. */

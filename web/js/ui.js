@@ -84,7 +84,10 @@ export class Ui extends EventTarget {
       b.setAttribute('aria-checked', 'false');
       b.setAttribute('aria-label', label);
       b.title = label;
-      b.addEventListener('click', () => { this.set('theme', id); this.sync(); });
+      b.addEventListener('click', () => {
+        this.set('theme', id);
+        this.sync();
+      });
       host.appendChild(b);
     }
   }
@@ -110,8 +113,10 @@ export class Ui extends EventTarget {
 
     for (const id of RANGES) {
       this.$(id).addEventListener('input', (e) => {
-        const v = id === 'fontSize' || id === 'measure'
-          ? parseInt(e.target.value, 10) : parseFloat(e.target.value);
+        const v =
+          id === 'fontSize' || id === 'measure'
+            ? parseInt(e.target.value, 10)
+            : parseFloat(e.target.value);
         this.set(id, v);
         this.$(`${id}-out`).textContent = (FORMAT[id] || String)(v);
       });
@@ -134,8 +139,12 @@ export class Ui extends EventTarget {
   _bindKeys() {
     document.addEventListener('keydown', (e) => {
       const t = e.target;
-      const typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA'
-        || t.tagName === 'SELECT' || t.isContentEditable);
+      const typing =
+        t &&
+        (t.tagName === 'INPUT' ||
+          t.tagName === 'TEXTAREA' ||
+          t.tagName === 'SELECT' ||
+          t.isContentEditable);
       if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
 
       const fire = (action, detail = {}) => {
@@ -144,15 +153,34 @@ export class Ui extends EventTarget {
       };
 
       switch (e.key) {
-        case ' ': fire('toggle'); break;
-        case 'ArrowRight': fire('next'); break;
-        case 'ArrowLeft': fire('prev'); break;
-        case 'ArrowUp': fire('rate', { delta: +0.1 }); break;
-        case 'ArrowDown': fire('rate', { delta: -0.1 }); break;
-        case 'r': case 'R': fire('repeat'); break;
-        case 'f': case 'F': fire('focus-cycle'); break;
-        case 'Escape': fire('escape'); break;
-        default: break;
+        case ' ':
+          fire('toggle');
+          break;
+        case 'ArrowRight':
+          fire('next');
+          break;
+        case 'ArrowLeft':
+          fire('prev');
+          break;
+        case 'ArrowUp':
+          fire('rate', { delta: +0.1 });
+          break;
+        case 'ArrowDown':
+          fire('rate', { delta: -0.1 });
+          break;
+        case 'r':
+        case 'R':
+          fire('repeat');
+          break;
+        case 'f':
+        case 'F':
+          fire('focus-cycle');
+          break;
+        case 'Escape':
+          fire('escape');
+          break;
+        default:
+          break;
       }
     });
   }

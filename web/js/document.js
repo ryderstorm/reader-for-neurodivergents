@@ -14,14 +14,45 @@ const WORD_RE = /[\p{L}\p{N}\p{M}]+(?:['’\-.,][\p{L}\p{N}\p{M}]+)*/gu;
 
 // Block-level tags that become their own readable unit.
 const BLOCK_TAGS = new Set([
-  'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE',
-  'TD', 'TH', 'DT', 'DD', 'FIGCAPTION',
+  'P',
+  'H1',
+  'H2',
+  'H3',
+  'H4',
+  'H5',
+  'H6',
+  'LI',
+  'BLOCKQUOTE',
+  'TD',
+  'TH',
+  'DT',
+  'DD',
+  'FIGCAPTION',
 ]);
 
 // Abbreviations that must not end a sentence.
 const ABBREV = new Set([
-  'mr', 'mrs', 'ms', 'dr', 'prof', 'st', 'sr', 'jr', 'vs', 'etc', 'eg', 'ie',
-  'fig', 'no', 'vol', 'approx', 'inc', 'ltd', 'dept', 'est', 'al',
+  'mr',
+  'mrs',
+  'ms',
+  'dr',
+  'prof',
+  'st',
+  'sr',
+  'jr',
+  'vs',
+  'etc',
+  'eg',
+  'ie',
+  'fig',
+  'no',
+  'vol',
+  'approx',
+  'inc',
+  'ltd',
+  'dept',
+  'est',
+  'al',
 ]);
 
 // One synthesis unit should stay short: it is the seek granularity, the retry
@@ -34,7 +65,10 @@ const MAX_BLOCK_CHARS = 420;
  * if there is nothing else — at the cap itself. Appends [start, end) pairs.
  */
 function subdivide(text, from, to, out) {
-  if (to - from <= MAX_BLOCK_CHARS) { out.push([from, to]); return; }
+  if (to - from <= MAX_BLOCK_CHARS) {
+    out.push([from, to]);
+    return;
+  }
 
   const breaks = [];
   for (let i = from; i < to - 1; i++) {
@@ -54,7 +88,8 @@ function subdivide(text, from, to, out) {
     }
     last = b;
   }
-  while (to - start > MAX_BLOCK_CHARS) {   // no break points at all
+  while (to - start > MAX_BLOCK_CHARS) {
+    // no break points at all
     out.push([start, start + MAX_BLOCK_CHARS]);
     start += MAX_BLOCK_CHARS;
   }

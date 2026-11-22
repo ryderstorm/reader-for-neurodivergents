@@ -17,13 +17,32 @@ import re
 import threading
 import unicodedata
 from collections import OrderedDict
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
+from typing import Any, TypedDict
 
 import numpy as np
+from numpy.typing import NDArray
 
 log = logging.getLogger("t2s.tts")
+
+
+class WordTiming(TypedDict):
+    """Word character span in source text paired with media timestamps."""
+
+    cs: int
+    ce: int
+    s: float
+    e: float
+
+
+class _PendingWordTiming(TypedDict):
+    cs: int
+    ce: int
+    s: float | None
+    e: float | None
+
 
 SAMPLE_RATE = 24000
 
@@ -46,10 +65,10 @@ def available_cpus() -> int:
         pass
     # cgroup v1
     try:
-        quota = int(Path("/sys/fs/cgroup/cpu/cpu.cfs_quota_us").read_text())
-        period = int(Path("/sys/fs/cgroup/cpu/cpu.cfs_period_us").read_text())
-        if quota > 0:
-            return max(1, round(quota / period))
+        quota_us = int(Path("/sys/fs/cgroup/cpu/cpu.cfs_quota_us").read_text())
+        period_us = int(Path("/sys/fs/cgroup/cpu/cpu.cfs_period_us").read_text())
+        if quota_us > 0:
+            return max(1, round(quota_us / period_us))
     except (OSError, ValueError):
         pass
     # Affinity mask covers taskset and some orchestrators.
@@ -66,10 +85,15 @@ def limit_torch_threads() -> int:
     effect, so this is called from the top of app.py.
     """
     n = available_cpus()
-    for var in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
-                "NUMEXPR_NUM_THREADS"):
+    for var in (
+        "OMP_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "OPENBLAS_NUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+    ):
         os.environ.setdefault(var, str(n))
     return n
+
 
 # Kokoro language codes -> human labels. 'a'/'b' are the two best-supported.
 LANGUAGES = {
@@ -84,8 +108,18 @@ LANGUAGES = {
 
 # Fallback voice list, used if the Hub file listing is unavailable (offline).
 FALLBACK_VOICES = {
-    "a": ["af_heart", "af_bella", "af_nicole", "af_aoede", "af_kore", "af_sarah",
-          "am_michael", "am_fenrir", "am_puck", "am_adam"],
+    "a": [
+        "af_heart",
+        "af_bella",
+        "af_nicole",
+        "af_aoede",
+        "af_kore",
+        "af_sarah",
+        "am_michael",
+        "am_fenrir",
+        "am_puck",
+        "am_adam",
+    ],
     "b": ["bf_emma", "bf_isabella", "bf_alice", "bm_george", "bm_fable", "bm_daniel"],
     "e": ["ef_dora", "em_alex"],
     "f": ["ff_siwis"],
@@ -138,8 +172,9 @@ def _key(s: str) -> str:
 @dataclass
 class Segment:
     """One synthesised chunk: audio plus word timings relative to its own start."""
-    audio: np.ndarray
-    words: list[dict] = field(default_factory=list)
+
+    audio: NDArray[np.float32]
+    words: list[WordTiming] = field(default_factory=list)
 
     @property
     def duration(self) -> float:
@@ -149,11 +184,12 @@ class Segment:
 class KokoroEngine:
     """Thread-safe, lazily-loaded Kokoro pipeline with an LRU result cache."""
 
-    def __init__(self, device: str | None = None, cache_size: int = 256):
+    def __init__(self, device: str | None = None, cache_size: int = 256) -> None:
         self._device = device
-        self._pipelines: dict[str, object] = {}
+        self._pipelines: dict[str, Any] = {}
+        self._model: Any = None
         self._lock = threading.Lock()
-        self._cache: OrderedDict[tuple, Segment] = OrderedDict()
+        self._cache: OrderedDict[tuple[str, str, str, float], Segment] = OrderedDict()
         self._cache_size = cache_size
         self.resolved_device = "unknown"
 
@@ -172,13 +208,14 @@ class KokoroEngine:
             return self._device
         try:
             import torch
+
             if torch.cuda.is_available():
                 return "cuda"
         except Exception:  # pragma: no cover - torch always present in practice
             pass
         return "cpu"
 
-    def pipeline(self, lang_code: str):
+    def pipeline(self, lang_code: str) -> Any:
         """Get (or build) the KPipeline for a language. One model, N G2P frontends."""
         lang_code = lang_code if lang_code in LANGUAGES else "a"
         with self._lock:
@@ -189,6 +226,7 @@ class KokoroEngine:
                     self.resolved_device = self._resolve_device()
                     if self.resolved_device == "cpu":
                         import torch
+
                         n = available_cpus()
                         torch.set_num_threads(n)
                         log.info("CPU inference limited to %d thread(s)", n)
@@ -217,7 +255,7 @@ class KokoroEngine:
             found: dict[str, list[str]] = {}
             for f in files:
                 if f.startswith("voices/") and f.endswith(".pt"):
-                    name = f[len("voices/"):-len(".pt")]
+                    name = f[len("voices/") : -len(".pt")]
                     found.setdefault(name[0], []).append(name)
             if found:
                 return {k: sorted(v) for k, v in found.items() if k in LANGUAGES}
@@ -227,8 +265,13 @@ class KokoroEngine:
 
     # ------------------------------------------------------------------ synth
 
-    def synth(self, text: str, voice: str = "af_heart", lang_code: str = "a",
-              speed: float = 1.0) -> Segment:
+    def synth(
+        self,
+        text: str,
+        voice: str = "af_heart",
+        lang_code: str = "a",
+        speed: float = 1.0,
+    ) -> Segment:
         """Synthesise one chunk of text and return audio + per-word timings."""
         cache_key = (text, voice, lang_code, round(speed, 3))
         with self._lock:
@@ -239,20 +282,22 @@ class KokoroEngine:
 
         pipeline = self.pipeline(lang_code)
         with self._lock:  # KModel forward is not re-entrant; serialise inference
-            chunks = list(pipeline(text, voice=voice, speed=speed,
-                                   split_pattern=r"\n{2,}"))
+            chunks = list(pipeline(text, voice=voice, speed=speed, split_pattern=r"\n{2,}"))
 
-        audio_parts: list[np.ndarray] = []
-        words: list[dict] = []
+        audio_parts: list[NDArray[np.float32]] = []
+        words: list[WordTiming] = []
         offset_samples = 0
         # Kokoro may internally split the chunk; stitch the pieces back together
         # and shift each piece's timestamps by everything that came before it.
         cursor = 0
         for res in chunks:
-            audio = res.audio
-            if audio is None:
+            raw_audio = res.audio
+            if raw_audio is None:
                 continue
-            audio = audio.detach().cpu().numpy() if hasattr(audio, "detach") else np.asarray(audio)
+            audio_arr: NDArray[np.float32] = np.asarray(
+                raw_audio.detach().cpu().numpy() if hasattr(raw_audio, "detach") else raw_audio,
+                dtype=np.float32,
+            )
             piece_text = res.graphemes if isinstance(res.graphemes, str) else ""
             # Locate this piece inside the original text so char offsets stay true.
             found = text.find(piece_text, cursor) if piece_text else -1
@@ -262,14 +307,23 @@ class KokoroEngine:
 
             t0 = offset_samples / SAMPLE_RATE
             words.extend(
-                self._align(piece_text, getattr(res, "tokens", None),
-                            len(audio) / SAMPLE_RATE, t0, base_char)
+                self._align(
+                    piece_text,
+                    getattr(res, "tokens", None),
+                    len(audio_arr) / SAMPLE_RATE,
+                    t0,
+                    base_char,
+                )
             )
-            audio_parts.append(audio)
-            offset_samples += len(audio)
+            audio_parts.append(audio_arr)
+            offset_samples += len(audio_arr)
 
-        full = np.concatenate(audio_parts) if audio_parts else np.zeros(0, dtype=np.float32)
-        seg = Segment(audio=full.astype(np.float32), words=words)
+        full: NDArray[np.float32] = (
+            np.concatenate(audio_parts).astype(np.float32)
+            if audio_parts
+            else np.zeros(0, dtype=np.float32)
+        )
+        seg = Segment(audio=full, words=words)
 
         with self._lock:
             self._cache[cache_key] = seg
@@ -279,8 +333,14 @@ class KokoroEngine:
 
     # -------------------------------------------------------------- alignment
 
-    def _align(self, text: str, tokens: Iterable | None, duration: float,
-               t_offset: float, char_offset: int) -> list[dict]:
+    def _align(
+        self,
+        text: str,
+        tokens: Iterable[Any] | None,
+        duration: float,
+        t_offset: float,
+        char_offset: int,
+    ) -> list[WordTiming]:
         """
         Map Kokoro's per-token timings onto the *original* words of `text`.
 
@@ -304,9 +364,8 @@ class KokoroEngine:
                 continue
             timed.append((k, float(s), float(e)))
 
-        out: list[dict] = [
-            {"cs": char_offset + s, "ce": char_offset + e, "s": None, "e": None}
-            for s, e, _ in src
+        pending: list[_PendingWordTiming] = [
+            {"cs": char_offset + s, "ce": char_offset + e, "s": None, "e": None} for s, e, _ in src
         ]
 
         if timed:
@@ -319,8 +378,8 @@ class KokoroEngine:
                 # so one skipped token does not derail the whole paragraph).
                 match = None
                 for probe in range(ti, min(ti + 6, len(timed))):
-                    tk = timed[probe][0]
-                    if tk == want or want.startswith(tk) or tk.startswith(want):
+                    tk_key = timed[probe][0]
+                    if tk_key == want or want.startswith(tk_key) or tk_key.startswith(want):
                         match = probe
                         break
                 if match is None:
@@ -338,15 +397,18 @@ class KokoroEngine:
                     got += nxt
                     end = timed[ti][2]
                     ti += 1
-                out[wi]["s"] = start + t_offset
-                out[wi]["e"] = end + t_offset
+                pending[wi]["s"] = start + t_offset
+                pending[wi]["e"] = end + t_offset
 
-        self._fill_gaps(out, t_offset, t_offset + duration, src)
-        return out
+        return self._fill_gaps(pending, t_offset, t_offset + duration, src)
 
     @staticmethod
-    def _fill_gaps(words: list[dict], t_start: float, t_end: float,
-                   src: list[tuple[int, int, str]]) -> None:
+    def _fill_gaps(
+        words: list[_PendingWordTiming],
+        t_start: float,
+        t_end: float,
+        src: list[tuple[int, int, str]],
+    ) -> list[WordTiming]:
         """Interpolate timings for words the aligner could not match.
 
         Unmatched runs are shared out between their known neighbours in
@@ -362,24 +424,31 @@ class KokoroEngine:
             j = i
             while j < n and words[j]["s"] is None:
                 j += 1
-            left = words[i - 1]["e"] if i > 0 and words[i - 1]["e"] is not None else t_start
-            right = words[j]["s"] if j < n and words[j]["s"] is not None else t_end
+            prev_end = words[i - 1]["e"] if i > 0 else None
+            next_start = words[j]["s"] if j < n else None
+            left = prev_end if prev_end is not None else t_start
+            right = next_start if next_start is not None else t_end
             if right < left:
                 right = left
             weights = [max(1, len(src[k][2])) for k in range(i, j)]
             total = sum(weights) or 1
             span = right - left
             pos = left
-            for k, w in zip(range(i, j), weights):
-                step = span * w / total
+            for k, weight in zip(range(i, j), weights, strict=True):
+                step = span * weight / total
                 words[k]["s"] = pos
                 words[k]["e"] = pos + step
                 pos += step
             i = j
 
         # Guarantee monotonic, non-degenerate spans.
+        out: list[WordTiming] = []
         prev = t_start
-        for w in words:
-            w["s"] = max(prev, min(w["s"], t_end))
-            w["e"] = max(w["s"] + 0.01, min(w["e"], t_end))
-            prev = w["s"]
+        for item in words:
+            raw_s = item["s"] if item["s"] is not None else prev
+            raw_e = item["e"] if item["e"] is not None else raw_s
+            clamped_s = max(prev, min(raw_s, t_end))
+            clamped_e = max(clamped_s + 0.01, min(raw_e, t_end))
+            out.append({"cs": item["cs"], "ce": item["ce"], "s": clamped_s, "e": clamped_e})
+            prev = clamped_s
+        return out

@@ -1,0 +1,7 @@
+node_modules/
+web/vendor/
+.venv/
+coverage/
+docs/
+.ai-readiness/
+package-lock.json

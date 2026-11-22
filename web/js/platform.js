@@ -31,7 +31,8 @@ export function registerServiceWorker({ onUpdate, onUnavailable } = {}) {
     return null;
   }
 
-  const ready = navigator.serviceWorker.register('/sw.js', { scope: '/' })
+  const ready = navigator.serviceWorker
+    .register('/sw.js', { scope: '/' })
     .then((reg) => {
       // Something is already waiting from a previous visit.
       if (reg.waiting && navigator.serviceWorker.controller && onUpdate) {
@@ -76,10 +77,17 @@ export function setupInstall(button, { onInstructions } = {}) {
   if (!button) return;
   let deferred = null;
 
-  const hide = () => { button.hidden = true; };
-  const show = () => { button.hidden = false; };
+  const hide = () => {
+    button.hidden = true;
+  };
+  const show = () => {
+    button.hidden = false;
+  };
 
-  if (isStandalone()) { hide(); return; }
+  if (isStandalone()) {
+    hide();
+    return;
+  }
 
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -87,7 +95,10 @@ export function setupInstall(button, { onInstructions } = {}) {
     show();
   });
 
-  window.addEventListener('appinstalled', () => { deferred = null; hide(); });
+  window.addEventListener('appinstalled', () => {
+    deferred = null;
+    hide();
+  });
 
   button.addEventListener('click', async () => {
     if (deferred) {
@@ -98,9 +109,11 @@ export function setupInstall(button, { onInstructions } = {}) {
       return;
     }
     if (onInstructions) {
-      onInstructions(isIOS()
-        ? 'In Safari: tap Share, then “Add to Home Screen”.'
-        : 'In your browser menu, choose “Install app” or “Add to Home screen”.');
+      onInstructions(
+        isIOS()
+          ? 'In Safari: tap Share, then “Add to Home Screen”.'
+          : 'In your browser menu, choose “Install app” or “Add to Home screen”.',
+      );
     }
   });
 
@@ -131,7 +144,9 @@ export function setupMediaSession(player, { title = 'Read Aloud' } = {}) {
     ms.setActionHandler('previoustrack', () => player.prev());
     ms.setActionHandler('seekforward', () => player.next());
     ms.setActionHandler('seekbackward', () => player.prev());
-  } catch { /* older browsers reject unknown actions */ }
+  } catch {
+    /* older browsers reject unknown actions */
+  }
 
   let docTitle = title;
 
@@ -146,13 +161,23 @@ export function setupMediaSession(player, { title = 'Read Aloud' } = {}) {
           { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
         ],
       });
-    } catch { /* MediaMetadata unavailable */ }
+    } catch {
+      /* MediaMetadata unavailable */
+    }
   };
 
   return {
-    setDocumentTitle(t) { docTitle = t || title; },
+    setDocumentTitle(t) {
+      docTitle = t || title;
+    },
     update,
-    setPlaybackState(state) { try { ms.playbackState = state; } catch { /* noop */ } },
+    setPlaybackState(state) {
+      try {
+        ms.playbackState = state;
+      } catch {
+        /* noop */
+      }
+    },
     setPosition(duration, position, rate) {
       if (!ms.setPositionState) return;
       try {
@@ -161,7 +186,9 @@ export function setupMediaSession(player, { title = 'Read Aloud' } = {}) {
           position: Math.min(Math.max(0, position || 0), Math.max(0, duration || 0)),
           playbackRate: rate || 1,
         });
-      } catch { /* Safari throws on odd values */ }
+      } catch {
+        /* Safari throws on odd values */
+      }
     },
   };
 }
@@ -183,8 +210,12 @@ export function createWakeLock() {
     if (document.visibilityState !== 'visible') return;
     try {
       sentinel = await navigator.wakeLock.request('screen');
-      sentinel.addEventListener('release', () => { sentinel = null; });
-    } catch { /* denied, low battery, or unsupported */ }
+      sentinel.addEventListener('release', () => {
+        sentinel = null;
+      });
+    } catch {
+      /* denied, low battery, or unsupported */
+    }
   };
 
   document.addEventListener('visibilitychange', () => {
@@ -192,13 +223,24 @@ export function createWakeLock() {
   });
 
   return {
-    async enable() { wanted = true; await acquire(); },
+    async enable() {
+      wanted = true;
+      await acquire();
+    },
     async disable() {
       wanted = false;
-      if (sentinel) { try { await sentinel.release(); } catch { /* noop */ } }
+      if (sentinel) {
+        try {
+          await sentinel.release();
+        } catch {
+          /* noop */
+        }
+      }
       sentinel = null;
     },
-    get supported() { return 'wakeLock' in navigator; },
+    get supported() {
+      return 'wakeLock' in navigator;
+    },
   };
 }
 
@@ -230,7 +272,9 @@ export function receiveIncoming({ onText, onFile, onPaste }) {
       try {
         const file = await launch.files[0].getFile();
         if (onFile) onFile(file);
-      } catch { /* permission withdrawn */ }
+      } catch {
+        /* permission withdrawn */
+      }
     });
   }
 }
