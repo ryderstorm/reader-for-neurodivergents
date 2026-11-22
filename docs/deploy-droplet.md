@@ -205,7 +205,7 @@ docker compose -f deploy/compose.prod.yaml up -d --build
 curl -fsS http://127.0.0.1:8765/api/health
 ```
 
-Confirm `"ok": true`, `"loaded": true`, and `"threads"` matches your droplet vCPU count. If the target release includes `GET /api/metrics` (added after `v1.1.3`), also check:
+Wait briefly for startup warm-up and re-check `/api/health` until `"ok": true`, `"loaded": true`, and `"threads"` matches the container's effective CPU limit (`2` with `cpus: 2.0` in `deploy/compose.prod.yaml`). If `"loaded"` remains `false` after warm-up, inspect container logs (`docker logs read-aloud`) for `"warm-up failed"` (note that the first synthesis request also triggers lazy model loading). If the target release includes `GET /api/metrics` (added after `v1.1.3`), also check:
 
 ```bash
 curl -fsS http://127.0.0.1:8765/api/metrics | grep read_aloud_speak
