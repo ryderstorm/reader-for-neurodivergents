@@ -6,16 +6,32 @@ Operational procedures for diagnosing and recovering a running Reader for Neurod
 
 1. Check service health and CPU thread pinning:
 
+Docker / droplet (HTTP behind nginx, per `deploy/compose.prod.yaml`):
+
 ```bash
 curl -fsS http://127.0.0.1:8765/api/health
 ```
 
-Confirm `"ok": true`, `"loaded": true`, and `"threads"` equals the container's `cpus:` quota (for example `2` on a 2-vCPU droplet).
+Host deployment with TLS enabled (`scripts-tools/run.sh` with `T2S_SSL_CERT`/`T2S_SSL_KEY` or `certs/cert.pem` + `certs/key.pem`; keep certificate verification enabled using the effective CA/cert):
+
+```bash
+curl -fsS --cacert "${T2S_SSL_CERT:-certs/cert.pem}" https://127.0.0.1:8765/api/health
+```
+
+Confirm `"ok": true`, `"loaded": true`, and `"threads"` equals the container's `cpus:` quota (for example `2` on a 2-vCPU droplet, or your configured host thread limit).
 
 2. Inspect Prometheus metrics for synthesis errors or latency spikes:
 
+Docker / droplet (HTTP):
+
 ```bash
 curl -fsS http://127.0.0.1:8765/api/metrics | grep read_aloud_speak
+```
+
+Host deployment with TLS enabled (HTTPS):
+
+```bash
+curl -fsS --cacert "${T2S_SSL_CERT:-certs/cert.pem}" https://127.0.0.1:8765/api/metrics | grep read_aloud_speak
 ```
 
 3. Inspect structured JSON container logs:

@@ -57,7 +57,7 @@ Run a single suite or a single test case:
 
 ```bash
 make test-py
-.venv/bin/pytest tests/python/test_app_api.py -k health
+.venv/bin/pytest --no-cov tests/python/test_app_api.py -k health
 
 make test-js
 node --test --test-name-pattern "splitSentences" tests/js/document_and_player.test.mjs
