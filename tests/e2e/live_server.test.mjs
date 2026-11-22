@@ -22,10 +22,19 @@ const PYTHON = existsSync(join(ROOT, '.venv/bin/python'))
   ? join(ROOT, '.venv/bin/python')
   : 'python3';
 
-async function waitForHealth(timeoutMs = 15000) {
+async function waitForHealth(server, getSpawnError, timeoutMs = 15000) {
   const deadline = Date.now() + timeoutMs;
   let lastError = 'no response';
   while (Date.now() < deadline) {
+    const spawnError = getSpawnError();
+    if (spawnError) {
+      throw spawnError;
+    }
+    if (server.exitCode !== null || server.signalCode !== null) {
+      throw new Error(
+        `server exited before becoming healthy (code=${server.exitCode}, signal=${server.signalCode})`,
+      );
+    }
     try {
       const res = await fetch(`${BASE}/api/health`);
       if (res.ok) return await res.json();
@@ -38,15 +47,28 @@ async function waitForHealth(timeoutMs = 15000) {
   throw new Error(`server failed to become healthy within ${timeoutMs}ms: ${lastError}`);
 }
 
+const serverEnv = { ...process.env, HF_HUB_OFFLINE: '1' };
+delete serverEnv.T2S_SSL_CERT;
+delete serverEnv.T2S_SSL_KEY;
+
 const server = spawn(
   PYTHON,
   ['server/app.py', '--host', '127.0.0.1', '--port', PORT, '--no-warm'],
   {
     cwd: ROOT,
-    env: { ...process.env, HF_HUB_OFFLINE: '1' },
+    env: serverEnv,
     stdio: ['ignore', 'pipe', 'pipe'],
   },
 );
+
+let spawnError = null;
+const serverExit = new Promise((resolve) => {
+  server.once('exit', resolve);
+  server.once('error', (err) => {
+    spawnError = err;
+    resolve();
+  });
+});
 
 let stderrLog = '';
 server.stderr.on('data', (chunk) => {
@@ -54,7 +76,7 @@ server.stderr.on('data', (chunk) => {
 });
 
 try {
-  const health = await waitForHealth();
+  const health = await waitForHealth(server, () => spawnError);
   assert.equal(health.ok, true);
   assert.equal(health.model, 'hexgrad/Kokoro-82M');
   assert.ok(health.threads >= 1);
@@ -106,6 +128,8 @@ try {
     `E2E PASS: ${BASE} healthy, metrics exposed, ${doc.blocks.length} sample blocks built.`,
   );
 } finally {
-  server.kill('SIGTERM');
-  await new Promise((resolve) => server.once('exit', resolve));
+  if (!spawnError && server.exitCode === null && server.signalCode === null) {
+    server.kill('SIGTERM');
+  }
+  await serverExit;
 }

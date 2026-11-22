@@ -19,7 +19,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Set up uv
         uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
@@ -30,7 +32,7 @@ jobs:
         run: uv sync --python 3.12 --frozen
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "22"
           cache: npm
@@ -63,7 +65,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Set up uv
         uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
@@ -74,13 +78,16 @@ jobs:
         run: uv sync --python 3.12 --frozen
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "22"
           cache: npm
 
       - name: Install Node dev dependencies
         run: npm ci --no-audit --no-fund
+
+      - name: Verify server/requirements.txt pins match uv.lock
+        run: .venv/bin/python scripts-tools/check_deps_sync.py
 
       - name: Run Python unit tests with coverage floor and timings
         run: |
@@ -98,7 +105,7 @@ jobs:
 
       - name: Upload test timing report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: pytest-junit
           path: test-results/pytest.xml
@@ -109,11 +116,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Dependency Review (PRs)
         if: github.event_name == 'pull_request'
-        uses: actions/dependency-review-action@v4
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
         with:
           fail-on-severity: high
           fail-on-scopes: runtime, development, unknown
@@ -126,11 +135,14 @@ jobs:
       - name: Install Python dev dependencies
         run: uv sync --python 3.12 --frozen
 
-      - name: Run pip-audit
-        run: .venv/bin/pip-audit
+      - name: Run pip-audit (dev environment + production TTS graph)
+        run: |
+          .venv/bin/pip-audit
+          uv export --frozen --extra tts --no-dev --no-emit-project -o /tmp/requirements-tts.txt
+          .venv/bin/pip-audit -r /tmp/requirements-tts.txt --no-deps --disable-pip
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "22"
           cache: npm

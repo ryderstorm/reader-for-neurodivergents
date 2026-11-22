@@ -6,7 +6,7 @@ Exact commands for setting up, running, testing, linting, and type-checking this
 
 - Python 3.12 (Kokoro 0.9.4 supports 3.10–3.12; `Dockerfile` targets 3.12)
 - `uv` (or `python3.12 -m venv` + `pip`)
-- Node.js 22+ and `npm`
+- Node.js 22.13+ (within the 22.x line, or 24+) and `npm`
 - `shellcheck` (for shell script linting)
 
 ## Setup
@@ -57,10 +57,10 @@ Run a single suite or a single test case:
 
 ```bash
 make test-py
-.venv/bin/pytest tests/python/test_app_api.py -k health
+.venv/bin/pytest --no-cov tests/python/test_app_api.py -k health
 
 make test-js
-node --test tests/js/document_and_player.test.mjs --test-name-pattern "splitSentences"
+node --test --test-name-pattern "splitSentences" tests/js/document_and_player.test.mjs
 ```
 
 Run the smoke test (starts the server, probes `/api/health`, `/api/metrics`, and `/`, then shuts down):
@@ -75,10 +75,11 @@ Run the headless live-server end-to-end test:
 make test-e2e
 ```
 
-Run hardware TTS alignment verification (requires full `make setup` with Kokoro installed):
+Run hardware TTS alignment verification (requires full `make setup` with Kokoro installed; start `make run` in another terminal before running `test_frontend.mjs`):
 
 ```bash
 .venv/bin/python scripts-tools/check_timestamps.py
+# In another terminal, start the server first: make run
 node scripts-tools/test_frontend.mjs http://127.0.0.1:8765
 ```
 

@@ -119,6 +119,20 @@ def test_static_and_pwa_routes_serve_expected_headers() -> None:
     assert "application/manifest+json" in manifest.headers["content-type"]
 
 
+def test_security_headers_are_set_on_app_responses() -> None:
+    resp = client.get("/")
+    assert resp.status_code == 200
+    assert resp.headers["x-content-type-options"] == "nosniff"
+    assert resp.headers["x-frame-options"] == "DENY"
+    assert resp.headers["referrer-policy"] == "no-referrer"
+    assert "camera=()" in resp.headers["permissions-policy"]
+    assert resp.headers["cross-origin-embedder-policy"] == "require-corp"
+    assert resp.headers["cross-origin-opener-policy"] == "same-origin"
+    assert resp.headers["cross-origin-resource-policy"] == "same-origin"
+    assert "default-src 'self'" in resp.headers["content-security-policy"]
+    assert "frame-ancestors 'none'" in resp.headers["content-security-policy"]
+
+
 def test_configure_logging_emits_valid_json(capsys: pytest.CaptureFixture[str]) -> None:
     server_app.configure_logging()
     logging.getLogger("t2s.test").info("structured check")

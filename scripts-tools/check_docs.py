@@ -23,7 +23,12 @@ def check_file(doc: Path) -> list[str]:
         if in_fence:
             continue
         for raw_target in LINK_RE.findall(line):
-            target = raw_target.strip().split("#", 1)[0]
+            cleaned = raw_target.strip()
+            if cleaned.startswith("<") and ">" in cleaned:
+                dest = cleaned[1 : cleaned.index(">")].strip()
+            else:
+                dest = cleaned.split(None, 1)[0] if cleaned else ""
+            target = dest.split("#", 1)[0]
             if not target or target.startswith(SKIP_PREFIXES):
                 continue
             resolved = (doc.parent / target).resolve()

@@ -15,11 +15,22 @@ if ! command -v iptables >/dev/null 2>&1; then
   exit 1
 fi
 
+mapfile -t DNS_SERVERS < <(
+  awk '/^[[:space:]]*nameserver[[:space:]]+/ { print $2 }' /etc/resolv.conf \
+    | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' || true
+)
+if [ "${#DNS_SERVERS[@]}" -eq 0 ]; then
+  echo "No IPv4 DNS resolvers found in /etc/resolv.conf; aborting firewall setup" >&2
+  exit 1
+fi
+
 iptables -F OUTPUT
 iptables -A OUTPUT -o lo -j ACCEPT
 iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -p udp --dport 53 -j ACCEPT
-iptables -A OUTPUT -p tcp --dport 53 -j ACCEPT
+for ns in "${DNS_SERVERS[@]}"; do
+  iptables -A OUTPUT -d "$ns" -p udp --dport 53 -j ACCEPT
+  iptables -A OUTPUT -d "$ns" -p tcp --dport 53 -j ACCEPT
+done
 
 for domain in "${ALLOWED_DOMAINS[@]}"; do
   while read -r ip; do
