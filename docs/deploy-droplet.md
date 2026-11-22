@@ -205,7 +205,7 @@ docker compose -f deploy/compose.prod.yaml up -d --build
 curl -fsS http://127.0.0.1:8765/api/health
 ```
 
-Confirm `"ok": true`, `"loaded": true`, and `"threads"` matches your droplet vCPU count. For releases that expose Prometheus metrics (`v1.1.3+`), also check:
+Confirm `"ok": true`, `"loaded": true`, and `"threads"` matches your droplet vCPU count. If the target release includes `GET /api/metrics` (added after `v1.1.3`), also check:
 
 ```bash
 curl -fsS http://127.0.0.1:8765/api/metrics | grep read_aloud_speak

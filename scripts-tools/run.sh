@@ -11,11 +11,14 @@ if [ ! -x .venv/bin/python ]; then
   echo "!! No virtualenv found. Run ./scripts-tools/setup.sh first."; exit 1
 fi
 
-# Serve over https when certificates exist, so phones can install the reader
-# as an app. Create them with ./scripts-tools/make-cert.sh
+# Serve over https when TLS paths are configured or default certificates exist,
+# so phones can install the reader as an app. Create defaults with ./scripts-tools/make-cert.sh
 TLS_ARGS=()
 SCHEME=http
-if [ -f certs/server.crt ] && [ -f certs/server.key ]; then
+if [ -n "${T2S_SSL_CERT:-}" ] && [ -n "${T2S_SSL_KEY:-}" ]; then
+  TLS_ARGS=(--ssl-certfile "$T2S_SSL_CERT" --ssl-keyfile "$T2S_SSL_KEY")
+  SCHEME=https
+elif [ -f certs/server.crt ] && [ -f certs/server.key ]; then
   TLS_ARGS=(--ssl-certfile certs/server.crt --ssl-keyfile certs/server.key)
   SCHEME=https
 fi
