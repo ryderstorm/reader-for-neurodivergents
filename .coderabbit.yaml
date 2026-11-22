@@ -19,6 +19,7 @@ reviews:
     layout tweaks that do not alter playback sync or sanitization.
   auto_approvals:
     enabled: true
+    min_blocking_severity: "major"
     approve_on_skipped_review: false
     allow_author_approval: false
     max_merge_risk: "low"
@@ -33,6 +34,7 @@ reviews:
         enabled: false
   path_filters:
     - "!docs/ai-native-audit.html"
+    - "!docs/ai-native-audit.json"
     - "!web/vendor/**"
     - "!web/fonts/**"
     - "!web/icons/**"
@@ -52,3 +54,9 @@ reviews:
       instructions: >-
         Review for security (least-privilege permissions, third-party action SHA pinning,
         no pull_request_target checkout of PR head) and fast CI feedback.
+    - path: "docs/**"
+      instructions: >-
+        Flag commands, flags, or paths that fail in the documented default setup or
+        contradict actual scripts and code. Do not request defensive multi-branch shell
+        fallback logic in runbook snippets for partially configured or broken environment
+        edge cases.

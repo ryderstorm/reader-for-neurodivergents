@@ -31,6 +31,11 @@ Operational guidance for agents working on **Reader for Neurodivergents**.
 - **Commits & branches**: Use Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`, `ci:`), enforced by `commitlint`. Name branches `feat/<slug>`, `fix/<slug>`, or `chore/<slug>`.
 - **Planning**: Specs that define what to build live in GitHub issues. Never commit spec files to source control.
 - **Human review**: Human approval is required for architecture, sync contracts, and security changes. Automated AI code review (e.g. CodeRabbit) augments human review and never replaces it.
+- **PR & CodeRabbit workflow**:
+  - Open WIP PRs as draft (`auto_review.drafts: false`) until local checks pass; batch fixes locally before pushing (Essentials plan allows 5 reviews/hour and pauses after 5 reviewed commits).
+  - Read the actual scripts, code, or git tags (`scripts-tools/run.sh`, `scripts-tools/make-cert.sh`, `git tag`) before editing docs or runbooks so fixes do not introduce regressions.
+  - Cap refinement on any single documentation hunk at 2 review rounds; after that, reply with rationale and resolve instead of chasing defensive shell edge cases.
+  - Leave verified-fixed CodeRabbit threads open so CodeRabbit auto-verifies and resolves them on the next review; manually resolve only won't-fix threads with a 1-line rationale.
 - **Keep docs current**: Update `README.md`, `docs/architecture.md`, and `docs/DEVELOPMENT.md` in the same PR whenever commands, API routes, environment variables, or behavior change.
 
 ## Guardrails & No-Go Zones
