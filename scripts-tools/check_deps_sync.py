@@ -23,13 +23,20 @@ TARGET_ENV = {
 }
 
 
+def _matches_target_env(pkg: dict[str, object]) -> bool:
+    markers = pkg.get("resolution-markers")
+    if not isinstance(markers, list) or not markers:
+        return True
+    return any(isinstance(m, str) and Marker(m).evaluate(TARGET_ENV) for m in markers)
+
+
 def load_lock_versions(lock_path: Path) -> dict[str, set[str]]:
     data = tomllib.loads(lock_path.read_text(encoding="utf-8"))
     packages = data.get("package", [])
     versions: dict[str, set[str]] = {}
     if isinstance(packages, list):
         for pkg in packages:
-            if not isinstance(pkg, dict):
+            if not isinstance(pkg, dict) or not _matches_target_env(pkg):
                 continue
             name = pkg.get("name")
             version = pkg.get("version")

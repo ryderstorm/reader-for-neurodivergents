@@ -34,8 +34,8 @@ Operational guidance for agents working on **Reader for Neurodivergents**.
 - **PR & CodeRabbit workflow**:
   - Open WIP PRs as draft (`auto_review.drafts: false`) until local checks pass; batch fixes locally before pushing (Essentials plan allows 5 reviews/hour and pauses after 5 reviewed commits).
   - Read the actual scripts, code, or git tags (`scripts-tools/run.sh`, `scripts-tools/make-cert.sh`, `git tag`) before editing docs or runbooks so fixes do not introduce regressions.
-  - Cap refinement on any single documentation hunk at 2 review rounds; after that, reply with rationale and resolve instead of chasing defensive shell edge cases.
-  - Leave verified-fixed CodeRabbit threads open so CodeRabbit auto-verifies and resolves them on the next review; manually resolve only won't-fix threads with a 1-line rationale.
+  - Cap speculative polish or defensive edge-case refinement on any single documentation hunk at 2 review rounds (still fix confirmed broken commands or defects); after 2 rounds of non-defect churn, reply with rationale and resolve.
+  - Leave verified-fixed CodeRabbit threads open so CodeRabbit auto-verifies and resolves them on the next review; if automatic reviews are paused, trigger `@coderabbitai review` or `@coderabbitai resume` (or manually resolve once verified). Manually resolve won't-fix threads with a 1-line rationale.
 - **Keep docs current**: Update `README.md`, `docs/architecture.md`, and `docs/DEVELOPMENT.md` in the same PR whenever commands, API routes, environment variables, or behavior change.
 
 ## Guardrails & No-Go Zones
