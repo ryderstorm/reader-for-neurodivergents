@@ -1,11 +1,38 @@
 language: "en-US"
 reviews:
-  profile: "assertive"
-  request_changes_workflow: false
+  profile: "chill"
   high_level_summary: true
   auto_review:
     enabled: true
     drafts: false
+  merge_risk_instructions: >-
+    High risk: any change that weakens offline/privacy isolation (HF_HUB_OFFLINE=1
+    or outbound network/telemetry calls), alters word-splitter parity between
+    server/tts.py:split_words and web/js/document.js:WORD_RE, moves
+    limit_torch_threads() after torch import, reintroduces libsndfile/LGPL audio
+    dependencies, weakens HTTP security headers/CSP/TLS/CORS, or changes CI,
+    release, Dockerfile, or deploy configs.
+    Low risk: documentation-only updates, test additions, and isolated CSS or UI
+    layout tweaks that do not alter playback sync or sanitization.
+  auto_approvals:
+    enabled: true
+    approve_on_skipped_review: false
+    allow_author_approval: false
+    max_merge_risk: "low"
+    overrides:
+      - paths:
+          - ".github/workflows/**"
+          - ".github/CODEOWNERS"
+          - ".coderabbit.yaml"
+          - ".devcontainer/**"
+          - "Dockerfile"
+          - "deploy/**"
+        enabled: false
+  path_filters:
+    - "!docs/ai-native-audit.html"
+    - "!web/vendor/**"
+    - "!web/fonts/**"
+    - "!web/icons/**"
   path_instructions:
     - path: "server/**"
       instructions: >-
