@@ -205,7 +205,18 @@ docker compose -f deploy/compose.prod.yaml up -d --build
 curl -fsS http://127.0.0.1:8765/api/health
 ```
 
-Wait briefly for startup warm-up and re-check `/api/health` until `"ok": true`, `"loaded": true`, and `"threads"` matches the container's effective CPU limit (`2` with `cpus: 2.0` in `deploy/compose.prod.yaml`). Then inspect container logs (`docker logs read-aloud`) even when `"loaded"` is `true` to confirm `model warm on ... - ready` appears and no `"warm-up failed"` entry is logged (if warm-up failed, the first synthesis request retries loading). If the target release includes `GET /api/metrics` (added after `v1.1.3`), also check:
+Wait briefly for startup warm-up and confirm `"ok": true` and `"threads"` matches the container's effective CPU limit (`2` with `cpus: 2.0` in `deploy/compose.prod.yaml`). Then verify synthesis readiness by **either**:
+
+- Confirming `/api/health` reports `"loaded": true` and `docker logs read-aloud` shows `model warm on ... - ready` with no `"warm-up failed"` entry, **or**
+- Running a synthesis smoke request (which also recovers and verifies service after a transient warm-up failure):
+
+```bash
+curl -fsS -X POST http://127.0.0.1:8765/api/speak \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"Ready."}' | grep -q '"audio"'
+```
+
+If the target release includes `GET /api/metrics` (added after `v1.1.3`), also check:
 
 ```bash
 curl -fsS http://127.0.0.1:8765/api/metrics | grep read_aloud_speak
